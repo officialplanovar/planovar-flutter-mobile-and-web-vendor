@@ -1,73 +1,107 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/mock/mock_data.dart';
 import '../../../core/router/app_routes.dart';
+import '../../../shared/models/vendor_model.dart';
 import '../../../shared/widgets/network_image_widget.dart';
+import '../../auth/bloc/auth_bloc.dart';
+import '../../auth/bloc/auth_state.dart';
+import '../../vendor/data/vendor_repository.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  VendorModel? _vendor;
+
+  @override
+  void initState() {
+    super.initState();
+    VendorRepository().getMe().then((v) {
+      if (mounted && v != null) setState(() => _vendor = v);
+    }).catchError((_) {});
+  }
+
+  String _locationLabel(VendorModel? v) {
+    final loc = (v?.location as Map?) ?? const {};
+    final parts = [loc['city'], loc['country']]
+        .where((e) => e != null && '$e'.trim().isNotEmpty)
+        .map((e) => '$e'.trim())
+        .toList();
+    return parts.isEmpty ? '' : parts.join(', ');
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final vendor = MockData.currentVendor;
-    final user = MockData.currentUser;
+    final vendor = _vendor;
+    final authState = context.watch<AuthBloc>().state;
+    final user = authState is AuthAuthenticated ? authState.user : null;
+    final topPadding = MediaQuery.of(context).padding.top;
+
+    final businessName = vendor?.businessName ?? user?.name ?? 'Your business';
+    final tag = (vendor?.tags.isNotEmpty ?? false) ? vendor!.tags.first : null;
+    final subtitle = [_locationLabel(vendor), tag]
+        .where((e) => e != null && e.isNotEmpty)
+        .join(' · ');
+    final tier = (vendor?.subscriptionTier ?? '').toUpperCase();
+    final tierLabel = tier.isEmpty
+        ? null
+        : '${tier[0]}${tier.substring(1).toLowerCase()} Plan';
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        title: Text(
-          'Profile',
-          style: GoogleFonts.urbanist(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
-          ),
-        ),
-      ),
+      backgroundColor: Colors.white,
       body: ListView(
-        padding: const EdgeInsets.only(bottom: 40),
+        padding: const EdgeInsets.only(bottom: 100),
         children: [
-          // Profile header card
+          // ── Gradient header ──────────────────────────────────────────────────
           Container(
-            margin: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.border, width: 1),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF5756F5), Color(0xFF3332D4)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
             ),
-            child: Row(
+            padding: EdgeInsets.only(
+              top: topPadding + 16,
+              left: 20,
+              right: 20,
+              bottom: 20,
+            ),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Stack(
-                  clipBehavior: Clip.none,
+                // Avatar + business name row
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     CircleAvatar(
-                      radius: 32,
+                      radius: 28,
                       backgroundColor: AppColors.primaryLight,
                       child: ClipOval(
                         child: AppNetworkImage(
-                          url: user.image,
-                          width: 64,
-                          height: 64,
+                          url: vendor?.logoUrl ?? user?.image,
+                          width: 56,
+                          height: 56,
                           fit: BoxFit.cover,
                           errorWidget: Container(
-                            width: 64,
-                            height: 64,
+                            width: 56,
+                            height: 56,
                             color: AppColors.primaryLight,
                             child: Center(
                               child: Text(
-                                vendor.businessName.isNotEmpty
-                                    ? vendor.businessName[0].toUpperCase()
+                                businessName.isNotEmpty
+                                    ? businessName[0].toUpperCase()
                                     : 'V',
                                 style: GoogleFonts.urbanist(
-                                  fontSize: 24,
+                                  fontSize: 20,
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.primary,
                                 ),
@@ -77,186 +111,168 @@ class ProfileScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: GestureDetector(
-                        onTap: () => context.push(AppRoutes.editProfile),
-                        child: Container(
-                          width: 22,
-                          height: 22,
-                          decoration: BoxDecoration(
-                            color: AppColors.primary,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 2),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            businessName,
+                            style: GoogleFonts.urbanist(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
-                          child: const Icon(
-                            Icons.edit_rounded,
-                            size: 10,
-                            color: Colors.white,
-                          ),
-                        ),
+                          if (subtitle.isNotEmpty) ...[
+                            const SizedBox(height: 2),
+                            Text(
+                              subtitle,
+                              style: GoogleFonts.urbanist(
+                                fontSize: 13,
+                                color: Colors.white70,
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        vendor.businessName,
-                        style: GoogleFonts.urbanist(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
+
+                const SizedBox(height: 12),
+
+                // Pill badges row
+                Row(
+                  children: [
+                    if (tierLabel != null) ...[
+                      _PillBadge(
+                        child: Text(
+                          tierLabel,
+                          style: GoogleFonts.urbanist(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        user.email,
-                        style: GoogleFonts.urbanist(
-                          fontSize: 13,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.star_rounded,
-                            color: AppColors.starColor,
-                            size: 16,
-                          ),
-                          const SizedBox(width: 2),
-                          Text(
-                            '${vendor.ratingAvg} · ${vendor.reviewCount} reviews',
-                            style: GoogleFonts.urbanist(
-                              fontSize: 13,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          if (vendor.isFeatured)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: AppColors.primaryLight,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                'Featured',
-                                style: GoogleFonts.urbanist(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.primary,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
+                      const SizedBox(width: 8),
                     ],
-                  ),
+                    if ((vendor?.reviewCount ?? 0) > 0) ...[
+                      _PillBadge(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.star_rounded, color: Colors.amber, size: 12),
+                            Text(
+                              ' ${vendor!.ratingAvg.toStringAsFixed(1)}',
+                              style: GoogleFonts.urbanist(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                    if (vendor?.isVerified ?? false)
+                      _PillBadge(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.verified_rounded, color: Colors.white, size: 12),
+                            Text(
+                              ' Verified',
+                              style: GoogleFonts.urbanist(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
                 ),
               ],
             ),
           ),
 
-          const SizedBox(height: 24),
-
-          // Business section
-          _SectionLabel(label: 'Business'),
+          // ── General section ──────────────────────────────────────────────────
+          _SectionLabel(label: 'General'),
           _MenuSection(
             items: [
               _MenuItem(
-                icon: Icons.store_rounded,
-                label: 'Edit Business Profile',
+                icon: Icons.person_outline_rounded,
+                label: 'Update your Profile',
                 onTap: () => context.push(AppRoutes.editProfile),
               ),
               _MenuItem(
-                icon: Icons.workspace_premium_rounded,
-                label: 'Subscription Plan',
-                trailing: _PlanBadge(plan: vendor.subscriptionTier),
+                icon: Icons.workspace_premium_outlined,
+                label: 'Subscription & Plan',
                 onTap: () => context.push(AppRoutes.subscriptionPlan),
               ),
               _MenuItem(
-                icon: Icons.account_balance_rounded,
-                label: 'Bank Details',
+                icon: Icons.shield_outlined,
+                label: 'Security',
+                onTap: () => context.push(AppRoutes.security),
+              ),
+              _MenuItem(
+                icon: Icons.star_border_rounded,
+                label: 'Reviews',
+                onTap: () => context.push(AppRoutes.reviews),
+              ),
+              _MenuItem(
+                icon: Icons.account_balance_outlined,
+                label: 'Linked Bank accounts',
                 onTap: () => context.push(AppRoutes.bankDetails),
               ),
-            ],
-          ),
-
-          const SizedBox(height: 16),
-
-          // Analytics section
-          _SectionLabel(label: 'Analytics'),
-          _MenuSection(
-            items: [
               _MenuItem(
-                icon: Icons.bar_chart_rounded,
-                label: 'Analytics',
-                onTap: () => context.push(AppRoutes.analytics),
-              ),
-              _MenuItem(
-                icon: Icons.account_balance_wallet_rounded,
-                label: 'Payouts',
-                onTap: () => context.push(AppRoutes.payouts),
+                icon: Icons.photo_library_outlined,
+                label: 'Gallery',
+                onTap: () => context.push(AppRoutes.gallery),
               ),
             ],
           ),
 
-          const SizedBox(height: 16),
-
-          // Preferences section
+          // ── Preferences section ──────────────────────────────────────────────
           _SectionLabel(label: 'Preferences'),
           _MenuSection(
             items: [
               _MenuItem(
-                icon: Icons.notifications_rounded,
-                label: 'Notifications',
-                onTap: () => context.push(AppRoutes.notificationSettings),
-              ),
-              _MenuItem(
-                icon: Icons.palette_rounded,
+                icon: Icons.contrast_rounded,
                 label: 'Theme',
                 onTap: () => context.push(AppRoutes.themeSettings),
               ),
               _MenuItem(
-                icon: Icons.lock_rounded,
-                label: 'Security',
-                onTap: () => context.push(AppRoutes.security),
+                icon: Icons.notifications_outlined,
+                label: 'Notifications',
+                onTap: () => context.push(AppRoutes.notificationSettings),
               ),
-            ],
-          ),
-
-          const SizedBox(height: 16),
-
-          // Support section
-          _SectionLabel(label: 'Support'),
-          _MenuSection(
-            items: [
               _MenuItem(
-                icon: Icons.help_rounded,
-                label: 'Help & Support',
+                icon: Icons.help_outline_rounded,
+                label: 'Help and Support',
                 onTap: () => context.push(AppRoutes.help),
               ),
               _MenuItem(
-                icon: Icons.quiz_rounded,
-                label: 'FAQs',
-                onTap: () => context.push(AppRoutes.faq),
+                icon: Icons.article_outlined,
+                label: 'Terms & Conditions',
+                onTap: () => context.push(AppRoutes.termsAndConditions),
+              ),
+              _MenuItem(
+                icon: Icons.logout_rounded,
+                label: 'Leave Planovar',
+                onTap: () => context.push(AppRoutes.deleteAccount),
               ),
             ],
           ),
 
-          const SizedBox(height: 24),
-
-          // Logout button
+          // ── Sign out button ──────────────────────────────────────────────────
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: _LogoutButton(),
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+            child: _SignOutButton(),
           ),
         ],
       ),
@@ -264,6 +280,27 @@ class ProfileScreen extends StatelessWidget {
   }
 }
 
+// ── Pill badge ─────────────────────────────────────────────────────────────────
+class _PillBadge extends StatelessWidget {
+  final Widget child;
+
+  const _PillBadge({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white, width: 1),
+      ),
+      child: child,
+    );
+  }
+}
+
+// ── Section label ──────────────────────────────────────────────────────────────
 class _SectionLabel extends StatelessWidget {
   final String label;
 
@@ -272,20 +309,19 @@ class _SectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+      padding: const EdgeInsets.only(left: 20, top: 24, bottom: 8),
       child: Text(
         label,
         style: GoogleFonts.urbanist(
-          fontSize: 13,
-          fontWeight: FontWeight.w700,
-          color: AppColors.textSecondary,
-          letterSpacing: 0.5,
+          fontSize: 12,
+          color: Colors.grey,
         ),
       ),
     );
   }
 }
 
+// ── Menu section card ──────────────────────────────────────────────────────────
 class _MenuSection extends StatelessWidget {
   final List<_MenuItem> items;
 
@@ -294,21 +330,36 @@ class _MenuSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border, width: 1),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+          BoxShadow(
+            color: Color(0x06000000),
+            blurRadius: 4,
+            offset: Offset(0, 1),
+          ),
+        ],
       ),
       child: Column(
         children: items.asMap().entries.map((entry) {
-          final i = entry.key;
+          final index = entry.key;
           final item = entry.value;
           return Column(
             children: [
               _MenuTile(item: item),
-              if (i < items.length - 1)
-                const Divider(height: 1, indent: 56, color: AppColors.divider),
+              if (index < items.length - 1)
+                const Divider(
+                  height: 1,
+                  indent: 56,
+                  color: AppColors.divider,
+                ),
             ],
           );
         }).toList(),
@@ -317,20 +368,20 @@ class _MenuSection extends StatelessWidget {
   }
 }
 
+// ── Menu item data ─────────────────────────────────────────────────────────────
 class _MenuItem {
   final IconData icon;
   final String label;
-  final Widget? trailing;
   final VoidCallback onTap;
 
   const _MenuItem({
     required this.icon,
     required this.label,
-    this.trailing,
     required this.onTap,
   });
 }
 
+// ── Menu tile ──────────────────────────────────────────────────────────────────
 class _MenuTile extends StatelessWidget {
   final _MenuItem item;
 
@@ -342,7 +393,7 @@ class _MenuTile extends StatelessWidget {
       onTap: item.onTap,
       behavior: HitTestBehavior.opaque,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
             Container(
@@ -365,12 +416,8 @@ class _MenuTile extends StatelessWidget {
                 ),
               ),
             ),
-            if (item.trailing != null) ...[
-              item.trailing!,
-              const SizedBox(width: 8),
-            ],
             const Icon(
-              Icons.chevron_right_rounded,
+              Icons.chevron_right,
               color: AppColors.textHint,
               size: 20,
             ),
@@ -381,33 +428,8 @@ class _MenuTile extends StatelessWidget {
   }
 }
 
-class _PlanBadge extends StatelessWidget {
-  final String plan;
-
-  const _PlanBadge({required this.plan});
-
-  @override
-  Widget build(BuildContext context) {
-    final label = plan[0].toUpperCase() + plan.substring(1);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: AppColors.primaryLight,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        label,
-        style: GoogleFonts.urbanist(
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          color: AppColors.primary,
-        ),
-      ),
-    );
-  }
-}
-
-class _LogoutButton extends StatelessWidget {
+// ── Sign out button ────────────────────────────────────────────────────────────
+class _SignOutButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -417,29 +439,29 @@ class _LogoutButton extends StatelessWidget {
         if (context.mounted) context.go(AppRoutes.onboarding);
       },
       child: Container(
-        width: double.infinity,
         height: 52,
         decoration: BoxDecoration(
-          color: Colors.transparent,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.error, width: 1.5),
+          color: const Color(0xFFFFEBEE),
+          borderRadius: BorderRadius.circular(26),
         ),
-        child: Center(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.logout_rounded, color: AppColors.error, size: 18),
-              const SizedBox(width: 8),
-              Text(
-                'Log Out',
-                style: GoogleFonts.urbanist(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.error,
-                ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.logout_rounded,
+              color: Color(0xFFE53935),
+              size: 18,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              'Sign out',
+              style: GoogleFonts.urbanist(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFFE53935),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

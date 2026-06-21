@@ -1,12 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/router/app_routes.dart';
+import '../../../core/services/upload_service.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_input.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../shared/models/subscription_plan_model.dart';
+import '../../listings/data/listings_repository.dart';
+import '../../subscription/data/subscription_repository.dart';
+import '../bloc/setup_cubit.dart';
+import 'payment_checkout_screen.dart';
+import '../../auth/bloc/auth_bloc.dart';
+import '../../auth/bloc/auth_state.dart';
 
 // ─── Shared Setup Widgets ────────────────────────────────────────────────────
 
@@ -208,7 +219,10 @@ class _SetupBusinessTypeScreenState extends State<SetupBusinessTypeScreen> {
               AppButton.primary(
                 'Proceed',
                 onTap: _selected != null
-                    ? () => context.push(AppRoutes.setupProfile)
+                    ? () {
+                        context.read<SetupCubit>().setBusinessType(_selected!);
+                        context.push(AppRoutes.setupProfile);
+                      }
                     : null,
               ),
             ],
@@ -221,25 +235,6 @@ class _SetupBusinessTypeScreenState extends State<SetupBusinessTypeScreen> {
 
 // ─── Step 2: Business Profile ─────────────────────────────────────────────────
 
-const _categoryTags = [
-  'Cakes',
-  'Desserts',
-  'Photography',
-  'Catering',
-  'Decor',
-  'DJ',
-  'Venues',
-  'Bands',
-  'Drinks',
-  'Emcees',
-  'Beauty',
-  'Confectionery',
-  'Security',
-  'Transportation',
-  'Lighting',
-  'Planning',
-];
-
 class SetupProfileScreen extends StatefulWidget {
   const SetupProfileScreen({super.key});
 
@@ -250,6 +245,28 @@ class SetupProfileScreen extends StatefulWidget {
 class _SetupProfileScreenState extends State<SetupProfileScreen> {
   final _descCtrl = TextEditingController();
   final Set<String> _selectedTags = {};
+  final _uploads = UploadService();
+  final _picker = ImagePicker();
+
+  // Categories from the backend.
+  List<CategoryOption> _categories = const [];
+  bool _loadingCats = true;
+  String? _catsError;
+
+  // Business logo upload state.
+  String? _logoUrl;
+  bool _uploadingLogo = false;
+
+  // Proof-of-ownership upload state.
+  String? _proofUrl;
+  String? _proofName;
+  bool _uploadingProof = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCategories();
+  }
 
   @override
   void dispose() {
@@ -257,51 +274,85 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
     super.dispose();
   }
 
-  void _showComingSoon() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.border,
-                borderRadius: BorderRadius.circular(4),
-              ),
-            ),
-            const SizedBox(height: 24),
-            const Icon(Icons.image_outlined,
-                size: 48, color: AppColors.textHint),
-            const SizedBox(height: 12),
-            Text(
-              'Coming soon',
-              style: GoogleFonts.urbanist(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Photo upload will be available in the next update.',
-              style: GoogleFonts.urbanist(
-                  fontSize: 14, color: AppColors.textSecondary),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            AppButton.primary('Got it', onTap: () => Navigator.pop(ctx)),
-          ],
-        ),
-      ),
-    );
+  Future<void> _loadCategories() async {
+    setState(() {
+      _loadingCats = true;
+      _catsError = null;
+    });
+    try {
+      final cats = await ListingsRepository().categories();
+      if (!mounted) return;
+      setState(() {
+        _categories = cats;
+        _loadingCats = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _catsError = 'Could not load categories';
+        _loadingCats = false;
+      });
+    }
+  }
+
+  void _toast(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<void> _pickLogo() async {
+    try {
+      final picked = await _picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1024,
+        imageQuality: 85,
+      );
+      if (picked == null) return;
+      setState(() => _uploadingLogo = true);
+      final bytes = await picked.readAsBytes();
+      final url = await _uploads.uploadVendorLogo(bytes, picked.name);
+      if (!mounted) return;
+      setState(() {
+        _logoUrl = url;
+        _uploadingLogo = false;
+      });
+    } catch (e) {
+      if (mounted) setState(() => _uploadingLogo = false);
+      _toast(e.toString().replaceFirst('Exception: ', ''));
+    }
+  }
+
+  Future<void> _pickProof() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: const ['jpg', 'jpeg', 'png', 'pdf'],
+        withData: true, // needed on web; also gives us bytes on mobile
+      );
+      if (result == null || result.files.isEmpty) return;
+      final f = result.files.first;
+      final bytes = f.bytes;
+      if (bytes == null) {
+        _toast('Could not read the selected file');
+        return;
+      }
+      if (bytes.length > 5 * 1024 * 1024) {
+        _toast('File is larger than 5 MB');
+        return;
+      }
+      setState(() => _uploadingProof = true);
+      final url = await _uploads.uploadDocument(bytes, f.name);
+      if (!mounted) return;
+      setState(() {
+        _proofUrl = url;
+        _proofName = f.name;
+        _uploadingProof = false;
+      });
+    } catch (e) {
+      if (mounted) setState(() => _uploadingProof = false);
+      _toast(e.toString().replaceFirst('Exception: ', ''));
+    }
   }
 
   @override
@@ -329,10 +380,11 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                       child: Column(
                         children: [
                           GestureDetector(
-                            onTap: _showComingSoon,
+                            onTap: _uploadingLogo ? null : _pickLogo,
                             child: Container(
                               width: 100,
                               height: 100,
+                              clipBehavior: Clip.antiAlias,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: AppColors.primaryLight,
@@ -341,12 +393,31 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                                   width: 1.5,
                                   style: BorderStyle.solid,
                                 ),
+                                image: (_logoUrl != null && !_uploadingLogo)
+                                    ? DecorationImage(
+                                        image: NetworkImage(_logoUrl!),
+                                        fit: BoxFit.cover,
+                                      )
+                                    : null,
                               ),
-                              child: const Icon(
-                                Icons.camera_alt_outlined,
-                                color: AppColors.primary,
-                                size: 32,
-                              ),
+                              child: _uploadingLogo
+                                  ? const Center(
+                                      child: SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: AppColors.primary,
+                                        ),
+                                      ),
+                                    )
+                                  : (_logoUrl == null
+                                      ? const Icon(
+                                          Icons.camera_alt_outlined,
+                                          color: AppColors.primary,
+                                          size: 32,
+                                        )
+                                      : null),
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -400,44 +471,90 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                         ),
                         const SizedBox(height: 8),
                         GestureDetector(
-                          onTap: _showComingSoon,
+                          onTap: _uploadingProof ? null : _pickProof,
                           child: Container(
                             width: double.infinity,
                             height: 120,
                             decoration: BoxDecoration(
-                              color: AppColors.divider,
+                              color: _proofUrl != null
+                                  ? AppColors.primaryLight
+                                  : AppColors.divider,
                               borderRadius: BorderRadius.circular(14),
                               border: Border.all(
-                                color: AppColors.border,
+                                color: _proofUrl != null
+                                    ? AppColors.primary
+                                    : AppColors.border,
                                 width: 1.5,
                               ),
                             ),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.upload_file_outlined,
-                                  color: AppColors.textHint,
-                                  size: 32,
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Tap to upload',
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'JPG, PNG or PDF up to 5mb',
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 12,
-                                    color: AppColors.textHint,
-                                  ),
-                                ),
-                              ],
+                              children: _uploadingProof
+                                  ? const [
+                                      SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: AppColors.primary,
+                                        ),
+                                      ),
+                                    ]
+                                  : _proofUrl != null
+                                      ? [
+                                          const Icon(
+                                            Icons.check_circle_outline_rounded,
+                                            color: AppColors.primary,
+                                            size: 32,
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 16),
+                                            child: Text(
+                                              _proofName ?? 'Document uploaded',
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: GoogleFonts.urbanist(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                                color: AppColors.primary,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            'Tap to replace',
+                                            style: GoogleFonts.urbanist(
+                                              fontSize: 12,
+                                              color: AppColors.textSecondary,
+                                            ),
+                                          ),
+                                        ]
+                                      : [
+                                          const Icon(
+                                            Icons.upload_file_outlined,
+                                            color: AppColors.textHint,
+                                            size: 32,
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            'Tap to upload',
+                                            style: GoogleFonts.urbanist(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                              color: AppColors.textSecondary,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            'JPG, PNG or PDF up to 5mb',
+                                            style: GoogleFonts.urbanist(
+                                              fontSize: 12,
+                                              color: AppColors.textHint,
+                                            ),
+                                          ),
+                                        ],
                             ),
                           ),
                         ),
@@ -455,10 +572,50 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                       ),
                     ),
                     const SizedBox(height: 10),
+                    if (_loadingCats)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8),
+                        child: SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: AppColors.primary),
+                        ),
+                      )
+                    else if (_catsError != null)
+                      Row(
+                        children: [
+                          Text(
+                            _catsError!,
+                            style: GoogleFonts.urbanist(
+                                fontSize: 13, color: AppColors.textSecondary),
+                          ),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: _loadCategories,
+                            child: Text(
+                              'Retry',
+                              style: GoogleFonts.urbanist(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    else if (_categories.isEmpty)
+                      Text(
+                        'No categories available yet',
+                        style: GoogleFonts.urbanist(
+                            fontSize: 13, color: AppColors.textHint),
+                      )
+                    else
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      children: _categoryTags.map((tag) {
+                      children: _categories.map((cat) {
+                        final tag = cat.name;
                         final isSelected = _selectedTags.contains(tag);
                         return GestureDetector(
                           onTap: () {
@@ -503,7 +660,16 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
               padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
               child: AppButton.primary(
                 'Proceed',
-                onTap: () => context.push(AppRoutes.setupLocation),
+                onTap: () {
+                  final desc = _descCtrl.text.trim();
+                  context.read<SetupCubit>().setProfile(
+                        description: desc.isEmpty ? null : desc,
+                        tags: _selectedTags,
+                        logoUrl: _logoUrl,
+                        proofUrl: _proofUrl,
+                      );
+                  context.push(AppRoutes.setupLocation);
+                },
               ),
             ),
           ],
@@ -808,7 +974,14 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
               padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
               child: AppButton.primary(
                 'Proceed',
-                onTap: () => context.push(AppRoutes.setupPlan),
+                onTap: () {
+                  context.read<SetupCubit>().setLocation(
+                        country: _country,
+                        city: _city,
+                        vendorType: _vendorType,
+                      );
+                  context.push(AppRoutes.setupPlan);
+                },
               ),
             ),
           ],
@@ -943,100 +1116,374 @@ class _PlanCard extends StatelessWidget {
   }
 }
 
-class SetupPlanScreen extends StatelessWidget {
+class SetupPlanScreen extends StatefulWidget {
   const SetupPlanScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    void goToPayout() => context.push(AppRoutes.setupPayout);
+  State<SetupPlanScreen> createState() => _SetupPlanScreenState();
+}
 
+class _SetupPlanScreenState extends State<SetupPlanScreen> {
+  final _subscriptions = SubscriptionRepository();
+  late Future<List<SubscriptionPlanModel>> _plansFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _plansFuture = _subscriptions.listPlans();
+  }
+
+  // Plan selection is carried in SetupCubit; subscribe runs at submit (KYC step).
+  void _selectPlan(SubscriptionPlanModel plan) {
+    context.read<SetupCubit>().setPlan(plan.id);
+    context.push(AppRoutes.setupKyc);
+  }
+
+  void _skip() {
+    context.read<SetupCubit>().setPlan(null); // stays on Basic
+    context.push(AppRoutes.setupKyc);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: _buildSetupAppBar(context, step: 4, total: 6),
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const _SetupHeader(
-                      title: 'Choose your plan',
-                      subtitle: 'Upgrade anytime. Cancel anytime.',
-                    ),
-                    const SizedBox(height: 28),
-
-                    _PlanCard(
-                      name: 'Basic',
-                      price: 'Free/month',
-                      features: [
-                        'Up to 10 listings',
-                        'Standard search ranking',
-                        'In-app chat',
-                      ],
-                      ctaLabel: 'Select Basic',
-                      onSelect: goToPayout,
-                    ),
-                    const SizedBox(height: 16),
-
-                    _PlanCard(
-                      name: 'Featured',
-                      price: '₦15,000/month',
-                      features: [
-                        'Priority search ranking',
-                        '5 featured listing slots',
-                        'Analytics dashboard',
-                        'Increased listing limits',
-                      ],
-                      ctaLabel: 'Select Featured',
-                      isPopular: true,
-                      isPrimary: true,
-                      onSelect: goToPayout,
-                    ),
-                    const SizedBox(height: 16),
-
-                    _PlanCard(
-                      name: 'Premium',
-                      price: '₦35,000/month',
-                      features: [
-                        'Highest search ranking',
-                        'Unlimited listings',
-                        'VoIP calling with clients',
-                        'Advanced analytics + account support',
-                      ],
-                      ctaLabel: 'Select Premium',
-                      onSelect: goToPayout,
-                    ),
-                    const SizedBox(height: 20),
-
-                    Center(
-                      child: TextButton(
-                        onPressed: goToPayout,
-                        child: Text(
-                          'Skip for now',
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const _SetupHeader(
+                title: 'Choose your plan',
+                subtitle: 'Upgrade anytime. Cancel anytime.',
+              ),
+              const SizedBox(height: 28),
+              FutureBuilder<List<SubscriptionPlanModel>>(
+                future: _plansFuture,
+                builder: (context, snap) {
+                  if (snap.connectionState != ConnectionState.done) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 48),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+                  if (snap.hasError || !snap.hasData) {
+                    return Column(
+                      children: [
+                        Text(
+                          'Could not load plans. Check your connection and try again.',
                           style: GoogleFonts.urbanist(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textSecondary,
-                          ),
+                            fontSize: 14, color: AppColors.textSecondary),
                         ),
-                      ),
+                        const SizedBox(height: 12),
+                        AppButton.secondary('Retry',
+                            onTap: () => setState(
+                                () => _plansFuture = _subscriptions.listPlans())),
+                      ],
+                    );
+                  }
+                  final plans = snap.data!;
+                  return Column(
+                    children: [
+                      for (final plan in plans) ...[
+                        _PlanCard(
+                          name: plan.name,
+                          price: plan.priceLabel(),
+                          features: plan.features,
+                          ctaLabel: 'Select ${plan.name}',
+                          isPopular: plan.tier == 'PREMIUM',
+                          isPrimary: plan.tier == 'PREMIUM',
+                          onSelect: () => _selectPlan(plan),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 4),
+              Center(
+                child: TextButton(
+                  onPressed: _skip,
+                  child: Text(
+                    'Skip for now',
+                    style: GoogleFonts.urbanist(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textSecondary,
                     ),
-                    const SizedBox(height: 8),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-// ─── Step 5: Payout ───────────────────────────────────────────────────────────
+// ─── Step 5: KYC / Verify identity ─────────────────────────────────────────────
+
+class SetupKycScreen extends StatefulWidget {
+  const SetupKycScreen({super.key});
+
+  @override
+  State<SetupKycScreen> createState() => _SetupKycScreenState();
+}
+
+class _SetupKycScreenState extends State<SetupKycScreen> {
+  final _uploads = UploadService();
+
+  String? _ninUrl, _ninName;
+  bool _uploadingNin = false;
+  String? _cacUrl, _cacName;
+  bool _uploadingCac = false;
+
+  void _toast(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<void> _pickDoc({required bool isNin}) async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: const ['jpg', 'jpeg', 'png', 'pdf'],
+        withData: true,
+      );
+      if (result == null || result.files.isEmpty) return;
+      final f = result.files.first;
+      final bytes = f.bytes;
+      if (bytes == null) {
+        _toast('Could not read the selected file');
+        return;
+      }
+      if (bytes.length > 5 * 1024 * 1024) {
+        _toast('File is larger than 5 MB');
+        return;
+      }
+      setState(() => isNin ? _uploadingNin = true : _uploadingCac = true);
+      final url = await _uploads.uploadDocument(bytes, f.name);
+      if (!mounted) return;
+      setState(() {
+        if (isNin) {
+          _ninUrl = url;
+          _ninName = f.name;
+          _uploadingNin = false;
+        } else {
+          _cacUrl = url;
+          _cacName = f.name;
+          _uploadingCac = false;
+        }
+      });
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _uploadingNin = false;
+          _uploadingCac = false;
+        });
+      }
+      _toast(e.toString().replaceFirst('Exception: ', ''));
+    }
+  }
+
+  Widget _uploadBox({
+    required String label,
+    required String? url,
+    required String? name,
+    required bool uploading,
+    required VoidCallback onTap,
+  }) {
+    final done = url != null;
+    return GestureDetector(
+      onTap: uploading ? null : onTap,
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.only(bottom: 16),
+        height: 110,
+        decoration: BoxDecoration(
+          color: done ? AppColors.primaryLight : AppColors.divider,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: done ? AppColors.primary : AppColors.border,
+            width: 1.5,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: uploading
+              ? const [
+                  SizedBox(
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: AppColors.primary),
+                  ),
+                ]
+              : done
+                  ? [
+                      const Icon(Icons.check_circle_outline_rounded,
+                          color: AppColors.primary, size: 30),
+                      const SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          name ?? 'Uploaded',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.urbanist(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primary),
+                        ),
+                      ),
+                      Text('Tap to replace',
+                          style: GoogleFonts.urbanist(
+                              fontSize: 12, color: AppColors.textSecondary)),
+                    ]
+                  : [
+                      const Icon(Icons.upload_file_outlined,
+                          color: AppColors.textHint, size: 30),
+                      const SizedBox(height: 8),
+                      Text(label,
+                          style: GoogleFonts.urbanist(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textSecondary)),
+                      Text('JPG, PNG or PDF up to 5mb',
+                          style: GoogleFonts.urbanist(
+                              fontSize: 12, color: AppColors.textHint)),
+                    ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: _buildSetupAppBar(context, step: 5, total: 6),
+      body: SafeArea(
+        child: BlocConsumer<SetupCubit, SetupState>(
+          listener: (context, state) async {
+            if (state.status == SetupStatus.success) {
+              // Paid plans return a Paystack checkout URL — collect payment in an
+              // in-app WebView before finishing. (Basic returns none.)
+              final url = state.checkoutUrl;
+              final payRef = state.paymentReference;
+              if (url != null && url.isNotEmpty && payRef != null) {
+                final reference = await Navigator.of(context).push<String>(
+                  MaterialPageRoute(
+                    builder: (_) => PaymentCheckoutScreen(
+                      checkoutUrl: url,
+                      reference: payRef,
+                    ),
+                  ),
+                );
+                if (!context.mounted) return;
+                if (reference != null) {
+                  try {
+                    await context.read<SetupCubit>().verifyPayment(reference);
+                  } catch (_) {/* surfaced below if not active */}
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                          'Payment not completed — you can subscribe to a paid plan anytime from your profile.'),
+                    ),
+                  );
+                }
+              }
+              if (context.mounted) context.go(AppRoutes.setupSuccess);
+            } else if (state.status == SetupStatus.error) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.error ?? 'Something went wrong')),
+              );
+            }
+          },
+          builder: (context, state) {
+            final submitting = state.status == SetupStatus.submitting;
+            return Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const _SetupHeader(
+                          title: 'Verify your identity',
+                          subtitle:
+                              'Upload your NIN, and CAC if you run a licensed business. Stored securely.',
+                        ),
+                        const SizedBox(height: 28),
+                        _uploadBox(
+                          label: 'Upload your NIN slip',
+                          url: _ninUrl,
+                          name: _ninName,
+                          uploading: _uploadingNin,
+                          onTap: () => _pickDoc(isNin: true),
+                        ),
+                        _uploadBox(
+                          label: 'Upload your CAC document',
+                          url: _cacUrl,
+                          name: _cacName,
+                          uploading: _uploadingCac,
+                          onTap: () => _pickDoc(isNin: false),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+                  child: Column(
+                    children: [
+                      AppButton.primary(
+                        submitting ? 'Setting up…' : 'Finish setup',
+                        onTap: submitting
+                            ? null
+                            : () {
+                                final auth = context.read<AuthBloc>().state;
+                                final name = auth is AuthAuthenticated
+                                    ? auth.user.name
+                                    : '';
+                                final cubit = context.read<SetupCubit>();
+                                // Keep the proof captured on the profile step if
+                                // no CAC was uploaded here.
+                                cubit.setKyc(
+                                  ninUrl: _ninUrl,
+                                  cacUrl: _cacUrl ?? cubit.cacUrl,
+                                );
+                                cubit.submit(businessName: name);
+                              },
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'You can complete verification later from your profile.',
+                        style: GoogleFonts.urbanist(
+                            fontSize: 12, color: AppColors.textHint),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Step 5 (legacy, unused under subscription-only): Payout ────────────────────
 
 const _nigerianBanks = [
   'Zenith Bank',

@@ -1,71 +1,435 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/router/app_routes.dart';
-import '../../../core/utils/formatters.dart';
-import '../../../core/mock/mock_data.dart';
-import '../../../shared/models/booking_model.dart';
-import '../../../shared/widgets/status_chip.dart';
-import '../../../shared/widgets/empty_state.dart';
-import '../../../shared/widgets/quote_request_card.dart';
 
-class OrdersScreen extends StatelessWidget {
+import '../../../core/router/app_routes.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/formatters.dart';
+import '../../../shared/models/order_model.dart';
+import '../../../shared/models/tracking_order_model.dart';
+import '../../../shared/widgets/network_image_widget.dart';
+import '../bloc/orders_cubit.dart';
+
+class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
 
   @override
+  State<OrdersScreen> createState() => _OrdersScreenState();
+}
+
+class _OrdersScreenState extends State<OrdersScreen> {
+  // 0 = My Bookings & Events, 1 = Order Tracking
+  int _tabIndex = 0;
+  // Bookings filter: 0 = Upcoming, 1 = Past, 2 = Cancelled
+  int _filterIndex = 0;
+  // Tracking filter: 0 = Purchase, 1 = Rentals, 2 = Completed, 3 = Cancelled
+  int _trackingFilter = 0;
+
+  static const _filters = ['Upcoming', 'Past', 'Cancelled'];
+  static const _trackingFilters = ['Purchase', 'Rentals', 'Completed', 'Cancelled'];
+
+  /// Live inquiries from the API (set from cubit state in build).
+  List<OrderModel> _orders = const [];
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<OrdersCubit>().load();
+  }
+
+  List<OrderModel> get _filteredOrders {
+    switch (_filterIndex) {
+      case 0:
+        // Upcoming = awaiting response or confirmed
+        return _orders
+            .where((o) => o.status == 'PENDING' || o.status == 'CONFIRMED')
+            .toList();
+      case 1:
+        return _orders.where((o) => o.status == 'COMPLETED').toList();
+      case 2:
+        return _orders.where((o) => o.status == 'CANCELLED').toList();
+      default:
+        return _orders;
+    }
+  }
+
+  int get _activeCount => _orders
+      .where((o) => o.status == 'PENDING' || o.status == 'CONFIRMED')
+      .length;
+
+  int get _needActionCount =>
+      _orders.where((o) => o.status == 'PENDING').length;
+
+  List<TrackingOrderModel> get _filteredTracking {
+    // Rental/purchase delivery tracking has no backend yet — show empty state.
+    const List<TrackingOrderModel> all = [];
+    switch (_trackingFilter) {
+      case 0: // Purchase
+        return all
+            .where((o) =>
+                o.orderType == 'purchase' &&
+                o.status != 'delivered' &&
+                o.status != 'cancelled')
+            .toList();
+      case 1: // Rentals
+        return all
+            .where((o) =>
+                o.orderType == 'rental' &&
+                o.status != 'return_confirmed' &&
+                o.status != 'completed' &&
+                o.status != 'cancelled')
+            .toList();
+      case 2: // Completed
+        return all
+            .where((o) =>
+                o.status == 'delivered' ||
+                o.status == 'return_confirmed' ||
+                o.status == 'completed')
+            .toList();
+      case 3: // Cancelled
+        return all.where((o) => o.status == 'cancelled').toList();
+      default:
+        return all;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        backgroundColor: AppColors.backgroundLight,
-        appBar: AppBar(
-          backgroundColor: AppColors.surface,
-          surfaceTintColor: Colors.transparent,
-          automaticallyImplyLeading: false,
-          elevation: 0,
-          title: Text(
-            'Orders',
-            style: GoogleFonts.urbanist(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
+    final topPadding = MediaQuery.of(context).padding.top;
+    // Live inquiries from the API.
+    _orders = context.watch<OrdersCubit>().state.orders;
+
+    return Scaffold(
+      backgroundColor: AppColors.backgroundLight,
+      body: Column(
+        children: [
+          // ── Gradient Header ────────────────────────────────────────────
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF5756F5), Color(0xFF3332D4)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            padding: EdgeInsets.only(
+              top: topPadding + 16,
+              left: 20,
+              right: 20,
+              bottom: 20,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Orders',
+                  style: GoogleFonts.urbanist(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '$_activeCount active · $_needActionCount need action',
+                  style: GoogleFonts.urbanist(
+                    fontSize: 13,
+                    color: Colors.white70,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Toggle pill selector
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.white, width: 1),
+                    borderRadius: BorderRadius.circular(28),
+                  ),
+                  child: Row(
+                    children: [
+                      _TogglePill(
+                        label: 'My Bookings & Events',
+                        selected: _tabIndex == 0,
+                        onTap: () => setState(() => _tabIndex = 0),
+                      ),
+                      _TogglePill(
+                        label: 'Order Tracking',
+                        selected: _tabIndex == 1,
+                        onTap: () => setState(() => _tabIndex = 1),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-          bottom: TabBar(
-            labelStyle: GoogleFonts.urbanist(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
+
+          if (_tabIndex == 0) ...[
+            // ── Filter Pills ───────────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+              child: Row(
+                children: List.generate(_filters.length, (i) {
+                  final selected = _filterIndex == i;
+                  return GestureDetector(
+                    onTap: () => setState(() => _filterIndex = i),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 160),
+                      margin: const EdgeInsets.only(right: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: selected
+                            ? AppColors.primaryDark
+                            : const Color(0xFFEEEEF8),
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: Text(
+                        _filters[i],
+                        style: GoogleFonts.urbanist(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: selected
+                              ? Colors.white
+                              : AppColors.textSecondary,
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ),
             ),
-            unselectedLabelStyle: GoogleFonts.urbanist(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
+
+            // ── Order List ─────────────────────────────────────────────
+            Expanded(
+              child: _filteredOrders.isEmpty
+                  ? Center(
+                      child: Text(
+                        'No orders here yet.',
+                        style: GoogleFonts.urbanist(
+                          fontSize: 14,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.only(top: 8, bottom: 24),
+                      itemCount: _filteredOrders.length,
+                      itemBuilder: (context, index) {
+                        return _OrderCard(order: _filteredOrders[index]);
+                      },
+                    ),
             ),
-            labelColor: AppColors.primary,
-            unselectedLabelColor: AppColors.textSecondary,
-            indicatorColor: AppColors.primary,
-            indicatorWeight: 2.5,
-            tabs: const [
-              Tab(text: 'Requests'),
-              Tab(text: 'Bookings'),
-              Tab(text: 'History'),
-            ],
+          ] else ...[
+            // ── Tracking Filter Pills ──────────────────────────────────
+            SizedBox(
+              height: 48,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
+                itemCount: _trackingFilters.length,
+                itemBuilder: (context, i) {
+                  final selected = _trackingFilter == i;
+                  return GestureDetector(
+                    onTap: () => setState(() => _trackingFilter = i),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 160),
+                      margin: const EdgeInsets.only(right: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: selected
+                            ? AppColors.primaryDark
+                            : const Color(0xFFEEEEF8),
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: Text(
+                        _trackingFilters[i],
+                        style: GoogleFonts.urbanist(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: selected
+                              ? Colors.white
+                              : AppColors.textSecondary,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            // ── Tracking List ──────────────────────────────────────────
+            Expanded(
+              child: _filteredTracking.isEmpty
+                  ? Center(
+                      child: Text(
+                        'No orders here yet.',
+                        style: GoogleFonts.urbanist(
+                          fontSize: 14,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      padding:
+                          const EdgeInsets.only(top: 8, bottom: 24),
+                      itemCount: _filteredTracking.length,
+                      itemBuilder: (context, index) {
+                        return _TrackingCard(
+                            order: _filteredTracking[index]);
+                      },
+                    ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Tracking Card ───────────────────────────────────────────────────────────
+
+class _TrackingCard extends StatelessWidget {
+  final TrackingOrderModel order;
+  const _TrackingCard({required this.order});
+
+  @override
+  Widget build(BuildContext context) {
+    final accentColor =
+        order.needsAction ? const Color(0xFFE53935) : AppColors.primary;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
           ),
-        ),
-        body: TabBarView(
+        ],
+      ),
+      child: IntrinsicHeight(
+        child: Row(
           children: [
-            _RequestsTab(),
-            _BookingsTab(
-              bookings: MockData.bookings
-                  .where((b) =>
-                      b.status == 'CONFIRMED' || b.status == 'ACTIVE')
-                  .toList(),
+            // Left accent bar
+            Container(
+              width: 4,
+              decoration: BoxDecoration(
+                color: accentColor,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(14),
+                  bottomLeft: Radius.circular(14),
+                ),
+              ),
             ),
-            _BookingsTab(
-              bookings: MockData.bookings
-                  .where((b) =>
-                      b.status == 'COMPLETED' || b.status == 'CANCELLED')
-                  .toList(),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Thumbnail
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: AppNetworkImage(
+                            url: order.productImage,
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        // Info
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                order.productName,
+                                style: GoogleFonts.urbanist(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textPrimary,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                Formatters.shortDate(order.orderDate),
+                                style: GoogleFonts.urbanist(
+                                  fontSize: 12,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Row(
+                                children: [
+                                  _TrackingStatusChip(status: order.status),
+                                  const Spacer(),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primaryLight,
+                                      borderRadius:
+                                          BorderRadius.circular(20),
+                                    ),
+                                    child: Text(
+                                      Formatters.currency(order.total),
+                                      style: GoogleFonts.urbanist(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    // View Details button
+                    GestureDetector(
+                      onTap: () => context
+                          .push(AppRoutes.trackingDetailPath(order.id)),
+                      child: Container(
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: AppColors.primary,
+                            width: 1.2,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'View Details',
+                            style: GoogleFonts.urbanist(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -74,195 +438,114 @@ class OrdersScreen extends StatelessWidget {
   }
 }
 
-// ─── Requests Tab ─────────────────────────────────────────────────────────────
+class _TrackingStatusChip extends StatelessWidget {
+  final String status;
+  const _TrackingStatusChip({required this.status});
 
-class _RequestsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final quotes = MockData.pendingQuotes;
+    final Color bg;
+    final Color fg;
+    final String label;
 
-    if (quotes.isEmpty) {
-      return const EmptyState(
-        icon: Icons.inbox_outlined,
-        title: 'No quote requests',
-        subtitle: 'New client requests will appear here.',
-      );
+    switch (status) {
+      case 'requested':
+        bg = AppColors.primaryLight;
+        fg = AppColors.primary;
+        label = 'Requested';
+      case 'confirmed':
+        bg = const Color(0xFFE8F5E9);
+        fg = const Color(0xFF2E7D32);
+        label = 'Order Confirmed';
+      case 'payment_confirmed':
+        bg = const Color(0xFFE8F5E9);
+        fg = const Color(0xFF2E7D32);
+        label = 'Payment Confirmed';
+      case 'in_production':
+        bg = const Color(0xFFE3F2FD);
+        fg = const Color(0xFF1565C0);
+        label = 'In Production';
+      case 'out_for_delivery':
+        bg = const Color(0xFFFFF3E0);
+        fg = const Color(0xFFE65100);
+        label = 'Out for Delivery';
+      case 'pickup_confirmed':
+        bg = const Color(0xFFE8F5E9);
+        fg = const Color(0xFF2E7D32);
+        label = 'Pickup Confirmed';
+      case 'delivered':
+        bg = const Color(0xFFE8F5E9);
+        fg = const Color(0xFF2E7D32);
+        label = 'Delivered';
+      case 'return_confirmed':
+        bg = const Color(0xFFE8F5E9);
+        fg = const Color(0xFF2E7D32);
+        label = 'Returned';
+      case 'completed':
+        bg = const Color(0xFFE8F5E9);
+        fg = const Color(0xFF2E7D32);
+        label = 'Completed';
+      case 'cancelled':
+        bg = const Color(0xFFFFEBEE);
+        fg = const Color(0xFFC62828);
+        label = 'Cancelled';
+      default:
+        bg = AppColors.divider;
+        fg = AppColors.textSecondary;
+        label = status;
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-      itemCount: quotes.length,
-      itemBuilder: (context, index) {
-        final quote = quotes[index];
-        return QuoteRequestCard(
-          key: ValueKey(quote.id),
-          quote: quote,
-          onRespond: () =>
-              context.push(AppRoutes.orderDetailPath(quote.id)),
-          onReject: () {},
-          showSingleButton: false,
-        );
-      },
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style: GoogleFonts.urbanist(
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          color: fg,
+        ),
+      ),
     );
   }
 }
 
-// ─── Bookings Tab (Bookings & History) ───────────────────────────────────────
+// ─── Toggle Pill ──────────────────────────────────────────────────────────────
 
-class _BookingsTab extends StatelessWidget {
-  final List<BookingModel> bookings;
-
-  const _BookingsTab({required this.bookings});
-
-  @override
-  Widget build(BuildContext context) {
-    if (bookings.isEmpty) {
-      return const EmptyState(
-        icon: Icons.receipt_long_outlined,
-        title: 'Nothing here yet',
-        subtitle: 'Confirmed or completed bookings will appear here.',
-      );
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-      itemCount: bookings.length,
-      itemBuilder: (context, index) {
-        final booking = bookings[index];
-        return _BookingCard(
-          booking: booking,
-          onTap: () => context.push(AppRoutes.orderDetailPath(booking.id)),
-        );
-      },
-    );
-  }
-}
-
-// ─── Booking Card ─────────────────────────────────────────────────────────────
-
-class _BookingCard extends StatelessWidget {
-  final BookingModel booking;
+class _TogglePill extends StatelessWidget {
+  final String label;
+  final bool selected;
   final VoidCallback onTap;
 
-  const _BookingCard({required this.booking, required this.onTap});
+  const _TogglePill({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Card(
-        margin: const EdgeInsets.only(bottom: 12),
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.border),
-        ),
-        color: AppColors.surface,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundColor: AppColors.divider,
-                    backgroundImage: (booking.clientImage != null &&
-                            booking.clientImage!.isNotEmpty)
-                        ? NetworkImage(booking.clientImage!)
-                        : null,
-                    child: (booking.clientImage == null ||
-                            booking.clientImage!.isEmpty)
-                        ? Text(
-                            booking.clientName.isNotEmpty
-                                ? booking.clientName[0]
-                                : '?',
-                            style: GoogleFonts.urbanist(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textSecondary,
-                            ),
-                          )
-                        : null,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          booking.clientName,
-                          style: GoogleFonts.urbanist(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          booking.listingTitle,
-                          style: GoogleFonts.urbanist(
-                            fontSize: 12,
-                            color: AppColors.textSecondary,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  StatusChip(status: booking.status),
-                ],
-              ),
-              const SizedBox(height: 12),
-              const Divider(height: 1, color: AppColors.divider),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  _InfoChip(
-                    icon: Icons.event_outlined,
-                    label: booking.eventName,
-                  ),
-                  const SizedBox(width: 12),
-                  _InfoChip(
-                    icon: Icons.calendar_today_outlined,
-                    label: Formatters.formatDate(booking.eventDate),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    Formatters.formatCurrency(booking.totalAmount),
-                    style: GoogleFonts.urbanist(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        'View details',
-                        style: GoogleFonts.urbanist(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      const Icon(
-                        Icons.chevron_right_rounded,
-                        size: 18,
-                        color: AppColors.primary,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(vertical: 9),
+          decoration: BoxDecoration(
+            color: selected ? Colors.white : Colors.transparent,
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.urbanist(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: selected ? AppColors.primary : Colors.white,
+            ),
           ),
         ),
       ),
@@ -270,30 +553,251 @@ class _BookingCard extends StatelessWidget {
   }
 }
 
-// ─── Info Chip ────────────────────────────────────────────────────────────────
+// ─── Order Card ───────────────────────────────────────────────────────────────
 
-class _InfoChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
+class _OrderCard extends StatelessWidget {
+  final OrderModel order;
 
-  const _InfoChip({required this.icon, required this.label});
+  const _OrderCard({required this.order});
+
+  bool get _isUpcoming =>
+      order.status == 'confirmed' || order.status == 'payment_pending';
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 13, color: AppColors.textSecondary),
-        const SizedBox(width: 4),
-        Text(
-          label,
-          style: GoogleFonts.urbanist(
-            fontSize: 12,
-            color: AppColors.textSecondary,
-            fontWeight: FontWeight.w400,
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Top Row ────────────────────────────────────────────────
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Thumbnail
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: AppNetworkImage(
+                    url: order.thumbnailUrl,
+                    width: 72,
+                    height: 72,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // Info Column
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // "Event" pill chip
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryLight,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.star_rounded,
+                              size: 12,
+                              color: AppColors.primary,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Event',
+                              style: GoogleFonts.urbanist(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        '${order.eventName} – ${order.category}',
+                        style: GoogleFonts.urbanist(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${Formatters.shortDate(order.eventDate)} · ${order.eventVenue}',
+                        style: GoogleFonts.urbanist(
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Status chip (top-right)
+                _StatusChip(status: order.status),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            // ── Bottom Row (Actions) ───────────────────────────────────
+            if (_isUpcoming)
+              Row(
+                children: [
+                  Expanded(
+                    child: _GradientButton(
+                      label: 'View Details',
+                      onTap: () =>
+                          context.push(AppRoutes.orderDetailPath(order.id)),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () => context
+                        .push(AppRoutes.conversationPath('conv-001')),
+                    child: Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryLight,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.chat_bubble_outline_rounded,
+                        color: AppColors.primary,
+                        size: 22,
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            else
+              _GradientButton(
+                label: 'View Details',
+                onTap: () =>
+                    context.push(AppRoutes.orderDetailPath(order.id)),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Status Chip ──────────────────────────────────────────────────────────────
+
+class _StatusChip extends StatelessWidget {
+  final String status;
+
+  const _StatusChip({required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    final Color bgColor;
+    final Color textColor;
+    final String label;
+
+    switch (status) {
+      case 'CONFIRMED':
+      case 'confirmed':
+        bgColor = const Color(0xFFE8F5E9);
+        textColor = const Color(0xFF2E7D32);
+        label = 'Confirmed';
+      case 'PENDING':
+      case 'payment_pending':
+        bgColor = AppColors.pendingBg;
+        textColor = AppColors.pendingText;
+        label = 'Awaiting response';
+      case 'COMPLETED':
+      case 'completed':
+        bgColor = const Color(0xFFE8F5E9);
+        textColor = const Color(0xFF2E7D32);
+        label = 'Completed';
+      case 'CANCELLED':
+      case 'cancelled':
+        bgColor = const Color(0xFFFFEBEE);
+        textColor = const Color(0xFFC62828);
+        label = 'Cancelled';
+      default:
+        bgColor = AppColors.divider;
+        textColor = AppColors.textSecondary;
+        label = status;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style: GoogleFonts.urbanist(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: textColor,
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Gradient Button ──────────────────────────────────────────────────────────
+
+class _GradientButton extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+
+  const _GradientButton({required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 44,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF6B6AF7), Color(0xFF3332D4)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(22),
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: GoogleFonts.urbanist(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
           ),
         ),
-      ],
+      ),
     );
   }
 }

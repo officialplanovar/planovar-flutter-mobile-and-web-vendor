@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_input.dart';
+import '../bloc/auth_bloc.dart';
+import '../bloc/auth_event.dart';
+import '../bloc/auth_state.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -15,24 +19,11 @@ class ForgotPasswordScreen extends StatefulWidget {
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _emailCtrl = TextEditingController();
   bool _sent = false;
-  bool _loading = false;
 
   @override
   void dispose() {
     _emailCtrl.dispose();
     super.dispose();
-  }
-
-  Future<void> _sendResetLink() async {
-    if (_emailCtrl.text.trim().isEmpty) return;
-    setState(() => _loading = true);
-    await Future.delayed(const Duration(milliseconds: 800));
-    if (mounted) {
-      setState(() {
-        _loading = false;
-        _sent = true;
-      });
-    }
   }
 
   @override
@@ -139,10 +130,32 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
             const SizedBox(height: 16),
 
-            AppButton.primary(
-              _sent ? 'Resend Link' : 'Send Reset Link',
-              loading: _loading,
-              onTap: _loading ? null : _sendResetLink,
+            BlocConsumer<AuthBloc, AuthState>(
+              listener: (context, state) {
+                if (state is AuthPasswordResetSent) {
+                  setState(() => _sent = true);
+                } else if (state is AuthError) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(state.message)),
+                  );
+                }
+              },
+              builder: (context, state) {
+                final loading = state is AuthLoading;
+                return AppButton.primary(
+                  _sent ? 'Resend Code' : 'Send Reset Code',
+                  loading: loading,
+                  onTap: loading
+                      ? null
+                      : () {
+                          final email = _emailCtrl.text.trim();
+                          if (email.isEmpty) return;
+                          context
+                              .read<AuthBloc>()
+                              .add(AuthForgotPasswordRequested(email: email));
+                        },
+                );
+              },
             ),
 
             if (_sent) ...[

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../core/utils/formatters.dart';
-import '../../../core/mock/mock_data.dart';
 import '../../../shared/models/listing_model.dart';
-import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/network_image_widget.dart';
-import '../../../shared/widgets/status_chip.dart';
+import '../../../shared/widgets/app_button.dart';
+import '../bloc/listings_cubit.dart';
 
 class ListingsScreen extends StatefulWidget {
   const ListingsScreen({super.key});
@@ -17,232 +17,244 @@ class ListingsScreen extends StatefulWidget {
   State<ListingsScreen> createState() => _ListingsScreenState();
 }
 
-class _ListingsScreenState extends State<ListingsScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _ListingsScreenState extends State<ListingsScreen> {
+  int _selectedTab = 0;
+
+  /// Live listings from the API (set from cubit state in build).
+  List<ListingModel> _all = const [];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    context.read<ListingsCubit>().load();
   }
 
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+  // ── Computed counts ──────────────────────────────────────────────────────────
 
-  List<ListingModel> _filterListings(int tabIndex) {
-    final all = MockData.listings;
-    switch (tabIndex) {
+  int get _allCount => _all.length;
+
+  int get _serviceCount => _all
+      .where((l) => l.pricingType != 'FIXED' && !l.isRentable)
+      .length;
+
+  int get _productCount => _all
+      .where((l) => l.pricingType == 'FIXED' && !l.isRentable)
+      .length;
+
+  int get _rentalCount => _all.where((l) => l.isRentable).length;
+
+  bool get _hasOutOfStock => _all.any((l) => !l.isActive);
+
+  int get _outOfStockCount => _all.where((l) => !l.isActive).length;
+
+  // ── Filter ────────────────────────────────────────────────────────────────────
+
+  List<ListingModel> get _filteredListings {
+    switch (_selectedTab) {
       case 1:
-        return all
-            .where((l) => !l.isRentable && l.pricingType != 'FIXED')
+        return _all
+            .where((l) => l.pricingType != 'FIXED' && !l.isRentable)
             .toList();
       case 2:
-        return all
-            .where((l) => !l.isRentable && l.pricingType == 'FIXED')
+        return _all
+            .where((l) => l.pricingType == 'FIXED' && !l.isRentable)
             .toList();
       case 3:
-        return all.where((l) => l.isRentable).toList();
+        return _all.where((l) => l.isRentable).toList();
       default:
-        return all;
+        return _all;
     }
   }
 
-  int get _serviceCount => MockData.listings
-      .where((l) => !l.isRentable && l.pricingType != 'FIXED')
-      .length;
+  // ── Helpers ────────────────────────────────────────────────────────────────
 
-  int get _productCount => MockData.listings
-      .where((l) => !l.isRentable && l.pricingType == 'FIXED')
-      .length;
+  String _listingTypeBadge(ListingModel listing) {
+    if (listing.isRentable) return 'Product (Rental)';
+    if (listing.pricingType == 'FIXED') return 'Product';
+    return 'Service';
+  }
 
-  int get _rentalCount =>
-      MockData.listings.where((l) => l.isRentable).length;
+  String _listingPrice(ListingModel listing) {
+    if (listing.isRentable) {
+      final rate = listing.perDayRate ?? listing.basePrice ?? 0;
+      return '${Formatters.formatCurrency(rate)} / day';
+    }
+    if (listing.pricingType == 'FIXED') {
+      return Formatters.formatCurrency(listing.basePrice ?? 0);
+    }
+    // QUOTE
+    final min = listing.basePrice ?? 0;
+    final max = listing.basePrice != null ? listing.basePrice! * 2 : 0;
+    if (listing.basePrice != null) {
+      return '${Formatters.formatCurrency(min)} – ${Formatters.formatCurrency(max)}';
+    }
+    return 'Quote based';
+  }
 
-  bool get _hasOutOfStockItems => MockData.listings
-      .any((l) => l.viewCount > 100 && !l.isActive);
+  // ── Bottom Sheet (reused from HomeScreen logic) ────────────────────────────
 
-  void _showDeleteDialog(BuildContext context, ListingModel listing) {
-    final isService = listing.pricingType != 'FIXED' && !listing.isRentable;
-    final label = isService ? 'Service' : 'Product';
-    showDialog(
+  void _showListingTypeBottomSheet(BuildContext context) {
+    showModalBottomSheet(
       context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        contentPadding: const EdgeInsets.all(24),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 56,
-              height: 56,
-              decoration: const BoxDecoration(
-                color: AppColors.cancelledBg,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.delete_outline_rounded,
-                color: AppColors.error,
-                size: 28,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Delete $label',
-              style: GoogleFonts.urbanist(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Are you sure you want to permanently delete this $label? This action cannot be undone.',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.urbanist(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: AppButton.secondary(
-                    'No, Keep',
-                    onTap: () => Navigator.pop(context),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.error,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      minimumSize: const Size(double.infinity, 52),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      'Yes, Delete',
-                      style: GoogleFonts.urbanist(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      useRootNavigator: true,
+      builder: (_) => _ListingTypeSheet(parentContext: context),
     );
   }
 
-  void _showDeactivateDialog(BuildContext context, ListingModel listing) {
-    final isService = listing.pricingType != 'FIXED' && !listing.isRentable;
-    final label = isService ? 'Service' : 'Product';
-    final isActive = listing.isActive;
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        contentPadding: const EdgeInsets.all(24),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 56,
-              height: 56,
-              decoration: const BoxDecoration(
-                color: Color(0xFFFFF7ED),
-                shape: BoxShape.circle,
+  // ── Gradient AppBar ────────────────────────────────────────────────────────
+
+  Widget _buildAppBar(BuildContext context) {
+    final topPadding = MediaQuery.of(context).padding.top;
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFF5756F5), Color(0xFF3332D4)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(24),
+          bottomRight: Radius.circular(24),
+        ),
+      ),
+      child: SizedBox(
+        height: topPadding + 64,
+        child: Padding(
+          padding: EdgeInsets.only(top: topPadding),
+          child: Row(
+            children: [
+              const SizedBox(width: 4),
+              IconButton(
+                icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                onPressed: () => context.pop(),
               ),
-              child: const Icon(
-                Icons.pause_circle_outline_rounded,
-                color: Color(0xFFEA580C),
-                size: 28,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              isActive ? 'Deactivate $label' : 'Activate $label',
-              style: GoogleFonts.urbanist(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              isActive
-                  ? 'This will hide your $label from clients and stop new bookings.'
-                  : 'This will make your $label visible to clients again.',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.urbanist(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-              ),
-            ),
-            if (isActive) ...[
-              const SizedBox(height: 10),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFF7ED),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFFED7AA)),
-                ),
-                child: Text(
-                  'You currently have active Contacts tied to this service. Enquire or your service will auto-cancel after event date.',
-                  style: GoogleFonts.urbanist(
-                    fontSize: 12,
-                    color: const Color(0xFFEA580C),
+              const Expanded(
+                child: Center(
+                  child: Text(
+                    'My Listings',
+                    style: TextStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
+              // Balance the back arrow
+              const SizedBox(width: 48),
             ],
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: AppButton.secondary(
-                    'No, Continue',
-                    onTap: () => Navigator.pop(context),
-                  ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ── Filter Tabs ────────────────────────────────────────────────────────────
+
+  Widget _buildFilterTabs() {
+    final tabs = [
+      'All ($_allCount)',
+      'Services ($_serviceCount)',
+      'Products ($_productCount)',
+      'Rentals ($_rentalCount)',
+    ];
+    return SizedBox(
+      height: 40,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        itemCount: tabs.length,
+        separatorBuilder: (context, index) => const SizedBox(width: 10),
+        itemBuilder: (_, i) {
+          final isActive = _selectedTab == i;
+          return GestureDetector(
+            onTap: () => setState(() => _selectedTab = i),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: isActive ? AppColors.primary : Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: isActive ? AppColors.primary : AppColors.border,
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFEA580C),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      minimumSize: const Size(double.infinity, 52),
-                      elevation: 0,
+              ),
+              child: Text(
+                tabs[i],
+                style: GoogleFonts.urbanist(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: isActive ? Colors.white : AppColors.textSecondary,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // ── Out-of-Stock Banner ────────────────────────────────────────────────────
+
+  Widget _buildOutOfStockBanner(BuildContext context) {
+    if (!_hasOutOfStock) return const SizedBox.shrink();
+    return GestureDetector(
+      onTap: () => context.push(AppRoutes.listingsOutOfStock),
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFF0F0),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.error.withValues(alpha: 0.4)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppColors.error,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.notifications_rounded,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: RichText(
+                text: TextSpan(
+                  style: GoogleFonts.urbanist(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: '$_outOfStockCount Items are out of Stock, ',
+                      style: const TextStyle(fontWeight: FontWeight.w700),
                     ),
-                    child: Text(
-                      isActive ? 'Yes, Deactivate' : 'Yes, Activate',
-                      style: GoogleFonts.urbanist(
-                        fontSize: 15,
+                    TextSpan(
+                      text: 'Click to update',
+                      style: TextStyle(
+                        color: AppColors.error,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
+            ),
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: AppColors.textHint,
+              size: 18,
             ),
           ],
         ),
@@ -250,318 +262,511 @@ class _ListingsScreenState extends State<ListingsScreen>
     );
   }
 
-  Widget _buildStatBar() {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-      padding: const EdgeInsets.symmetric(vertical: 14),
-      decoration: BoxDecoration(
-        color: AppColors.primaryLight,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Row(
-        children: [
-          _buildStatCell('Services', _serviceCount),
-          _buildStatDivider(),
-          _buildStatCell('Products', _productCount),
-          _buildStatDivider(),
-          _buildStatCell('Rentals', _rentalCount),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatCell(String label, int count) {
-    return Expanded(
-      child: Column(
-        children: [
-          Text(
-            '$count',
-            style: GoogleFonts.urbanist(
-              fontSize: 20,
-              fontWeight: FontWeight.w800,
-              color: AppColors.primary,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: GoogleFonts.urbanist(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textSecondary,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatDivider() {
-    return Container(
-      width: 1,
-      height: 36,
-      color: AppColors.border,
-    );
-  }
-
-  Widget _buildOutOfStockBanner() {
-    if (!_hasOutOfStockItems) return const SizedBox.shrink();
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFF7ED),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFFED7AA)),
-      ),
-      child: Row(
-        children: [
-          const Icon(
-            Icons.warning_amber_rounded,
-            color: Color(0xFFEA580C),
-            size: 20,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              '2 items are out of Stock. Click to update',
-              style: GoogleFonts.urbanist(
-                fontSize: 13,
-                color: const Color(0xFFEA580C),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // ── Listing Card ──────────────────────────────────────────────────────────
 
   Widget _buildListingCard(BuildContext context, ListingModel listing) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(16),
-              bottomLeft: Radius.circular(16),
+    final isActive = listing.isActive;
+    final typeBadge = _listingTypeBadge(listing);
+    final price = _listingPrice(listing);
+
+    return GestureDetector(
+      onTap: () => context.push('/listings/detail/${listing.id}'),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
-            child: AppNetworkImage(
-              url: listing.displayCoverUrl ?? '',
-              width: 90,
-              height: 90,
-              fit: BoxFit.cover,
-            ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Thumbnail
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: AppNetworkImage(
+                  url: listing.displayCoverUrl ?? '',
+                  width: 72,
+                  height: 72,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(width: 12),
+
+              // Info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title
+                    Text(
+                      listing.title,
+                      style: GoogleFonts.urbanist(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+
+                    // Type badge + category
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryLight,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            typeBadge,
+                            style: GoogleFonts.urbanist(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ),
+                        if (listing.categoryName != null) ...[
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              listing.categoryName!,
+                              style: GoogleFonts.urbanist(
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+
+                    // Price
+                    Text(
+                      price,
+                      style: GoogleFonts.urbanist(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+
+              // Right column: status + eye count
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // Status chip
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: isActive
+                          ? const Color(0xFFDCFCE7)
+                          : const Color(0xFFFFF7ED),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      isActive ? 'Active' : 'Inactive',
+                      style: GoogleFonts.urbanist(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: isActive
+                            ? const Color(0xFF16A34A)
+                            : const Color(0xFFEA580C),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  // Eye + view count
                   Row(
                     children: [
-                      StatusChip(
-                        status: listing.isActive ? 'active' : 'inactive',
+                      const Icon(
+                        Icons.remove_red_eye_outlined,
+                        size: 13,
+                        color: AppColors.textHint,
                       ),
-                      const Spacer(),
+                      const SizedBox(width: 3),
                       Text(
-                        '${listing.viewCount} views',
+                        '${listing.viewCount}',
                         style: GoogleFonts.urbanist(
-                          fontSize: 11,
+                          fontSize: 12,
                           color: AppColors.textSecondary,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ── Empty State ────────────────────────────────────────────────────────────
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.store_outlined,
+            size: 56,
+            color: AppColors.textHint,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'No listings here yet',
+            style: GoogleFonts.urbanist(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Tap + to add your first listing',
+            style: GoogleFonts.urbanist(
+              fontSize: 13,
+              color: AppColors.textHint,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── FAB ────────────────────────────────────────────────────────────────────
+
+  Widget _buildFAB(BuildContext context) {
+    // The shell's bottom nav bar (≈64px + safe area) overlays this screen, so
+    // lift the FAB above it instead of letting it sit underneath/clipped.
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).padding.bottom + 76,
+      ),
+      child: GestureDetector(
+        onTap: () => _showListingTypeBottomSheet(context),
+        child: Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF5756F5), Color(0xFF3332D4)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withValues(alpha: 0.35),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: const Icon(Icons.add, color: Colors.white, size: 26),
+        ),
+      ),
+    );
+  }
+
+  // ── Build ──────────────────────────────────────────────────────────────────
+
+  @override
+  Widget build(BuildContext context) {
+    final lState = context.watch<ListingsCubit>().state;
+    _all = lState.listings;
+    final listings = _filteredListings;
+    final isLoading =
+        lState.status == ListingsStatus.loading && _all.isEmpty;
+
+    return Scaffold(
+      backgroundColor: AppColors.backgroundLight,
+      body: Column(
+        children: [
+          _buildAppBar(context),
+          const SizedBox(height: 16),
+          _buildFilterTabs(),
+          _buildOutOfStockBanner(context),
+          const SizedBox(height: 12),
+          Expanded(
+            child: isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : lState.status == ListingsStatus.error && _all.isEmpty
+                    ? _buildErrorState(lState.error)
+                    : listings.isEmpty
+                        ? _buildEmptyState()
+                        : RefreshIndicator(
+                            onRefresh: () =>
+                                context.read<ListingsCubit>().load(),
+                            child: ListView.builder(
+                              padding:
+                                  const EdgeInsets.fromLTRB(20, 0, 20, 120),
+                              itemCount: listings.length,
+                              itemBuilder: (context, index) =>
+                                  _buildListingCard(context, listings[index]),
+                            ),
+                          ),
+          ),
+        ],
+      ),
+      floatingActionButton: _buildFAB(context),
+    );
+  }
+
+  Widget _buildErrorState(String? error) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.cloud_off_rounded,
+                size: 44, color: AppColors.textHint),
+            const SizedBox(height: 12),
+            Text(
+              error ?? 'Could not load your listings',
+              style: GoogleFonts.urbanist(
+                  fontSize: 14, color: AppColors.textSecondary),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            AppButton.secondary('Retry',
+                onTap: () => context.read<ListingsCubit>().load()),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Listing Type Bottom Sheet ──────────────────────────────────────────────────
+
+class _ListingTypeSheet extends StatefulWidget {
+  final BuildContext parentContext;
+
+  const _ListingTypeSheet({required this.parentContext});
+
+  @override
+  State<_ListingTypeSheet> createState() => _ListingTypeSheetState();
+}
+
+class _ListingTypeSheetState extends State<_ListingTypeSheet> {
+  String? _selected = 'service';
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      padding: EdgeInsets.fromLTRB(
+        24,
+        0,
+        24,
+        MediaQuery.of(context).padding.bottom + 24,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Handle
+          const SizedBox(height: 12),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: AppColors.border,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Cancel row
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Text(
+                  'Cancel',
+                  style: GoogleFonts.urbanist(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+              const Spacer(),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          Text(
+            'Listing Type',
+            style: GoogleFonts.urbanist(
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Select the type of listing you want to create',
+            style: GoogleFonts.urbanist(
+              fontSize: 14,
+              color: AppColors.textSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+
+          const SizedBox(height: 28),
+
+          _TypeCard(
+            type: 'service',
+            icon: Icons.work_outline_rounded,
+            title: 'Service',
+            subtitle: 'Bookable appointment',
+            selected: _selected,
+            onTap: (t) => setState(() => _selected = t),
+          ),
+
+          const SizedBox(height: 14),
+
+          _TypeCard(
+            type: 'product',
+            icon: Icons.inventory_2_outlined,
+            title: 'Product',
+            subtitle: 'Physical item for rent or sale',
+            selected: _selected,
+            onTap: (t) => setState(() => _selected = t),
+          ),
+
+          const SizedBox(height: 28),
+
+          AppButton.primary(
+            'Proceed',
+            onTap: _selected == null
+                ? null
+                : () {
+                    Navigator.pop(context);
+                    if (_selected == 'service') {
+                      widget.parentContext.push(AppRoutes.addService);
+                    } else {
+                      widget.parentContext.push(AppRoutes.addProduct);
+                    }
+                  },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TypeCard extends StatelessWidget {
+  final String type;
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final String? selected;
+  final void Function(String) onTap;
+
+  const _TypeCard({
+    required this.type,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isSelected = selected == type;
+    return GestureDetector(
+      onTap: () => onTap(type),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primaryLight : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.border,
+            width: isSelected ? 1.5 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.primary : AppColors.primaryLight,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(
+                icon,
+                color: isSelected ? Colors.white : AppColors.primary,
+                size: 26,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
-                    listing.title,
+                    title,
                     style: GoogleFonts.urbanist(
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    listing.categoryName ?? '',
+                    subtitle,
                     style: GoogleFonts.urbanist(
-                      fontSize: 12,
+                      fontSize: 13,
                       color: AppColors.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    listing.basePrice != null
-                        ? Formatters.formatCurrency(listing.basePrice!)
-                        : 'Quote based',
-                    style: GoogleFonts.urbanist(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primary,
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert, color: AppColors.textSecondary),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            itemBuilder: (_) => [
-              PopupMenuItem(
-                value: 'edit',
-                child: Text(
-                  'Edit',
-                  style: GoogleFonts.urbanist(fontSize: 14),
-                ),
-              ),
-              PopupMenuItem(
-                value: 'deactivate',
-                child: Text(
-                  listing.isActive ? 'Deactivate' : 'Activate',
-                  style: GoogleFonts.urbanist(fontSize: 14),
-                ),
-              ),
-              PopupMenuItem(
-                value: 'delete',
-                child: Text(
-                  'Delete',
-                  style: GoogleFonts.urbanist(
-                    fontSize: 14,
-                    color: AppColors.error,
-                  ),
-                ),
-              ),
-            ],
-            onSelected: (value) {
-              if (value == 'edit') {
-                context.push(AppRoutes.editListingPath(listing.id));
-              } else if (value == 'deactivate') {
-                _showDeactivateDialog(context, listing);
-              } else if (value == 'delete') {
-                _showDeleteDialog(context, listing);
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTabContent(int tabIndex) {
-    final listings = _filterListings(tabIndex);
-    if (listings.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.store_outlined,
-                size: 56, color: AppColors.textHint),
-            const SizedBox(height: 12),
-            Text(
-              'No listings here yet',
-              style: GoogleFonts.urbanist(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Tap + to add your first listing',
-              style: GoogleFonts.urbanist(
-                fontSize: 13,
-                color: AppColors.textHint,
-              ),
+            Icon(
+              isSelected
+                  ? Icons.radio_button_checked_rounded
+                  : Icons.radio_button_off_rounded,
+              color: isSelected ? AppColors.primary : AppColors.textHint,
+              size: 22,
             ),
           ],
         ),
-      );
-    }
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 100),
-      itemCount: listings.length,
-      itemBuilder: (context, index) =>
-          _buildListingCard(context, listings[index]),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
-        title: Text(
-          'My Listings',
-          style: GoogleFonts.urbanist(
-            fontSize: 20,
-            fontWeight: FontWeight.w800,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        actions: [
-          GestureDetector(
-            onTap: () => context.push(AppRoutes.addListing),
-            child: Container(
-              margin: const EdgeInsets.only(right: 16),
-              width: 40,
-              height: 40,
-              decoration: const BoxDecoration(
-                color: AppColors.primary,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.add, color: Colors.white, size: 22),
-            ),
-          ),
-        ],
-        bottom: TabBar(
-          controller: _tabController,
-          labelStyle: GoogleFonts.urbanist(
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-          ),
-          unselectedLabelStyle: GoogleFonts.urbanist(
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-          ),
-          labelColor: AppColors.primary,
-          unselectedLabelColor: AppColors.textSecondary,
-          indicatorColor: AppColors.primary,
-          indicatorWeight: 2.5,
-          tabs: const [
-            Tab(text: 'All'),
-            Tab(text: 'Services'),
-            Tab(text: 'Products'),
-            Tab(text: 'Rentals'),
-          ],
-        ),
-      ),
-      body: Column(
-        children: [
-          _buildStatBar(),
-          _buildOutOfStockBanner(),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: List.generate(4, (i) => _buildTabContent(i)),
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -4,6 +4,9 @@ import 'core/theme/app_theme.dart';
 import 'core/theme/theme_cubit.dart';
 import 'core/router/router.dart';
 import 'features/auth/bloc/auth_bloc.dart';
+import 'features/setup/bloc/setup_cubit.dart';
+import 'features/listings/bloc/listings_cubit.dart';
+import 'features/orders/bloc/orders_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,6 +33,9 @@ class _PlanovarVendorAppState extends State<PlanovarVendorApp> {
       providers: [
         BlocProvider<ThemeCubit>.value(value: widget.themeCubit),
         BlocProvider<AuthBloc>(create: (_) => AuthBloc()),
+        BlocProvider<SetupCubit>(create: (_) => SetupCubit()),
+        BlocProvider<ListingsCubit>(create: (_) => ListingsCubit()),
+        BlocProvider<OrdersCubit>(create: (_) => OrdersCubit()),
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         bloc: widget.themeCubit,

@@ -4,15 +4,18 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/router/app_routes.dart';
+import '../../../core/widgets/planovar_logo.dart';
 import '../../../shared/widgets/app_button.dart';
 
 class _OnboardingSlide {
-  final IconData icon;
+  final String image; // asset hero illustration
+  final IconData fallbackIcon; // shown if the asset is missing
   final String title;
   final String subtitle;
 
   const _OnboardingSlide({
-    required this.icon,
+    required this.image,
+    required this.fallbackIcon,
     required this.title,
     required this.subtitle,
   });
@@ -20,22 +23,25 @@ class _OnboardingSlide {
 
 const _slides = [
   _OnboardingSlide(
-    icon: Icons.storefront_rounded,
+    image: 'assets/images/onboarding/onboarding_1.png',
+    fallbackIcon: Icons.storefront_rounded,
     title: 'Unlock thousands of event clients',
     subtitle:
         'Connect with couples, corporates, and event planners in your location, all actively searching for vendors like you',
   ),
   _OnboardingSlide(
-    icon: Icons.dashboard_rounded,
+    image: 'assets/images/onboarding/onboarding_2.png',
+    fallbackIcon: Icons.dashboard_rounded,
     title: 'Manage Everything in one Dashboard',
     subtitle:
-        'Track orders, messages, and payouts from a single workspace',
+        'Track your inquiries, bookings, and conversations from a single workspace',
   ),
   _OnboardingSlide(
-    icon: Icons.payments_rounded,
-    title: 'Get paid automatically',
+    image: 'assets/images/onboarding/onboarding_3.png',
+    fallbackIcon: Icons.workspace_premium_rounded,
+    title: 'Showcase your work, get discovered',
     subtitle:
-        'Payouts hit your account within 24–48 hours of order completion. No manual follow-up needed.',
+        'List your products, services and rentals — then subscribe to climb search rankings and reach event planners first.',
   ),
 ];
 
@@ -82,38 +88,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Logo area
-                    Row(
-                      children: [
-                        Container(
-                          width: 28,
-                          height: 28,
-                          decoration: BoxDecoration(
-                            color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(7),
-                          ),
-                          child: Center(
-                            child: Text(
-                              'P',
-                              style: GoogleFonts.urbanist(
-                                color: Colors.white,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          'Planovar',
-                          style: GoogleFonts.urbanist(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
+                    // Logo
+                    const PlanovarLogo(height: 40),
                     if (!isLastPage)
                       TextButton(
                         onPressed: () => context.go(AppRoutes.register),
@@ -144,17 +120,28 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(
-                          width: 120,
-                          height: 120,
-                          decoration: const BoxDecoration(
-                            color: AppColors.primaryLight,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            slide.icon,
-                            color: AppColors.primary,
-                            size: 56,
+                        // Hero illustration (falls back to an icon if the asset
+                        // hasn't been added yet).
+                        Image.asset(
+                          slide.image,
+                          height: 320,
+                          fit: BoxFit.contain,
+                          // Cap decode size — large source PNGs were heavy to
+                          // decode on slower runtimes (simulator/emulator/web).
+                          cacheWidth: 820,
+                          filterQuality: FilterQuality.medium,
+                          errorBuilder: (context, error, stack) => Container(
+                            width: 120,
+                            height: 120,
+                            decoration: const BoxDecoration(
+                              color: AppColors.primaryLight,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              slide.fallbackIcon,
+                              color: AppColors.primary,
+                              size: 56,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 40),

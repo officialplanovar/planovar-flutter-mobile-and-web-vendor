@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/mock/mock_data.dart';
+import '../../../core/services/notification_service.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../shared/models/notification_model.dart';
 
@@ -15,12 +15,22 @@ class NotificationsScreen extends StatefulWidget {
 class _NotificationsScreenState extends State<NotificationsScreen> {
   String _filter = 'All';
   final _filters = ['All', 'Orders', 'Payments', 'System'];
-  late List<NotificationModel> _notifications;
+  final _service = NotificationService();
+  List<NotificationModel> _notifications = [];
 
   @override
   void initState() {
     super.initState();
-    _notifications = List.from(MockData.notifications);
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final notifs = await _service.getNotifications();
+      if (mounted) setState(() => _notifications = notifs);
+    } catch (_) {
+      // keep empty on error
+    }
   }
 
   List<NotificationModel> get _filtered {
@@ -66,6 +76,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   void _markAllRead() {
+    _service.markAllRead();
     setState(() {
       _notifications = _notifications
           .map((n) => NotificationModel(
@@ -202,6 +213,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                 notif: notif,
                                 iconForType: _iconForType,
                                 onTap: () {
+                                  _service.markRead(notif.id);
                                   setState(() {
                                     final idx = _notifications.indexWhere((n) => n.id == notif.id);
                                     if (idx != -1) {

@@ -46,31 +46,50 @@ class ListingModel extends Equatable {
     this.categoryName,
   });
 
+  /// Tolerant of the API shape: Prisma Decimals arrive as strings
+  /// ("250000"), `category` is a nested object, and `media` is a list of
+  /// {id,url,type,...} objects.
   factory ListingModel.fromJson(Map<String, dynamic> json) {
+    final category = json['category'];
+    final media = json['media'] as List?;
     return ListingModel(
       id: json['id'] as String,
-      vendorId: json['vendorId'] as String,
-      categoryId: json['categoryId'] as String,
+      vendorId: json['vendorId'] as String? ?? '',
+      categoryId: json['categoryId'] as String? ??
+          (category is Map ? category['id'] as String? ?? '' : ''),
       title: json['title'] as String,
       description: json['description'] as String?,
       pricingType: json['pricingType'] as String? ?? 'FIXED',
-      basePrice: json['basePrice'] != null ? (json['basePrice'] as num).toDouble() : null,
+      basePrice: _toDouble(json['basePrice']),
       isActive: json['isActive'] as bool? ?? true,
       isFeatured: json['isFeatured'] as bool? ?? false,
       isRentable: json['isRentable'] as bool? ?? false,
-      perDayRate: json['perDayRate'] != null ? (json['perDayRate'] as num).toDouble() : null,
-      depositAmount: json['depositAmount'] != null ? (json['depositAmount'] as num).toDouble() : null,
+      perDayRate: _toDouble(json['perDayRate']),
+      depositAmount: _toDouble(json['depositAmount']),
       tags: List<String>.from(json['tags'] as List? ?? []),
-      ratingAvg: (json['ratingAvg'] as num? ?? 0).toDouble(),
+      ratingAvg: _toDouble(json['ratingAvg']) ?? 0.0,
       reviewCount: json['reviewCount'] as int? ?? 0,
       viewCount: json['viewCount'] as int? ?? 0,
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'] as String)
           : DateTime.now(),
-      mediaUrls: List<String>.from(json['mediaUrls'] as List? ?? []),
+      mediaUrls: json['mediaUrls'] != null
+          ? List<String>.from(json['mediaUrls'] as List)
+          : (media ?? const [])
+              .map((m) => m is Map ? m['url'] as String? : null)
+              .whereType<String>()
+              .toList(),
       coverUrl: json['coverUrl'] as String?,
-      categoryName: json['categoryName'] as String?,
+      categoryName: json['categoryName'] as String? ??
+          (category is Map ? category['name'] as String? : null),
     );
+  }
+
+  /// Accepts num or numeric string (Prisma Decimal serialization).
+  static double? _toDouble(dynamic v) {
+    if (v == null) return null;
+    if (v is num) return v.toDouble();
+    return double.tryParse(v.toString());
   }
 
   Map<String, dynamic> toJson() => {

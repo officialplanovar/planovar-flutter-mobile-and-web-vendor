@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_input.dart';
+import '../bloc/auth_bloc.dart';
+import '../bloc/auth_event.dart';
+import '../bloc/auth_state.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -18,25 +21,12 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
   bool _obscure = true;
-  bool _loading = false;
 
   @override
   void dispose() {
     _emailCtrl.dispose();
     _passwordCtrl.dispose();
     super.dispose();
-  }
-
-  Future<void> _signIn() async {
-    setState(() => _loading = true);
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 800));
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('vendor_isLoggedIn', true);
-    if (mounted) {
-      setState(() => _loading = false);
-      context.go(AppRoutes.home);
-    }
   }
 
   Widget _buildDivider() {
@@ -181,10 +171,31 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(height: 28),
 
             // Sign in button
-            AppButton.primary(
-              'Sign In',
-              loading: _loading,
-              onTap: _loading ? null : _signIn,
+            BlocConsumer<AuthBloc, AuthState>(
+              listener: (context, state) {
+                if (state is AuthAuthenticated) {
+                  context.go(AppRoutes.home);
+                } else if (state is AuthError) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(state.message)),
+                  );
+                }
+              },
+              builder: (context, state) {
+                final loading = state is AuthLoading;
+                return AppButton.primary(
+                  'Sign In',
+                  loading: loading,
+                  onTap: loading
+                      ? null
+                      : () => context.read<AuthBloc>().add(
+                            AuthSignInRequested(
+                              email: _emailCtrl.text.trim(),
+                              password: _passwordCtrl.text,
+                            ),
+                          ),
+                );
+              },
             ),
             const SizedBox(height: 20),
 

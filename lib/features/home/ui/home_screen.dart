@@ -1,21 +1,60 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/router/app_routes.dart';
-import '../../../core/utils/formatters.dart';
 import '../../../core/mock/mock_data.dart';
+import '../../../shared/models/vendor_model.dart';
 import '../../../shared/widgets/network_image_widget.dart';
 import '../../../shared/widgets/app_button.dart';
+import '../../auth/bloc/auth_bloc.dart';
+import '../../auth/bloc/auth_state.dart';
+import '../../orders/bloc/orders_cubit.dart';
+import '../../vendor/data/vendor_repository.dart';
 
-class HomeScreen extends StatelessWidget {
+/// Neutral placeholder shown only while the real vendor profile is loading.
+const _kEmptyVendor = VendorModel(
+  id: '',
+  businessName: '',
+  slug: '',
+  ratingAvg: 0,
+  reviewCount: 0,
+  subscriptionTier: 'basic',
+  isVerified: false,
+);
+
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  VendorModel? _vendor;
+
+  @override
+  void initState() {
+    super.initState();
+    // Inquiry counts power the alert banner + stats.
+    final orders = context.read<OrdersCubit>();
+    if (orders.state.orders.isEmpty) orders.load();
+    // Live vendor profile (rating, review count, business name).
+    VendorRepository().getMe().then((v) {
+      if (mounted && v != null) setState(() => _vendor = v);
+    }).catchError((_) {});
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final vendor = MockData.currentVendor;
-    final user = MockData.currentUser;
-    final schedule = MockData.todaySchedule;
+    // Live data; neutral placeholders while the profile loads (no mock).
+    final vendor = _vendor ?? _kEmptyVendor;
+    final authState = context.watch<AuthBloc>().state;
+    final user = authState is AuthAuthenticated ? authState.user : null;
+    // No schedule/calendar backend yet — show the empty state, not mock events.
+    const schedule = <ScheduleItem>[];
+    final summary = context.watch<OrdersCubit>().state.summary;
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
@@ -31,9 +70,9 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Alert banner
+                  // Alert banner — pending inquiries needing a response
                   _AlertBanner(
-                    count: MockData.pendingRequests,
+                    count: summary.actionNeeded,
                     onTap: () => context.push(AppRoutes.actionNeeded),
                   ),
 
@@ -42,7 +81,11 @@ class HomeScreen extends StatelessWidget {
                   // Stats grid
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: _StatsGrid(vendor: vendor),
+                    child: _StatsGrid(
+                      vendor: vendor,
+                      activeCount: summary.confirmed,
+                      pendingCount: summary.actionNeeded,
+                    ),
                   ),
 
                   const SizedBox(height: 28),
@@ -98,6 +141,14 @@ class _GradientHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
 
+    // Derive the location from the vendor's saved profile.
+    final loc = (vendor.location as Map?) ?? const {};
+    final locParts = [loc['city'], loc['country']]
+        .where((e) => e != null && '$e'.trim().isNotEmpty)
+        .map((e) => '$e'.trim())
+        .toList();
+    final locationLabel = locParts.isEmpty ? 'Nigeria' : locParts.join(', ');
+
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -121,7 +172,7 @@ class _GradientHeader extends StatelessWidget {
               const Icon(Icons.location_on_rounded, size: 14, color: Colors.white70),
               const SizedBox(width: 4),
               Text(
-                'Abuja, Nigeria',
+                locationLabel,
                 style: GoogleFonts.urbanist(
                   fontSize: 13,
                   color: Colors.white,
@@ -145,7 +196,7 @@ class _GradientHeader extends StatelessWidget {
                   backgroundColor: Colors.white24,
                   child: ClipOval(
                     child: AppNetworkImage(
-                      url: user.image,
+                      url: user?.image,
                       width: 56,
                       height: 56,
                       fit: BoxFit.cover,
@@ -313,12 +364,18 @@ class _AlertBanner extends StatelessWidget {
 
 class _StatsGrid extends StatelessWidget {
   final dynamic vendor;
+  final int activeCount;
+  final int pendingCount;
 
-  const _StatsGrid({required this.vendor});
+  const _StatsGrid({
+    required this.vendor,
+    required this.activeCount,
+    required this.pendingCount,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final reviewCount = (vendor.reviewCount as int?) ?? 200;
+    final reviewCount = (vendor.reviewCount as int?) ?? 0;
 
     return GridView.count(
       padding: EdgeInsets.zero,
@@ -330,23 +387,23 @@ class _StatsGrid extends StatelessWidget {
       mainAxisSpacing: 12,
       children: [
         _StatCard(
-          label: 'Active Events',
-          value: '${MockData.activeEvents}',
-          badge: _StatBadge.up('+18%'),
+          label: 'Confirmed Bookings',
+          value: '$activeCount',
+          badge: _StatBadge.up(''),
         ),
         _StatCard(
           label: 'Pending Requests',
-          value: '${MockData.pendingRequests}',
-          badge: _StatBadge.down('+3'),
+          value: '$pendingCount',
+          badge: _StatBadge.down(''),
         ),
         _StatCard(
           label: 'This month',
-          value: Formatters.formatCurrency(MockData.thisMonthEarnings),
-          badge: _StatBadge.up('+18%'),
+          value: '$activeCount bookings',
+          badge: _StatBadge.up(''),
         ),
         _StatCard(
           label: 'Avg Rating',
-          value: '${MockData.ratingAvg}',
+          value: '${(vendor.ratingAvg as num?) ?? 0}',
           ratingPrefix: true,
           reviewsText: 'from $reviewCount reviews',
         ),

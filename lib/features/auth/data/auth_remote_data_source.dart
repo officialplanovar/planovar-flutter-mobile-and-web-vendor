@@ -1,0 +1,105 @@
+import 'package:dio/dio.dart';
+import '../../../core/api/api_client.dart';
+
+/// Thin wrapper over the Better Auth endpoints (/api/auth/*).
+/// Captures the `set-auth-token` header (bearer plugin) into secure storage.
+class AuthRemoteDataSource {
+  final ApiClient _api;
+  AuthRemoteDataSource(this._api);
+
+  Dio get _dio => _api.dio;
+
+  Future<Map<String, dynamic>> signUpEmail({
+    required String name,
+    required String email,
+    required String password,
+    String role = 'VENDOR',
+    String? phone,
+  }) async {
+    final res = await _dio.post('/api/auth/sign-up/email', data: {
+      'name': name,
+      'email': email,
+      'password': password,
+      'role': role,
+      if (phone != null && phone.isNotEmpty) 'phone': phone,
+    });
+    _ensureOk(res);
+    await _captureToken(res);
+    return _asMap(res.data);
+  }
+
+  Future<Map<String, dynamic>> signInEmail({
+    required String email,
+    required String password,
+  }) async {
+    final res = await _dio
+        .post('/api/auth/sign-in/email', data: {'email': email, 'password': password});
+    _ensureOk(res);
+    await _captureToken(res);
+    return _asMap(res.data);
+  }
+
+  Future<Map<String, dynamic>?> getSession() async {
+    final res = await _dio.get('/api/auth/get-session');
+    if (res.statusCode == 200 && res.data is Map) return _asMap(res.data);
+    return null;
+  }
+
+  Future<void> sendOtp({required String email, String type = 'email-verification'}) async {
+    final res = await _dio.post('/api/auth/email-otp/send-verification-otp',
+        data: {'email': email, 'type': type});
+    _ensureOk(res);
+  }
+
+  Future<Map<String, dynamic>> verifyEmailOtp({
+    required String email,
+    required String otp,
+  }) async {
+    final res = await _dio
+        .post('/api/auth/email-otp/verify-email', data: {'email': email, 'otp': otp});
+    _ensureOk(res);
+    await _captureToken(res);
+    return _asMap(res.data);
+  }
+
+  Future<void> resetPasswordOtp({
+    required String email,
+    required String otp,
+    required String password,
+  }) async {
+    final res = await _dio.post('/api/auth/email-otp/reset-password',
+        data: {'email': email, 'otp': otp, 'password': password});
+    _ensureOk(res);
+  }
+
+  Future<void> signOut() async {
+    try {
+      await _dio.post('/api/auth/sign-out');
+    } catch (_) {
+      // ignore — clear the local token regardless
+    }
+    await _api.tokenStore.clear();
+  }
+
+  // ── helpers ──────────────────────────────────────────────────────────────
+
+  Future<void> _captureToken(Response res) async {
+    final token = res.headers.value('set-auth-token');
+    if (token != null && token.isNotEmpty) {
+      await _api.tokenStore.save(token);
+    }
+  }
+
+  Map<String, dynamic> _asMap(dynamic data) =>
+      data is Map<String, dynamic> ? data : <String, dynamic>{};
+
+  void _ensureOk(Response res) {
+    final code = res.statusCode ?? 0;
+    if (code >= 200 && code < 300) return;
+    final data = res.data;
+    final msg = (data is Map && data['message'] != null)
+        ? data['message'].toString()
+        : 'Request failed ($code)';
+    throw Exception(msg);
+  }
+}

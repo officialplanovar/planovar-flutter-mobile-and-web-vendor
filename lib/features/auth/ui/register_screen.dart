@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_input.dart';
+import '../bloc/auth_bloc.dart';
+import '../bloc/auth_event.dart';
+import '../bloc/auth_state.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -272,15 +276,44 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 28),
 
-            // Next button
-            AppButton.primary(
-              'Next',
-              onTap: _agreed
-                  ? () => context.push(
-                        AppRoutes.verifyEmail,
-                        extra: {'email': _emailCtrl.text.trim()},
-                      )
-                  : null,
+            // Next button — creates the account + sends email OTP, then advances
+            BlocConsumer<AuthBloc, AuthState>(
+              listener: (context, state) {
+                if (state is AuthOtpSent) {
+                  context.push(
+                    AppRoutes.verifyEmail,
+                    extra: {'email': _emailCtrl.text.trim()},
+                  );
+                } else if (state is AuthError) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(state.message)),
+                  );
+                }
+              },
+              builder: (context, state) {
+                final loading = state is AuthLoading;
+                return AppButton.primary(
+                  'Next',
+                  loading: loading,
+                  onTap: (_agreed && !loading)
+                      ? () {
+                          // Strip a leading national-trunk 0 so 08012345678 and
+                          // 8012345678 both become +2348012345678.
+                          final phone = _phoneCtrl.text
+                              .trim()
+                              .replaceAll(RegExp(r'^0+'), '');
+                          context.read<AuthBloc>().add(
+                                AuthSignUpRequested(
+                                  businessName: _businessNameCtrl.text.trim(),
+                                  email: _emailCtrl.text.trim(),
+                                  password: _passwordCtrl.text,
+                                  phone: phone.isEmpty ? null : '+234$phone',
+                                ),
+                              );
+                        }
+                      : null,
+                );
+              },
             ),
             const SizedBox(height: 20),
 
@@ -290,9 +323,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
             _buildGoogleButton(),
             const SizedBox(height: 28),
 
-            // Sign in link
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            // Sign in link — Wrap so it never overflows on narrow screens.
+            Wrap(
+              alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 Text(
                   'Already have an account? ',

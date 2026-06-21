@@ -16,12 +16,24 @@ import '../../features/listings/ui/add_product_screen.dart';
 import '../../features/listings/ui/add_service_screen.dart';
 import '../../features/listings/ui/edit_listing_screen.dart';
 import '../../features/listings/ui/add_listing_success_screen.dart';
+import '../../features/listings/ui/listing_detail_screen.dart';
+import '../../features/listings/ui/out_of_stock_screen.dart';
 import '../../features/orders/ui/orders_screen.dart';
 import '../../features/orders/ui/order_detail_screen.dart';
+import '../../features/orders/ui/cancel_order_screen.dart';
+import '../../features/orders/ui/leave_review_screen.dart';
+import '../../features/orders/ui/order_tracking_detail_screen.dart';
 import '../../features/messaging/ui/messages_screen.dart';
 import '../../features/messaging/ui/conversation_screen.dart';
+import '../../features/messaging/ui/create_quote_screen.dart';
+import '../../features/messaging/ui/create_invoice_screen.dart';
 import '../../features/profile/ui/profile_screen.dart';
 import '../../features/profile/ui/profile_sub_screens.dart';
+import '../../features/profile/ui/twofa_screens.dart';
+import '../../features/profile/ui/reviews_screen.dart';
+import '../../features/profile/ui/gallery_screen.dart';
+import '../../features/profile/ui/support_screen.dart';
+import '../../features/profile/ui/terms_screen.dart';
 import '../../features/analytics/ui/analytics_screen.dart';
 import '../../features/payouts/ui/payouts_screen.dart';
 import '../../features/notifications/ui/notifications_screen.dart';
@@ -43,6 +55,7 @@ final _authPaths = [
   AppRoutes.setupProfile,
   AppRoutes.setupLocation,
   AppRoutes.setupPlan,
+  AppRoutes.setupKyc,
   AppRoutes.setupPayout,
   AppRoutes.setupSuccess,
 ];
@@ -114,6 +127,10 @@ GoRouter createRouter() {
         builder: (ctx, route) =>const SetupPlanScreen(),
       ),
       GoRoute(
+        path: AppRoutes.setupKyc,
+        builder: (ctx, route) =>const SetupKycScreen(),
+      ),
+      GoRoute(
         path: AppRoutes.setupPayout,
         builder: (ctx, route) =>const SetupPayoutScreen(),
       ),
@@ -143,8 +160,23 @@ GoRouter createRouter() {
       ),
       GoRoute(
         path: AppRoutes.editListing,
-        builder: (_, state) =>
-            EditListingScreen(listingId: state.pathParameters['id']!),
+        builder: (_, state) => EditListingScreen(
+          listingId: state.pathParameters['id'] ?? '',
+        ),
+      ),
+
+      // ─── Listing Detail ───────────────────────────────────────────────────
+      GoRoute(
+        path: AppRoutes.listingDetail,
+        builder: (_, state) => ListingDetailScreen(
+          listingId: state.pathParameters['id'] ?? '',
+        ),
+      ),
+
+      // ─── Out of Stock ─────────────────────────────────────────────────────
+      GoRoute(
+        path: AppRoutes.outOfStock,
+        builder: (_, __) => const OutOfStockScreen(),
       ),
 
       // ─── Listing Success ──────────────────────────────────────────────────
@@ -158,6 +190,23 @@ GoRouter createRouter() {
             isService: extra['isService'] as bool? ?? false,
           );
         },
+      ),
+
+      // ─── Create Quote ─────────────────────────────────────────────────────────
+      GoRoute(
+        path: AppRoutes.createQuote,
+        builder: (_, state) => CreateQuoteScreen(
+          conversationId: state.uri.queryParameters['convId'] ?? '',
+          bookingId: state.uri.queryParameters['bookingId'],
+        ),
+      ),
+
+      // ─── Create Invoice ────────────────────────────────────────────────────────
+      GoRoute(
+        path: AppRoutes.createInvoice,
+        builder: (_, state) => CreateInvoiceScreen(
+          conversationId: state.uri.queryParameters['convId'] ?? '',
+        ),
       ),
 
       // ─── Shell (bottom nav) ────────────────────────────────────────────────
@@ -214,6 +263,25 @@ GoRouter createRouter() {
             OrderDetailScreen(orderId: state.pathParameters['id']!),
       ),
 
+      // ─── Cancel Order ─────────────────────────────────────────────────────
+      GoRoute(
+        path: AppRoutes.cancelOrder,
+        builder: (_, state) => CancelOrderScreen(orderId: state.pathParameters['id']!),
+      ),
+
+      // ─── Leave Review ─────────────────────────────────────────────────────
+      GoRoute(
+        path: AppRoutes.leaveReview,
+        builder: (_, state) => LeaveReviewScreen(orderId: state.pathParameters['id']!),
+      ),
+
+      // ─── Order Tracking Detail ────────────────────────────────────────────
+      GoRoute(
+        path: AppRoutes.trackingDetail,
+        builder: (_, state) =>
+            OrderTrackingDetailScreen(orderId: state.pathParameters['id']!),
+      ),
+
       // ─── Conversation ──────────────────────────────────────────────────────
       GoRoute(
         path: AppRoutes.conversation,
@@ -266,11 +334,87 @@ GoRouter createRouter() {
       ),
       GoRoute(
         path: AppRoutes.faq,
-        builder: (ctx, route) => const HelpScreen(),
+        builder: (ctx, route) => const FaqScreen(),
       ),
       GoRoute(
         path: AppRoutes.notificationSettings,
         builder: (ctx, route) => const NotificationSettingsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.deleteAccount,
+        builder: (ctx, route) => const DeleteAccountScreen(),
+      ),
+
+      // ─── Profile — Reviews & Gallery ──────────────────────────────────────
+      GoRoute(
+        path: AppRoutes.reviews,
+        builder: (_, __) => const ReviewsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.gallery,
+        builder: (_, __) => const GalleryScreen(),
+      ),
+
+      // ─── Profile — Terms ──────────────────────────────────────────────────
+      GoRoute(
+        path: AppRoutes.termsAndConditions,
+        builder: (_, __) => const TermsAndConditionsScreen(),
+      ),
+      GoRoute(
+        path: '/profile/terms/use',
+        builder: (_, __) => const TermsOfUseScreen(),
+      ),
+      GoRoute(
+        path: '/profile/terms/privacy',
+        builder: (_, __) => const PrivacyPolicyScreen(),
+      ),
+
+      // ─── Profile — Change Password ────────────────────────────────────────
+      GoRoute(
+        path: '/profile/security/change-password',
+        builder: (_, __) => const ChangePasswordScreen(),
+      ),
+
+      // ─── Profile — 2FA Flow ────────────────────────────────────────────────
+      GoRoute(
+        path: '/profile/2fa',
+        builder: (_, __) => const TwoFAIntroScreen(),
+      ),
+      GoRoute(
+        path: '/profile/2fa/setup',
+        builder: (_, __) => const TwoFASetupScreen(),
+      ),
+      GoRoute(
+        path: '/profile/2fa/confirm',
+        builder: (_, __) => const TwoFAConfirmScreen(),
+      ),
+      GoRoute(
+        path: '/profile/2fa/success',
+        builder: (_, __) => const TwoFASuccessScreen(),
+      ),
+
+      // ─── Profile — Support ─────────────────────────────────────────────────
+      GoRoute(
+        path: '/profile/support',
+        builder: (_, __) => const SupportScreen(),
+      ),
+      GoRoute(
+        path: '/profile/support/call',
+        builder: (_, __) => const CallSupportScreen(),
+      ),
+      GoRoute(
+        path: '/profile/support/live-chat',
+        builder: (_, __) => const LiveChatScreen(),
+      ),
+      GoRoute(
+        path: '/profile/support/faq',
+        builder: (_, __) => const FaqScreen(),
+      ),
+      GoRoute(
+        path: '/profile/support/faq/:index',
+        builder: (_, state) => FaqDetailScreen(
+          index: int.tryParse(state.pathParameters['index'] ?? '0') ?? 0,
+        ),
       ),
     ],
   );

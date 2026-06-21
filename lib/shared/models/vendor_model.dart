@@ -5,6 +5,7 @@ class VendorModel extends Equatable {
   final String businessName;
   final String slug;
   final String? description;
+  final String? logoUrl;
   final String? coverUrl;
   final String? phone;
   final String? email;
@@ -22,6 +23,7 @@ class VendorModel extends Equatable {
     required this.businessName,
     required this.slug,
     this.description,
+    this.logoUrl,
     this.coverUrl,
     this.phone,
     this.email,
@@ -40,17 +42,32 @@ class VendorModel extends Equatable {
       businessName: json['businessName'] as String,
       slug: json['slug'] as String,
       description: json['description'] as String?,
+      logoUrl: json['logoUrl'] as String?,
       coverUrl: json['coverUrl'] as String?,
       phone: json['phone'] as String?,
       email: json['email'] as String?,
       tags: List<String>.from(json['tags'] as List? ?? []),
       portfolioUrls: List<String>.from(json['portfolioUrls'] as List? ?? []),
-      ratingAvg: (json['ratingAvg'] as num).toDouble(),
-      reviewCount: json['reviewCount'] as int? ?? 0,
+      // Prisma Decimal serializes as a String over JSON (e.g. "0") — tolerate both.
+      ratingAvg: _toDouble(json['ratingAvg']),
+      reviewCount: _toInt(json['reviewCount']),
       subscriptionTier: json['subscriptionTier'] as String? ?? 'basic',
       isVerified: json['isVerified'] as bool? ?? false,
       location: json['location'] as Map<String, dynamic>?,
     );
+  }
+
+  static double _toDouble(dynamic v) {
+    if (v is num) return v.toDouble();
+    if (v is String) return double.tryParse(v) ?? 0.0;
+    return 0.0;
+  }
+
+  static int _toInt(dynamic v) {
+    if (v is int) return v;
+    if (v is num) return v.toInt();
+    if (v is String) return int.tryParse(v) ?? 0;
+    return 0;
   }
 
   Map<String, dynamic> toJson() => {
@@ -58,6 +75,7 @@ class VendorModel extends Equatable {
         'businessName': businessName,
         'slug': slug,
         'description': description,
+        'logoUrl': logoUrl,
         'coverUrl': coverUrl,
         'phone': phone,
         'email': email,
@@ -75,6 +93,7 @@ class VendorModel extends Equatable {
     String? businessName,
     String? slug,
     String? description,
+    String? logoUrl,
     String? coverUrl,
     String? phone,
     String? email,
@@ -91,6 +110,7 @@ class VendorModel extends Equatable {
       businessName: businessName ?? this.businessName,
       slug: slug ?? this.slug,
       description: description ?? this.description,
+      logoUrl: logoUrl ?? this.logoUrl,
       coverUrl: coverUrl ?? this.coverUrl,
       phone: phone ?? this.phone,
       email: email ?? this.email,

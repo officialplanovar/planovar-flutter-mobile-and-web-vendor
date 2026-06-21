@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/mock/mock_data.dart';
 import '../../../core/router/app_routes.dart';
-import '../../../core/utils/formatters.dart';
-import '../../../shared/models/quote_model.dart';
+import '../../../shared/models/order_model.dart';
+import '../../orders/bloc/orders_cubit.dart';
 
 class ActionNeededScreen extends StatelessWidget {
   const ActionNeededScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final quotes = MockData.pendingQuotes;
-    final grouped = _groupByDay(quotes);
+    final state = context.watch<OrdersCubit>().state;
+    final pending = state.orders
+        .where((o) => o.status.toUpperCase() == 'PENDING')
+        .toList();
+    final loading =
+        state.status == OrdersStatus.loading && state.orders.isEmpty;
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
@@ -47,78 +51,71 @@ class ActionNeededScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 24, 20, 40),
-        children: grouped.entries.map((entry) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                entry.key,
-                style: GoogleFonts.urbanist(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
+      body: loading
+          ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+          : pending.isEmpty
+              ? _EmptyState()
+              : ListView(
+                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 40),
+                  children: pending
+                      .map((o) => Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: _ActionCard(order: o),
+                          ))
+                      .toList(),
                 ),
-              ),
-              const SizedBox(height: 12),
-              ...entry.value.map(
-                (quote) => Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: _ActionCard(quote: quote),
-                ),
-              ),
-              const SizedBox(height: 8),
-            ],
-          );
-        }).toList(),
-      ),
     );
   }
+}
 
-  /// Groups quotes into "Today", "Yesterday", or "dd MMM" buckets.
-  Map<String, List<QuoteModel>> _groupByDay(List<QuoteModel> quotes) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final yesterday = today.subtract(const Duration(days: 1));
-
-    final Map<String, List<QuoteModel>> result = {};
-
-    for (final q in quotes) {
-      final d = DateTime(q.createdAt.year, q.createdAt.month, q.createdAt.day);
-      final String label;
-      if (d == today) {
-        label = 'Today';
-      } else if (d == yesterday) {
-        label = 'Yesterday';
-      } else {
-        label = Formatters.formatDate(q.createdAt);
-      }
-      result.putIfAbsent(label, () => []).add(q);
-    }
-
-    return result;
+class _EmptyState extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.inbox_outlined, size: 56, color: AppColors.textHint),
+            const SizedBox(height: 12),
+            Text(
+              'You’re all caught up',
+              style: GoogleFonts.urbanist(
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'No inquiries are waiting on your response.',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.urbanist(
+                fontSize: 14,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
 // ── Action Card ────────────────────────────────────────────────────────────────
 
 class _ActionCard extends StatelessWidget {
-  final QuoteModel quote;
+  final OrderModel order;
 
-  const _ActionCard({required this.quote});
-
-  bool get _isOrder => quote.totalAmount > 0;
+  const _ActionCard({required this.order});
 
   @override
   Widget build(BuildContext context) {
-    final accentColor = _isOrder ? AppColors.error : AppColors.primary;
-    final icon = _isOrder ? Icons.inventory_2_outlined : Icons.chat_bubble_outline_rounded;
-    final title = _isOrder ? 'New Order' : 'Quote request';
-    final subtitle = _isOrder
-        ? '${quote.clientName.split(' ').first} O. · ${Formatters.timeAgo(quote.createdAt)} · ${Formatters.formatCurrency(quote.totalAmount)}'
-        : '${quote.clientName.split(' ').first} B. · ${quote.eventName.toLowerCase()}';
-    final buttonLabel = _isOrder ? 'View Details' : 'Open & Respond';
+    final subtitle = [
+      order.clientName,
+      if (order.eventName.isNotEmpty) order.eventName,
+    ].join(' · ');
 
     return Container(
       decoration: BoxDecoration(
@@ -136,18 +133,16 @@ class _ActionCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Left accent bar
             Container(
               width: 4,
-              decoration: BoxDecoration(
-                color: accentColor,
-                borderRadius: const BorderRadius.only(
+              decoration: const BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(16),
                   bottomLeft: Radius.circular(16),
                 ),
               ),
             ),
-            // Content
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -157,7 +152,6 @@ class _ActionCard extends StatelessWidget {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Icon box
                         Container(
                           width: 52,
                           height: 52,
@@ -165,16 +159,16 @@ class _ActionCard extends StatelessWidget {
                             color: AppColors.primaryLight,
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Icon(icon, color: AppColors.primary, size: 24),
+                          child: const Icon(Icons.chat_bubble_outline_rounded,
+                              color: AppColors.primary, size: 24),
                         ),
                         const SizedBox(width: 12),
-                        // Text
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                title,
+                                'New inquiry',
                                 style: GoogleFonts.urbanist(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w700,
@@ -195,7 +189,6 @@ class _ActionCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        // "New" badge
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
@@ -214,9 +207,8 @@ class _ActionCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 14),
-                    // Action button
                     GestureDetector(
-                      onTap: () => context.push(AppRoutes.orderDetailPath(quote.id)),
+                      onTap: () => context.push(AppRoutes.orderDetailPath(order.id)),
                       child: Container(
                         width: double.infinity,
                         height: 44,
@@ -227,7 +219,7 @@ class _ActionCard extends StatelessWidget {
                         ),
                         child: Center(
                           child: Text(
-                            buttonLabel,
+                            'Open & Respond',
                             style: GoogleFonts.urbanist(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,

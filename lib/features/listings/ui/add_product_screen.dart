@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../../core/services/upload_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_input.dart';
+import '../../../shared/widgets/tag_input_field.dart';
+import '../bloc/listings_cubit.dart';
+import '../data/listings_repository.dart';
 
 class AddProductScreen extends StatefulWidget {
   const AddProductScreen({super.key});
@@ -24,9 +30,100 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final _perDayController = TextEditingController();
   final _depositController = TextEditingController();
   final _durationController = TextEditingController();
+
+  // Product photos — uploaded to the API; up to 4.
+  final _picker = ImagePicker();
+  final _uploads = UploadService();
+  final List<String?> _imageSlots = List<String?>.filled(4, null, growable: false);
+  final List<bool> _uploadingSlots = List<bool>.filled(4, false, growable: false);
+
+  Future<void> _pickPhoto(int index) async {
+    try {
+      final picked = await _picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1600,
+        imageQuality: 85,
+      );
+      if (picked == null) return;
+      setState(() => _uploadingSlots[index] = true);
+      final bytes = await picked.readAsBytes();
+      final url = await _uploads.uploadListingImage(bytes, picked.name);
+      if (!mounted) return;
+      setState(() {
+        _imageSlots[index] = url;
+        _uploadingSlots[index] = false;
+      });
+    } catch (e) {
+      if (mounted) setState(() => _uploadingSlots[index] = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+        );
+      }
+    }
+  }
   final _skuController = TextEditingController();
   final _quantityController = TextEditingController();
-  final _tagsController = TextEditingController();
+  List<String> _tags = [];
+  bool _publishing = false;
+
+  double? _parseAmount(String text) =>
+      double.tryParse(text.replaceAll(',', '').trim());
+
+  Future<void> _publish() async {
+    final name = _nameController.text.trim();
+    final desc = _descController.text.trim();
+    if (name.isEmpty || desc.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Product name and description are required')),
+      );
+      return;
+    }
+    setState(() => _publishing = true);
+    try {
+      final repo = ListingsRepository();
+      // No category picker in this design yet — best-effort match from tags,
+      // falling back to the first active category.
+      final cats = await repo.categories();
+      if (cats.isEmpty) throw Exception('No categories available');
+      final match = cats.firstWhere(
+        (c) => _tags.any((t) =>
+            c.name.toLowerCase().contains(t.toLowerCase()) ||
+            t.toLowerCase().contains(c.name.toLowerCase())),
+        orElse: () => cats.first,
+      );
+      final listing = await repo.create(
+        categoryId: match.id,
+        title: name,
+        description: desc,
+        pricingType: 'FIXED',
+        basePrice: _parseAmount(_priceController.text),
+        isRentable: _isForRent,
+        perDayRate: _isForRent ? _parseAmount(_perDayController.text) : null,
+        depositAmount: _isForRent ? _parseAmount(_depositController.text) : null,
+        tags: _tags,
+        mediaUrls: _imageSlots.whereType<String>().toList(),
+      );
+      if (!mounted) return;
+      context.read<ListingsCubit>().load();
+      context.pushReplacement(
+        '/listings/add-success',
+        extra: {
+          'isService': false,
+          'productId': listing.id,
+          'sku': _skuController.text.trim(),
+          'tags': _tags,
+        },
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+      );
+    } finally {
+      if (mounted) setState(() => _publishing = false);
+    }
+  }
 
   @override
   void dispose() {
@@ -38,7 +135,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
     _durationController.dispose();
     _skuController.dispose();
     _quantityController.dispose();
-    _tagsController.dispose();
     super.dispose();
   }
 
@@ -111,15 +207,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
     );
   }
 
-  Widget _buildPhotoBox(String label) {
+  Widget _buildPhotoBox(int index, String label) {
+    final url = _imageSlots[index];
+    final uploading = _uploadingSlots[index];
     return GestureDetector(
-      onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Photo upload coming soon')),
-        );
-      },
+      onTap: uploading ? null : () => _pickPhoto(index),
       child: Container(
         height: 90,
+        clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: AppColors.divider,
           borderRadius: BorderRadius.circular(12),
@@ -129,25 +224,57 @@ class _AddProductScreenState extends State<AddProductScreen> {
             width: 1.5,
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.add_photo_alternate_outlined,
-              color: AppColors.textHint,
-              size: 24,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: GoogleFonts.urbanist(
-                fontSize: 11,
-                color: AppColors.textSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+        child: uploading
+            ? const Center(
+                child: SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: AppColors.primary),
+                ),
+              )
+            : url != null
+                ? Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.network(url, fit: BoxFit.cover),
+                      Positioned(
+                        top: 4,
+                        right: 4,
+                        child: GestureDetector(
+                          onTap: () => setState(() => _imageSlots[index] = null),
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: const BoxDecoration(
+                              color: Colors.black54,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.close_rounded,
+                                color: Colors.white, size: 16),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.add_photo_alternate_outlined,
+                        color: AppColors.textHint,
+                        size: 24,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        label,
+                        style: GoogleFonts.urbanist(
+                          fontSize: 11,
+                          color: AppColors.textSecondary,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
       ),
     );
   }
@@ -318,10 +445,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   _buildSectionTitle('Available Sizes (Optional)'),
                   _buildSizesRow(),
                   const SizedBox(height: 20),
-                  AppInput(
+                  TagInputField(
+                    tags: _tags,
                     label: 'Tags',
-                    hint: 'Enter tags...',
-                    controller: _tagsController,
+                    hint: 'e.g. Wedding, Cake, Luxury',
+                    onChanged: (updated) => setState(() => _tags = updated),
                   ),
                   const SizedBox(height: 20),
                   _buildSectionTitle('Product Photos'),
@@ -333,10 +461,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     mainAxisSpacing: 12,
                     childAspectRatio: 2.0,
                     children: [
-                      _buildPhotoBox('Front Photo'),
-                      _buildPhotoBox('Back Photo'),
-                      _buildPhotoBox('Side Photo'),
-                      _buildPhotoBox('Detail Photo'),
+                      _buildPhotoBox(0, 'Front Photo'),
+                      _buildPhotoBox(1, 'Back Photo'),
+                      _buildPhotoBox(2, 'Side Photo'),
+                      _buildPhotoBox(3, 'Detail Photo'),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -353,17 +481,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
               ),
             ),
             child: AppButton.primary(
-              'Publish Product',
-              onTap: () {
-                context.pushReplacement(
-                  '/listings/add-success',
-                  extra: {
-                    'isService': false,
-                    'productId': '#PN-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
-                    'sku': 'SKU${DateTime.now().millisecondsSinceEpoch.toString().substring(9)}',
-                  },
-                );
-              },
+              _publishing ? 'Publishing…' : 'Publish Product',
+              loading: _publishing,
+              onTap: _publishing ? null : _publish,
             ),
           ),
         ],

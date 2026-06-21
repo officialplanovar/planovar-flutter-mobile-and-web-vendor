@@ -11,6 +11,8 @@ import '../../shared/models/analytics_model.dart';
 import '../../shared/models/top_listing_item_model.dart';
 import '../../shared/models/notification_model.dart';
 import '../../shared/models/user_model.dart';
+import '../../shared/models/order_model.dart';
+import '../../shared/models/tracking_order_model.dart';
 
 class MockData {
   // ─── Current Vendor User ──────────────────────────────────────────────────────
@@ -551,53 +553,578 @@ class MockData {
 
   // ─── Conversations (from clients) ─────────────────────────────────────────────
   static final List<ConversationModel> conversations = [
+    // ── State 1: Quote Requested (client initiated, no quote yet) ─────────────
     ConversationModel(
       id: 'conv-001',
-      participantName: 'Amaka Obi',
-      participantImage:
-          'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200',
-      lastMessage: 'Can you reduce the price a little?',
-      lastMessageAt: DateTime.now().subtract(const Duration(minutes: 14)),
-      unreadCount: 2,
+      participantName: 'Esther Howard',
+      participantImage: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200',
+      lastMessage: 'Quote Requested - Wedding Setup',
+      statusLabel: 'Quote Requested - Wedding Setup',
+      statusType: 'quote_requested',
+      lastMessageAt: DateTime.now().subtract(const Duration(minutes: 1)),
+      unreadCount: 1,
+      quoteStatus: null,
+      status: 'active',
+      isKycRequired: false,
+      ratingAvg: 4.7,
+      isOnline: true,
+      eventName: 'Wedding',
+      eventDate: DateTime(2026, 3, 14),
       type: 'direct',
     ),
+
+    // ── State 2: Quote Sent (vendor sent a quote, awaiting client acceptance) ─
     ConversationModel(
       id: 'conv-002',
-      participantName: 'Adaeze Okonkwo',
-      participantImage:
-          'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200',
-      lastMessage: 'Cake delivery confirmed for 10am!',
-      lastMessageAt: DateTime.now().subtract(const Duration(hours: 1)),
+      participantName: 'Marvin McKinney',
+      participantImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200',
+      lastMessage: 'Quote sent – awaiting your review',
+      statusLabel: 'Quote Sent - Pending Approval',
+      statusType: null,
+      lastMessageAt: DateTime.now().subtract(const Duration(hours: 2)),
       unreadCount: 0,
+      quoteStatus: 'QUOTE_SENT',
+      status: 'payment_pending',
+      isKycRequired: false,
+      ratingAvg: 4.6,
+      isOnline: false,
+      eventName: 'Corporate Dinner',
+      eventDate: DateTime(2026, 6, 10),
       type: 'direct',
     ),
+
+    // ── State 3: Quote Accepted (client accepted, invoice not yet sent) ───────
     ConversationModel(
       id: 'conv-003',
-      participantName: 'Chinedu Eze',
-      participantImage: null,
-      lastMessage: 'Thank you so much, it was perfect!',
-      lastMessageAt: DateTime.now().subtract(const Duration(hours: 4)),
+      participantName: 'Ronald Richards',
+      participantImage: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200',
+      lastMessage: 'Quote accepted - Invoice Pending',
+      statusLabel: 'Quote accepted - Invoice Pending',
+      statusType: 'quote_accepted',
+      lastMessageAt: DateTime.now().subtract(const Duration(hours: 1)),
       unreadCount: 0,
+      quoteStatus: 'QUOTE_ACCEPTED',
+      status: 'confirmed',
+      isKycRequired: false,
+      ratingAvg: 4.5,
+      isOnline: false,
+      eventName: 'Birthday Party',
+      eventDate: DateTime(2026, 4, 20),
       type: 'direct',
     ),
+
+    // ── State 4: Invoice Sent (full flow — invoice in transit) ────────────────
     ConversationModel(
       id: 'conv-004',
-      participantName: 'Kemi Afolabi',
-      participantImage:
-          'https://images.unsplash.com/photo-1499952127939-9bbf5af6c51c?w=200',
-      lastMessage: 'Quote received, I\'ll confirm by Friday.',
+      participantName: 'Courtney Henry',
+      participantImage: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200',
+      lastMessage: 'Looking forward to the cake tasting…',
       lastMessageAt: DateTime.now().subtract(const Duration(days: 1)),
       unreadCount: 0,
+      quoteStatus: 'INVOICE_SENT',
+      status: 'payment_pending',
+      isKycRequired: false,
+      ratingAvg: 4.8,
+      isOnline: true,
+      eventName: 'Cake Tasting',
+      eventDate: DateTime(2026, 5, 30),
       type: 'direct',
     ),
+
+    // ── State 5: KYC Incomplete (vendor must complete KYC before acting) ──────
     ConversationModel(
       id: 'conv-005',
-      participantName: 'Planovar Support',
-      participantImage: null,
-      lastMessage: 'Your verification is complete!',
-      lastMessageAt: DateTime.now().subtract(const Duration(days: 7)),
+      participantName: 'Robert Fox',
+      participantImage: 'https://images.unsplash.com/photo-1499952127939-9bbf5af6c51c?w=200',
+      lastMessage: 'How far chairman, you go fit do this for me?',
+      lastMessageAt: DateTime(2026, 5, 21),
       unreadCount: 0,
+      quoteStatus: null,
+      status: 'active',
+      isKycRequired: true,
+      ratingAvg: 4.3,
+      isOnline: false,
+      eventName: 'Engagement Party',
+      eventDate: DateTime(2026, 7, 5),
+      type: 'direct',
+    ),
+
+    // ── State 6: Completed (payment received, job done) ───────────────────────
+    ConversationModel(
+      id: 'conv-006',
+      participantName: 'Bessie Cooper',
+      participantImage: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200',
+      lastMessage: 'Thank you so much! Everything was perfect.',
+      lastMessageAt: DateTime.now().subtract(const Duration(days: 3)),
+      unreadCount: 0,
+      quoteStatus: 'INVOICE_SENT',
+      status: 'completed',
+      isKycRequired: false,
+      ratingAvg: 4.9,
+      isOnline: false,
+      eventName: 'Bridal Shower',
+      eventDate: DateTime(2026, 5, 10),
+      type: 'direct',
+    ),
+
+    // ── State 7: Plain chat (no quote flow started) ───────────────────────────
+    ConversationModel(
+      id: 'conv-007',
+      participantName: 'Eleanor Pena',
+      participantImage: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200',
+      lastMessage: 'That sounds perfect. When would you be available?',
+      lastMessageAt: DateTime.now().subtract(const Duration(hours: 4)),
+      unreadCount: 0,
+      quoteStatus: null,
+      status: 'active',
+      isKycRequired: false,
+      ratingAvg: 4.4,
+      isOnline: true,
+      eventName: 'Anniversary Dinner',
+      eventDate: DateTime(2026, 8, 22),
+      type: 'direct',
+    ),
+
+    // ── State 8: Disputed ─────────────────────────────────────────────────────
+    ConversationModel(
+      id: 'conv-008',
+      participantName: 'Devon Lane',
+      participantImage: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200',
+      lastMessage: 'I paid for everything and nothing showed up.',
+      lastMessageAt: DateTime.now().subtract(const Duration(hours: 6)),
+      unreadCount: 2,
+      quoteStatus: 'INVOICE_SENT',
+      status: 'disputed',
+      isKycRequired: false,
+      ratingAvg: 3.8,
+      isOnline: false,
+      eventName: 'Graduation Party',
+      eventDate: DateTime(2026, 5, 18),
+      type: 'direct',
+    ),
+
+    // ── State 9: Support conversation ─────────────────────────────────────────
+    ConversationModel(
+      id: 'conv-009',
+      participantName: 'Planovar Support',
+      participantImage: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=200',
+      lastMessage: 'Hi there! How can we help you today?',
+      lastMessageAt: DateTime.now().subtract(const Duration(days: 2)),
+      unreadCount: 0,
+      quoteStatus: null,
+      status: 'active',
+      isKycRequired: false,
+      ratingAvg: 5.0,
+      isOnline: true,
       type: 'support',
+    ),
+
+    // ── State 10: Group conversation ──────────────────────────────────────────
+    ConversationModel(
+      id: 'conv-010',
+      participantName: 'Ngozi, Chidi + 4 others',
+      participantImage: null,
+      lastMessage: 'Chidi: Confirmed! The venue is booked.',
+      lastMessageAt: DateTime.now().subtract(const Duration(minutes: 30)),
+      unreadCount: 3,
+      quoteStatus: null,
+      status: 'confirmed',
+      isKycRequired: false,
+      ratingAvg: 4.6,
+      isOnline: false,
+      eventName: 'Gold & White Wedding',
+      eventDate: DateTime(2026, 9, 12),
+      type: 'group',
+      isGroup: true,
+      groupName: 'Gold & White Wedding Team',
+      groupParticipantCount: 6,
+      groupAvatars: [
+        'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200',
+        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200',
+        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200',
+      ],
+    ),
+  ];
+
+  // ─── Orders ───────────────────────────────────────────────────────────────────
+  static final List<OrderModel> orders = [
+    // order-001: confirmed, invoice accepted, payment pending
+    OrderModel(
+      id: 'order-001',
+      orderNumber: 'EF-2026-0341',
+      eventName: 'Our Wedding',
+      serviceName: 'Full-day wedding photography',
+      vendorName: 'Lumière Photography',
+      clientName: 'Anita Chimdi',
+      clientImage: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200',
+      thumbnailUrl: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400',
+      eventDate: DateTime(2026, 3, 14),
+      eventLocation: 'Festac, Lokogoma Abuja',
+      eventVenue: 'Eko Hotel',
+      guestCount: 200,
+      category: 'Wedding Decoration',
+      duration: '2 Hours',
+      additionalInfo: 'Please use butter for the frosting instead of artificial cream',
+      clientRating: 4.7,
+      accountNumber: '2938*********',
+      bankName: 'Zenith Bank',
+      amount: 300000,
+      status: 'confirmed',
+      invoiceAcceptedAt: DateTime(2026, 2, 14),
+      paymentConfirmedAt: null,
+      serviceDeliveredAt: null,
+      reviewedAt: null,
+    ),
+
+    // order-002: confirmed, invoice accepted + payment confirmed, service pending
+    OrderModel(
+      id: 'order-002',
+      orderNumber: 'EF-2026-0342',
+      eventName: 'Our Wedding',
+      serviceName: 'Full-day wedding photography',
+      vendorName: 'Lumière Photography',
+      clientName: 'Anita Chimdi',
+      clientImage: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200',
+      thumbnailUrl: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400',
+      eventDate: DateTime(2026, 3, 14),
+      eventLocation: 'Festac, Lokogoma Abuja',
+      eventVenue: 'Eko Hotel',
+      guestCount: 200,
+      category: 'Wedding Decoration',
+      duration: '2 Hours',
+      additionalInfo: 'Please use butter for the frosting instead of artificial cream',
+      clientRating: 4.7,
+      accountNumber: '2938*********',
+      bankName: 'Zenith Bank',
+      amount: 300000,
+      status: 'confirmed',
+      invoiceAcceptedAt: DateTime(2026, 2, 14),
+      paymentConfirmedAt: DateTime(2026, 2, 20),
+      serviceDeliveredAt: null,
+      reviewedAt: null,
+    ),
+
+    // order-003: completed, all steps done except review
+    OrderModel(
+      id: 'order-003',
+      orderNumber: 'EF-2026-0289',
+      eventName: 'Birthday Bash',
+      serviceName: 'DJ & Sound System',
+      vendorName: 'Lumière Photography',
+      clientName: 'Kolade Bello',
+      clientImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200',
+      thumbnailUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400',
+      eventDate: DateTime(2026, 5, 14),
+      eventLocation: 'Lekki Phase 1, Lagos',
+      eventVenue: 'The Podium',
+      guestCount: 150,
+      category: 'Entertainment',
+      duration: '5 Hours',
+      additionalInfo: null,
+      clientRating: 4.5,
+      accountNumber: '1234*********',
+      bankName: 'GTBank',
+      amount: 180000,
+      status: 'completed',
+      invoiceAcceptedAt: DateTime(2026, 5, 14),
+      paymentConfirmedAt: DateTime(2026, 5, 14),
+      serviceDeliveredAt: DateTime(2026, 5, 14),
+      reviewedAt: null,
+    ),
+
+    // order-004: completed, ALL steps done including review
+    OrderModel(
+      id: 'order-004',
+      orderNumber: 'EF-2026-0290',
+      eventName: 'Birthday Bash',
+      serviceName: 'DJ & Sound System',
+      vendorName: 'Lumière Photography',
+      clientName: 'Kolade Bello',
+      clientImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200',
+      thumbnailUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400',
+      eventDate: DateTime(2026, 5, 14),
+      eventLocation: 'Lekki Phase 1, Lagos',
+      eventVenue: 'The Podium',
+      guestCount: 150,
+      category: 'Entertainment',
+      duration: '5 Hours',
+      additionalInfo: null,
+      clientRating: 4.5,
+      accountNumber: '1234*********',
+      bankName: 'GTBank',
+      amount: 180000,
+      status: 'completed',
+      invoiceAcceptedAt: DateTime(2026, 5, 14),
+      paymentConfirmedAt: DateTime(2026, 5, 14),
+      serviceDeliveredAt: DateTime(2026, 5, 14),
+      reviewedAt: DateTime(2026, 5, 16),
+    ),
+
+    // order-005: cancelled
+    OrderModel(
+      id: 'order-005',
+      orderNumber: 'EF-2026-0210',
+      eventName: 'Engagement Party',
+      serviceName: 'Event Decoration',
+      vendorName: 'Lumière Photography',
+      clientName: 'Fatima Abubakar',
+      clientImage: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200',
+      thumbnailUrl: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=400',
+      eventDate: DateTime(2026, 4, 5),
+      eventLocation: 'Wuse 2, Abuja',
+      eventVenue: 'Sheraton Hotel',
+      guestCount: 80,
+      category: 'Decoration',
+      duration: '3 Hours',
+      additionalInfo: null,
+      clientRating: 4.2,
+      accountNumber: '5678*********',
+      bankName: 'Access Bank',
+      amount: 120000,
+      status: 'cancelled',
+      invoiceAcceptedAt: DateTime(2026, 3, 1),
+      paymentConfirmedAt: null,
+      serviceDeliveredAt: null,
+      reviewedAt: null,
+    ),
+  ];
+
+  // ─── Tracking Orders ─────────────────────────────────────────────────────────
+  static final List<TrackingOrderModel> trackingOrders = [
+    // track-001: Purchase — newly placed, needs vendor action (Accept/Decline)
+    TrackingOrderModel(
+      id: 'track-001',
+      orderNumber: 'PO-2026-1041',
+      orderType: 'purchase',
+      productName: 'Gold Candelabra Set (x10)',
+      productImage: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400',
+      clientName: 'Amara Nwosu',
+      clientImage: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200',
+      orderDate: DateTime(2026, 5, 25),
+      status: 'requested',
+      amount: 45000,
+      platformFee: 2250,
+      deliveryCost: 3500,
+      hasDelivery: true,
+      deliveryAddress: '14 Bourdillon Road, Ikoyi, Lagos',
+      deliveryRoute: 'Lagos → Ikoyi',
+      orderPlacedAt: DateTime(2026, 5, 25, 9, 14),
+    ),
+
+    // track-002: Purchase — vendor confirmed, needs to mark "In Production"
+    TrackingOrderModel(
+      id: 'track-002',
+      orderNumber: 'PO-2026-0998',
+      orderType: 'purchase',
+      productName: 'White Drape Backdrop (3m × 6m)',
+      productImage: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400',
+      clientName: 'Tunde Fashola',
+      clientImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200',
+      orderDate: DateTime(2026, 5, 24),
+      status: 'confirmed',
+      amount: 28000,
+      platformFee: 1400,
+      deliveryCost: 2500,
+      hasDelivery: true,
+      deliveryAddress: '3 Ahmadu Bello Way, Victoria Island, Lagos',
+      deliveryRoute: 'Lagos → VI',
+      orderPlacedAt: DateTime(2026, 5, 24, 10, 0),
+      vendorConfirmedAt: DateTime(2026, 5, 24, 11, 30),
+    ),
+
+    // track-003: Purchase — in production, ready to "Send for Delivery"
+    TrackingOrderModel(
+      id: 'track-003',
+      orderNumber: 'PO-2026-0951',
+      orderType: 'purchase',
+      productName: 'Floral Centrepiece Bundles (x20)',
+      productImage: 'https://images.unsplash.com/photo-1490750967868-88df5691cc5e?w=400',
+      clientName: 'Ngozi Okonkwo',
+      clientImage: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200',
+      orderDate: DateTime(2026, 5, 23),
+      status: 'in_production',
+      amount: 62000,
+      platformFee: 3100,
+      deliveryCost: 4000,
+      hasDelivery: true,
+      deliveryAddress: '7 Ademola Adetokunbo Crescent, Wuse 2, Abuja',
+      deliveryRoute: 'Lagos → Abuja',
+      orderPlacedAt: DateTime(2026, 5, 23, 8, 0),
+      vendorConfirmedAt: DateTime(2026, 5, 23, 9, 0),
+      inProductionAt: DateTime(2026, 5, 23, 15, 0),
+    ),
+
+    // track-004: Purchase — out for delivery
+    TrackingOrderModel(
+      id: 'track-004',
+      orderNumber: 'PO-2026-0910',
+      orderType: 'purchase',
+      productName: 'Crystal Chandelier Hire (Large)',
+      productImage: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400',
+      clientName: 'Emeka Obi',
+      clientImage: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200',
+      orderDate: DateTime(2026, 5, 22),
+      status: 'out_for_delivery',
+      amount: 95000,
+      platformFee: 4750,
+      deliveryCost: 6500,
+      hasDelivery: true,
+      deliveryAddress: 'Plot 1234 Usman Dan Fodio Road, Asokoro, Abuja',
+      deliveryRoute: 'Lagos → Abuja',
+      driverName: 'Chukwuemeka Eze',
+      driverPhone: '+2348056781234',
+      orderPlacedAt: DateTime(2026, 5, 22, 7, 30),
+      vendorConfirmedAt: DateTime(2026, 5, 22, 9, 0),
+      inProductionAt: DateTime(2026, 5, 22, 12, 0),
+      outForDeliveryAt: DateTime(2026, 5, 24, 8, 0),
+    ),
+
+    // track-005: Purchase — delivered (completed)
+    TrackingOrderModel(
+      id: 'track-005',
+      orderNumber: 'PO-2026-0860',
+      orderType: 'purchase',
+      productName: 'Custom Neon Sign – "Mr & Mrs"',
+      productImage: 'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=400',
+      clientName: 'Bisi Adeyemi',
+      clientImage: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200',
+      orderDate: DateTime(2026, 5, 20),
+      status: 'delivered',
+      amount: 38000,
+      platformFee: 1900,
+      deliveryCost: 2800,
+      hasDelivery: true,
+      deliveryAddress: '22 Kofo Abayomi Street, Victoria Island',
+      deliveryRoute: 'Lagos → VI',
+      driverName: 'Taiwo Olawale',
+      driverPhone: '+2348022445566',
+      orderPlacedAt: DateTime(2026, 5, 20, 10, 0),
+      vendorConfirmedAt: DateTime(2026, 5, 20, 11, 0),
+      inProductionAt: DateTime(2026, 5, 20, 14, 0),
+      outForDeliveryAt: DateTime(2026, 5, 22, 8, 0),
+      deliveredAt: DateTime(2026, 5, 23, 14, 30),
+    ),
+
+    // track-006: Rental — newly requested (Accept/Decline, no timeline yet)
+    TrackingOrderModel(
+      id: 'track-006',
+      orderNumber: 'RN-2026-0503',
+      orderType: 'rental',
+      productName: 'Gold Tiffany Chair Set (x50)',
+      productImage: 'https://images.unsplash.com/photo-1581539250439-c96689b516dd?w=400',
+      clientName: 'Chinyere Okeke',
+      clientImage: 'https://images.unsplash.com/photo-1499952127939-9bbf5af6c51c?w=200',
+      orderDate: DateTime(2026, 5, 25),
+      status: 'requested',
+      amount: 50000,
+      platformFee: 2500,
+      depositAmount: 10000,
+      perDayRate: 25000,
+      rentalDays: 2,
+      pickupTime: DateTime(2026, 5, 28, 9, 0),
+      returnByTime: DateTime(2026, 5, 30, 18, 0),
+      orderPlacedAt: DateTime(2026, 5, 25, 14, 0),
+    ),
+
+    // track-007: Rental — payment confirmed, needs pickup confirmation
+    TrackingOrderModel(
+      id: 'track-007',
+      orderNumber: 'RN-2026-0478',
+      orderType: 'rental',
+      productName: 'Photo Booth Machine (Premium)',
+      productImage: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400',
+      clientName: 'Damilola Adebayo',
+      clientImage: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200',
+      orderDate: DateTime(2026, 5, 24),
+      status: 'payment_confirmed',
+      amount: 40000,
+      platformFee: 2000,
+      depositAmount: 8000,
+      perDayRate: 40000,
+      rentalDays: 1,
+      pickupTime: DateTime(2026, 5, 26, 10, 0),
+      returnByTime: DateTime(2026, 5, 27, 10, 0),
+      hasDelivery: true,
+      deliveryAddress: '5 Idejo Street, Victoria Island, Lagos',
+      deliveryRoute: 'Lagos → VI',
+      orderPlacedAt: DateTime(2026, 5, 24, 11, 0),
+      paymentConfirmedAt: DateTime(2026, 5, 24, 16, 0),
+    ),
+
+    // track-008: Rental — pickup confirmed, sent for delivery
+    TrackingOrderModel(
+      id: 'track-008',
+      orderNumber: 'RN-2026-0441',
+      orderType: 'rental',
+      productName: 'PA Sound System (2000W)',
+      productImage: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400',
+      clientName: 'Seun Kuti',
+      clientImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200',
+      orderDate: DateTime(2026, 5, 23),
+      status: 'out_for_delivery',
+      amount: 35000,
+      platformFee: 1750,
+      depositAmount: 7000,
+      perDayRate: 35000,
+      rentalDays: 1,
+      pickupTime: DateTime(2026, 5, 25, 9, 0),
+      returnByTime: DateTime(2026, 5, 26, 9, 0),
+      hasDelivery: true,
+      deliveryAddress: '12 Awolowo Road, Ikoyi',
+      deliveryRoute: 'Lagos → Ikoyi',
+      driverName: 'Biodun Olatunji',
+      driverPhone: '+2348011223344',
+      orderPlacedAt: DateTime(2026, 5, 23, 9, 0),
+      paymentConfirmedAt: DateTime(2026, 5, 23, 10, 0),
+      pickupConfirmedAt: DateTime(2026, 5, 25, 9, 0),
+      outForDeliveryAt: DateTime(2026, 5, 25, 10, 30),
+    ),
+
+    // track-009: Rental — active/out, awaiting return confirmation
+    TrackingOrderModel(
+      id: 'track-009',
+      orderNumber: 'RN-2026-0399',
+      orderType: 'rental',
+      productName: 'LED Dance Floor (4m × 4m)',
+      productImage: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=400',
+      clientName: 'Kemi Afolabi',
+      clientImage: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200',
+      orderDate: DateTime(2026, 5, 21),
+      status: 'pickup_confirmed',
+      amount: 80000,
+      platformFee: 4000,
+      depositAmount: 16000,
+      perDayRate: 40000,
+      rentalDays: 2,
+      pickupTime: DateTime(2026, 5, 23, 10, 0),
+      returnByTime: DateTime(2026, 5, 25, 18, 0),
+      orderPlacedAt: DateTime(2026, 5, 21, 8, 0),
+      paymentConfirmedAt: DateTime(2026, 5, 21, 14, 0),
+      pickupConfirmedAt: DateTime(2026, 5, 23, 10, 0),
+    ),
+
+    // track-010: Rental — fully completed, leave review
+    TrackingOrderModel(
+      id: 'track-010',
+      orderNumber: 'RN-2026-0342',
+      orderType: 'rental',
+      productName: 'Stretch Limousine (8 hrs)',
+      productImage: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=400',
+      clientName: 'Victor Onah',
+      clientImage: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200',
+      orderDate: DateTime(2026, 5, 18),
+      status: 'return_confirmed',
+      amount: 120000,
+      platformFee: 6000,
+      depositAmount: 24000,
+      perDayRate: 120000,
+      rentalDays: 1,
+      pickupTime: DateTime(2026, 5, 20, 12, 0),
+      returnByTime: DateTime(2026, 5, 21, 20, 0),
+      orderPlacedAt: DateTime(2026, 5, 18, 10, 0),
+      paymentConfirmedAt: DateTime(2026, 5, 18, 15, 0),
+      pickupConfirmedAt: DateTime(2026, 5, 20, 12, 0),
+      returnConfirmedAt: DateTime(2026, 5, 21, 20, 30),
     ),
   ];
 
@@ -609,41 +1136,9 @@ class MockData {
           id: 'msg-c1-1',
           conversationId: 'conv-001',
           senderId: 'client-011',
-          content: 'Hi! I need a 5-tier wedding cake for 300 guests. Ivory and gold theme.',
+          content: "Hi! We're planning a wedding for 200 guests on 14 March. Need a 3-tier fondant cake + table centerpieces for all tables.",
           type: 'TEXT',
-          createdAt: DateTime.now().subtract(const Duration(days: 2, hours: 3)),
-          isMe: false,
-        ),
-        MessageModel(
-          id: 'msg-c1-2',
-          conversationId: 'conv-001',
-          senderId: 'vendor-001',
-          content:
-              'Hello Amaka! Congratulations on your upcoming wedding! '
-              'We would love to create your dream cake. Let me send over a quote for you.',
-          type: 'TEXT',
-          createdAt: DateTime.now().subtract(const Duration(days: 2, hours: 2)),
-          isMe: true,
-        ),
-        MessageModel(
-          id: 'msg-c1-3',
-          conversationId: 'conv-001',
-          senderId: 'vendor-001',
-          content:
-              'Here is my preliminary estimate: 5-tier fondant cake (₦180,000) + '
-              'delivery to Eko Hotel (₦15,000) + setup (₦10,000) = Total ₦205,000.',
-          type: 'TEXT',
-          createdAt: DateTime.now().subtract(const Duration(days: 1, hours: 22)),
-          isMe: true,
-        ),
-        MessageModel(
-          id: 'msg-c1-4',
-          conversationId: 'conv-001',
-          senderId: 'client-011',
-          content:
-              'Can you reduce the price a little? Our budget is around ₦180,000 all in.',
-          type: 'TEXT',
-          createdAt: DateTime.now().subtract(const Duration(minutes: 14)),
+          createdAt: DateTime.now().subtract(const Duration(hours: 2)),
           isMe: false,
         ),
       ];
@@ -770,6 +1265,70 @@ class MockData {
       color: Colors.blue,
     ),
   ];
+
+  // ─── Search & Recommendation ────────────────────────────────────────────────
+
+  /// Full-text search across listing name, description, category, and tags.
+  /// Returns results ranked by relevance:
+  ///   1. Tag exact match  (score 4)
+  ///   2. Name match       (score 3)
+  ///   3. Category match   (score 2)
+  ///   4. Description word (score 1)
+  static List<ListingModel> searchListings(String query) {
+    final q = query.trim().toLowerCase();
+    if (q.isEmpty) return listings;
+
+    final terms = q.split(RegExp(r'\s+')); // support multi-word queries
+
+    final scored = listings.map((l) {
+      int score = 0;
+
+      for (final term in terms) {
+        // Tags — highest signal (exact match)
+        if (l.tags.any((t) => t.toLowerCase() == term)) score += 4;
+        // Tags — partial match
+        else if (l.tags.any((t) => t.toLowerCase().contains(term))) score += 2;
+
+        // Title
+        if (l.title.toLowerCase().contains(term)) score += 3;
+
+        // Category
+        if ((l.categoryName ?? '').toLowerCase().contains(term)) score += 2;
+
+        // Description words
+        if ((l.description ?? '').toLowerCase().contains(term)) score += 1;
+      }
+
+      return (listing: l, score: score);
+    }).where((r) => r.score > 0).toList()
+      ..sort((a, b) => b.score.compareTo(a.score));
+
+    return scored.map((r) => r.listing).toList();
+  }
+
+  /// Returns listings whose tags overlap with [tags], excluding [excludeId].
+  /// Used by recommendation carousels ("You might also like").
+  static List<ListingModel> recommendedFor(
+    List<String> tags, {
+    String? excludeId,
+    int limit = 5,
+  }) {
+    final lower = tags.map((t) => t.toLowerCase()).toSet();
+
+    final scored = listings
+        .where((l) => l.id != excludeId)
+        .map((l) {
+          final overlap = l.tags
+              .where((t) => lower.contains(t.toLowerCase()))
+              .length;
+          return (listing: l, score: overlap);
+        })
+        .where((r) => r.score > 0)
+        .toList()
+      ..sort((a, b) => b.score.compareTo(a.score));
+
+    return scored.take(limit).map((r) => r.listing).toList();
+  }
 }
 
 // ─── ScheduleItem ─────────────────────────────────────────────────────────────

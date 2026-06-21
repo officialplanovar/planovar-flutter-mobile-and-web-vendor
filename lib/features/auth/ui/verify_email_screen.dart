@@ -1,11 +1,15 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../shared/widgets/app_button.dart';
+import '../bloc/auth_bloc.dart';
+import '../bloc/auth_event.dart';
+import '../bloc/auth_state.dart';
 
 class VerifyEmailScreen extends StatefulWidget {
   final String email;
@@ -55,7 +59,10 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
+          icon: const Icon(
+            Icons.arrow_back_rounded,
+            color: AppColors.textPrimary,
+          ),
           onPressed: () => context.pop(),
         ),
       ),
@@ -120,39 +127,78 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
             ),
             const SizedBox(height: 32),
 
-            // OTP input
-            PinCodeTextField(
-              appContext: context,
-              length: 6,
-              keyboardType: TextInputType.number,
-              pinTheme: PinTheme(
-                shape: PinCodeFieldShape.box,
-                borderRadius: BorderRadius.circular(12),
-                fieldHeight: 52,
-                fieldWidth: 44,
-                activeFillColor: AppColors.primaryLight,
-                selectedFillColor: AppColors.primaryLight,
-                inactiveFillColor: AppColors.divider,
-                activeColor: AppColors.primary,
-                selectedColor: AppColors.primary,
-                inactiveColor: Colors.transparent,
-              ),
-              enableActiveFill: true,
-              onChanged: (v) => setState(() => _otp = v),
-              textStyle: GoogleFonts.urbanist(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+            // OTP input — constrained so the fixed-width boxes don't stretch on web.
+            // Theme override: PinCodeTextField renders a hidden TextField under the
+            // boxes which inherits the app-wide filled/grey InputDecorationTheme —
+            // that painted a grey bar behind the row. Strip the fill locally.
+            Center(
+              child: SizedBox(
+                width: 320,
+                child: Theme(
+                  data: Theme.of(context).copyWith(
+                    inputDecorationTheme: const InputDecorationTheme(
+                      filled: false,
+                      border: InputBorder.none,
+                    ),
+                  ),
+                  child: PinCodeTextField(
+                    appContext: context,
+                    length: 6,
+                    keyboardType: TextInputType.number,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    pinTheme: PinTheme(
+                      shape: PinCodeFieldShape.box,
+                      borderRadius: BorderRadius.circular(12),
+                      fieldHeight: 56,
+                      fieldWidth: 48,
+                      borderWidth: 1.5,
+                      activeFillColor: Colors.white,
+                      selectedFillColor: Colors.white,
+                      inactiveFillColor: Colors.white,
+                      // visible outline on empty boxes (divider #F3F4F6 is too faint)
+                      inactiveColor: AppColors.border,
+                      selectedColor: AppColors.primary,
+                      activeColor: AppColors.primary,
+                    ),
+                    enableActiveFill: true,
+                    onChanged: (v) => setState(() => _otp = v),
+                    textStyle: GoogleFonts.urbanist(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 32),
 
-            // Proceed button
-            AppButton.primary(
-              'Proceed',
-              onTap: canProceed
-                  ? () => context.go(AppRoutes.setupBusinessType)
-                  : null,
+            // Proceed button — verifies the OTP against the backend
+            BlocConsumer<AuthBloc, AuthState>(
+              listener: (context, state) {
+                if (state is AuthOtpVerified) {
+                  context.go(AppRoutes.setupBusinessType);
+                } else if (state is AuthError) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(state.message)));
+                }
+              },
+              builder: (context, state) {
+                final loading = state is AuthLoading;
+                return AppButton.primary(
+                  'Proceed',
+                  loading: loading,
+                  onTap: (canProceed && !loading)
+                      ? () => context.read<AuthBloc>().add(
+                          AuthOtpVerifyRequested(
+                            email: widget.email,
+                            otp: _otp,
+                          ),
+                        )
+                      : null,
+                );
+              },
             ),
             const SizedBox(height: 24),
 

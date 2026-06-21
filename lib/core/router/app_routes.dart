@@ -13,7 +13,8 @@ abstract class AppRoutes {
   static const setupProfile = '/setup/profile';
   static const setupLocation = '/setup/location';
   static const setupPlan = '/setup/plan';
-  static const setupPayout = '/setup/payout';
+  static const setupKyc = '/setup/kyc';
+  static const setupPayout = '/setup/payout'; // legacy, unused under subscription-only
   static const setupSuccess = '/setup/success';
 
   // ─── Main App (Shell routes) ──────────────────────────────────────────────────
@@ -31,14 +32,29 @@ abstract class AppRoutes {
   static const editListing = '/listings/edit/:id';
   static String editListingPath(String id) => '/listings/edit/$id';
   static const addListingSuccess = '/listings/add-success';
+  static const listingDetail = '/listings/detail/:id';
+  static String listingDetailPath(String id) => '/listings/detail/$id';
+  static const outOfStock = '/listings/out-of-stock';
+  static const listingsOutOfStock = '/listings/out-of-stock';
 
   // ─── Orders / Bookings ────────────────────────────────────────────────────────
   static const orderDetail = '/orders/:id';
   static String orderDetailPath(String id) => '/orders/$id';
+  static const cancelOrder = '/orders/:id/cancel';
+  static String cancelOrderPath(String id) => '/orders/$id/cancel';
+  static const leaveReview = '/orders/:id/review';
+  static String leaveReviewPath(String id) => '/orders/$id/review';
+  static const trackingDetail = '/orders/tracking/:id';
+  static String trackingDetailPath(String id) => '/orders/tracking/$id';
 
   // ─── Messages ────────────────────────────────────────────────────────────────
   static const conversation = '/messages/:id';
   static String conversationPath(String id) => '/messages/$id';
+  static const createQuote = '/messages/create-quote';
+  static String createQuotePath(String conversationId) => '/messages/create-quote?convId=$conversationId';
+  static String createQuoteForBookingPath(String bookingId) => '/messages/create-quote?bookingId=$bookingId';
+  static const createInvoice = '/messages/create-invoice';
+  static String createInvoicePath(String conversationId) => '/messages/create-invoice?convId=$conversationId';
 
   // ─── Analytics ────────────────────────────────────────────────────────────────
   static const analytics = '/analytics';
@@ -59,4 +75,7 @@ abstract class AppRoutes {
   static const deleteAccount = '/profile/delete-account';
   static const subscriptionPlan = '/profile/plan';
   static const bankDetails = '/profile/bank-details';
+  static const reviews = '/profile/reviews';
+  static const gallery = '/profile/gallery';
+  static const termsAndConditions = '/profile/terms';
 }

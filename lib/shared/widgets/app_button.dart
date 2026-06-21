@@ -157,6 +157,7 @@ class AppButton extends StatelessWidget {
     }
 
     final bool isPrimary = variant == ButtonVariant.primary;
+    const double radius = 14;
 
     return GestureDetector(
       onTap: disabled ? null : onTap,
@@ -178,10 +179,71 @@ class AppButton extends StatelessWidget {
                       end: Alignment.bottomRight,
                     ))
               : null,
-          borderRadius: BorderRadius.circular(isPrimary ? 28 : 14),
+          borderRadius: BorderRadius.circular(radius),
           border: border,
+          // Soft coloured glow beneath primary buttons — the glossy lift.
+          boxShadow: (isPrimary && !disabled)
+              ? [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.45),
+                    blurRadius: 18,
+                    offset: const Offset(0, 8),
+                  ),
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.15),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
         ),
-        child: Center(child: content),
+        child: isPrimary
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(radius),
+                child: Stack(
+                  children: [
+                    // Top sheen — white highlight fading downward (glass look).
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: _height * 0.5,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.white.withValues(alpha: disabled ? 0.12 : 0.26),
+                              Colors.white.withValues(alpha: 0.0),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Soft specular highlight, upper-left.
+                    Positioned(
+                      top: 3,
+                      left: 24,
+                      child: Container(
+                        width: 90,
+                        height: _height * 0.28,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(40),
+                          gradient: RadialGradient(
+                            colors: [
+                              Colors.white.withValues(alpha: disabled ? 0.06 : 0.16),
+                              Colors.transparent,
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Center(child: content),
+                  ],
+                ),
+              )
+            : Center(child: content),
       ),
     );
   }
