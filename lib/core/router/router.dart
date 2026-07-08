@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../features/splash/splash_screen.dart';
@@ -430,10 +431,10 @@ class _AppShell extends StatelessWidget {
   // Nav tabs excluding the centre FAB (Messages).
   // branch: maps to the StatefulShellBranch index.
   static const _tabs = [
-    (icon: Icons.home_outlined,         activeIcon: Icons.home_rounded,         label: 'Home',     branch: 0),
-    (icon: Icons.store_outlined,        activeIcon: Icons.store_rounded,        label: 'Listings', branch: 1),
-    (icon: Icons.receipt_long_outlined, activeIcon: Icons.receipt_long_rounded, label: 'Orders',   branch: 2),
-    (icon: Icons.person_outline_rounded,activeIcon: Icons.person_rounded,       label: 'Profile',  branch: 4),
+    (icon: 'assets/icons/nav-home.svg',     activeIcon: 'assets/icons/nav-home-active.svg',     label: 'Home',     branch: 0),
+    (icon: 'assets/icons/nav-listings.svg', activeIcon: 'assets/icons/nav-listings-active.svg', label: 'Listings', branch: 1),
+    (icon: 'assets/icons/nav-orders.svg',   activeIcon: 'assets/icons/nav-orders-active.svg',   label: 'Orders',   branch: 2),
+    (icon: 'assets/icons/nav-profile.svg',  activeIcon: 'assets/icons/nav-profile-active.svg',  label: 'Profile',  branch: 4),
   ];
 
   // Messages branch index in the StatefulShellRoute.
@@ -445,8 +446,10 @@ class _AppShell extends StatelessWidget {
     end: Alignment.bottomRight,
   );
 
-  Widget _buildTab(int branchIndex, IconData icon, IconData activeIcon, String label) {
+  Widget _buildTab(BuildContext context, int branchIndex, String icon,
+      String activeIcon, String label) {
     final isActive = shell.currentIndex == branchIndex;
+    final inactiveColor = context.c.textSecondary;
     return Expanded(
       child: GestureDetector(
         onTap: () => shell.goBranch(
@@ -457,10 +460,14 @@ class _AppShell extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            SvgPicture.asset(
               isActive ? activeIcon : icon,
-              color: isActive ? AppColors.primary : AppColors.textSecondary,
-              size: 24,
+              width: 24,
+              height: 24,
+              colorFilter: ColorFilter.mode(
+                isActive ? AppColors.primary : inactiveColor,
+                BlendMode.srcIn,
+              ),
             ),
             const SizedBox(height: 2),
             Text(
@@ -468,7 +475,7 @@ class _AppShell extends StatelessWidget {
               style: TextStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 10,
-                color: isActive ? AppColors.primary : AppColors.textSecondary,
+                color: isActive ? AppColors.primary : inactiveColor,
                 fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
@@ -494,9 +501,9 @@ class _AppShell extends StatelessWidget {
             bottom: 0,
             child: Container(
               height: barHeight,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                border: Border(
+              decoration: BoxDecoration(
+                color: context.c.surface,
+                border: const Border(
                   top: BorderSide(color: Color(0x18000000), width: 0.5),
                 ),
               ),
@@ -504,15 +511,15 @@ class _AppShell extends StatelessWidget {
               child: Row(
                 children: [
                   // Home
-                  _buildTab(_tabs[0].branch, _tabs[0].icon, _tabs[0].activeIcon, _tabs[0].label),
+                  _buildTab(context, _tabs[0].branch, _tabs[0].icon, _tabs[0].activeIcon, _tabs[0].label),
                   // Listings
-                  _buildTab(_tabs[1].branch, _tabs[1].icon, _tabs[1].activeIcon, _tabs[1].label),
+                  _buildTab(context, _tabs[1].branch, _tabs[1].icon, _tabs[1].activeIcon, _tabs[1].label),
                   // Centre FAB placeholder (takes up Expanded space)
                   const Expanded(child: SizedBox()),
                   // Orders
-                  _buildTab(_tabs[2].branch, _tabs[2].icon, _tabs[2].activeIcon, _tabs[2].label),
+                  _buildTab(context, _tabs[2].branch, _tabs[2].icon, _tabs[2].activeIcon, _tabs[2].label),
                   // Profile
-                  _buildTab(_tabs[3].branch, _tabs[3].icon, _tabs[3].activeIcon, _tabs[3].label),
+                  _buildTab(context, _tabs[3].branch, _tabs[3].icon, _tabs[3].activeIcon, _tabs[3].label),
                 ],
               ),
             ),
@@ -543,10 +550,14 @@ class _AppShell extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: const Icon(
-                    Icons.chat_bubble_outline_rounded,
-                    color: Colors.white,
-                    size: 26,
+                  child: Center(
+                    child: SvgPicture.asset(
+                      'assets/icons/chat.svg',
+                      width: 26,
+                      height: 26,
+                      colorFilter: const ColorFilter.mode(
+                          Colors.white, BlendMode.srcIn),
+                    ),
                   ),
                 ),
               ),

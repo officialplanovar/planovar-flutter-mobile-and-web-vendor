@@ -62,7 +62,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.c.background,
       body: Column(
         children: [
           // Gradient AppBar
@@ -144,7 +144,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                             painter: _DashedBorderPainter(),
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: context.c.surface,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Center(

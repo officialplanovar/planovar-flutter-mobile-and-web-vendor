@@ -67,7 +67,7 @@ class _TermsRow extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.c.surface,
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
@@ -83,7 +83,7 @@ class _TermsRow extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: AppColors.primaryLight,
+                color: context.c.primaryLight,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: AppColors.primary, size: 24),
@@ -98,7 +98,7 @@ class _TermsRow extends StatelessWidget {
                     style: GoogleFonts.urbanist(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -106,16 +106,16 @@ class _TermsRow extends StatelessWidget {
                     subtitle,
                     style: GoogleFonts.urbanist(
                       fontSize: 13,
-                      color: AppColors.textSecondary,
+                      color: context.c.textSecondary,
                     ),
                   ),
                 ],
               ),
             ),
             const Spacer(),
-            const Icon(
+            Icon(
               Icons.chevron_right_rounded,
-              color: AppColors.textHint,
+              color: context.c.textHint,
               size: 20,
             ),
           ],
@@ -133,7 +133,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.c.background,
       body: Column(
         children: [
           _buildGradientAppBar(context, title: 'Terms & Conditions'),
@@ -183,7 +183,7 @@ class TermsOfUseScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       body: Column(
         children: [
           _buildGradientAppBar(context, title: 'Terms of Use'),
@@ -197,7 +197,7 @@ class TermsOfUseScreen extends StatelessWidget {
                     _loremParagraph,
                     style: GoogleFonts.urbanist(
                       fontSize: 14,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                       height: 1.7,
                     ),
                   ),
@@ -206,7 +206,7 @@ class TermsOfUseScreen extends StatelessWidget {
                     _loremParagraph,
                     style: GoogleFonts.urbanist(
                       fontSize: 14,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                       height: 1.7,
                     ),
                   ),
@@ -215,7 +215,7 @@ class TermsOfUseScreen extends StatelessWidget {
                     _loremParagraph,
                     style: GoogleFonts.urbanist(
                       fontSize: 14,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                       height: 1.7,
                     ),
                   ),
@@ -237,7 +237,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       body: Column(
         children: [
           _buildGradientAppBar(context, title: 'Privacy Policy'),
@@ -251,7 +251,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     _loremParagraph,
                     style: GoogleFonts.urbanist(
                       fontSize: 14,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                       height: 1.7,
                     ),
                   ),
@@ -260,7 +260,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     _loremParagraph,
                     style: GoogleFonts.urbanist(
                       fontSize: 14,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                       height: 1.7,
                     ),
                   ),
@@ -269,7 +269,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     _loremParagraph,
                     style: GoogleFonts.urbanist(
                       fontSize: 14,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                       height: 1.7,
                     ),
                   ),

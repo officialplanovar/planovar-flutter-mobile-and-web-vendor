@@ -146,7 +146,7 @@ class _SupportRow extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.c.surface,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -162,7 +162,7 @@ class _SupportRow extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: AppColors.primaryLight,
+                color: context.c.primaryLight,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: AppColors.primary, size: 22),
@@ -177,7 +177,7 @@ class _SupportRow extends StatelessWidget {
                     style: GoogleFonts.urbanist(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -185,16 +185,16 @@ class _SupportRow extends StatelessWidget {
                     subtitle,
                     style: GoogleFonts.urbanist(
                       fontSize: 13,
-                      color: AppColors.textSecondary,
+                      color: context.c.textSecondary,
                     ),
                   ),
                 ],
               ),
             ),
             const Spacer(),
-            const Icon(
+            Icon(
               Icons.chevron_right_rounded,
-              color: AppColors.textHint,
+              color: context.c.textHint,
               size: 20,
             ),
           ],
@@ -216,7 +216,7 @@ class SupportScreen extends StatelessWidget {
     final firstName = name.isNotEmpty ? name.split(' ').first : 'there';
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.c.background,
       body: Column(
         children: [
           _buildGradientAppBar(context, title: 'Support'),
@@ -230,7 +230,7 @@ class SupportScreen extends StatelessWidget {
                   style: GoogleFonts.urbanist(
                     fontSize: 24,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
+                    color: context.c.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -238,22 +238,22 @@ class SupportScreen extends StatelessWidget {
                 Container(
                   height: 48,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: context.c.surface,
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: AppColors.divider),
+                    border: Border.all(color: context.c.divider),
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     children: [
-                      const Icon(Icons.search_rounded,
-                          color: AppColors.textHint, size: 20),
+                      Icon(Icons.search_rounded,
+                          color: context.c.textHint, size: 20),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           'How can we help you?',
                           style: GoogleFonts.urbanist(
                             fontSize: 14,
-                            color: AppColors.textHint,
+                            color: context.c.textHint,
                           ),
                         ),
                       ),
@@ -310,7 +310,7 @@ class SupportScreen extends StatelessWidget {
                 // FAQ card
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: context.c.surface,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
@@ -330,7 +330,7 @@ class SupportScreen extends StatelessWidget {
                           style: GoogleFonts.urbanist(
                             fontSize: 15,
                             fontWeight: FontWeight.w800,
-                            color: AppColors.textPrimary,
+                            color: context.c.textPrimary,
                           ),
                         ),
                       ),
@@ -351,21 +351,21 @@ class SupportScreen extends StatelessWidget {
                                         _faqs[i]['q']!,
                                         style: GoogleFonts.urbanist(
                                           fontSize: 14,
-                                          color: AppColors.textPrimary,
+                                          color: context.c.textPrimary,
                                         ),
                                       ),
                                     ),
-                                    const Icon(
+                                    Icon(
                                       Icons.chevron_right_rounded,
-                                      color: AppColors.textHint,
+                                      color: context.c.textHint,
                                       size: 18,
                                     ),
                                   ],
                                 ),
                               ),
                             ),
-                            const Divider(
-                                height: 1, color: AppColors.divider),
+                            Divider(
+                                height: 1, color: context.c.divider),
                           ],
                         );
                       }),
@@ -422,7 +422,7 @@ class FaqScreen extends StatelessWidget {
     final topPadding = MediaQuery.of(context).padding.top;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.c.background,
       body: Column(
         children: [
           Container(
@@ -482,7 +482,7 @@ class FaqScreen extends StatelessWidget {
             child: ListView.separated(
               itemCount: _faqs.length,
               separatorBuilder: (_, __) =>
-                  const Divider(height: 1, color: AppColors.divider),
+                  Divider(height: 1, color: context.c.divider),
               itemBuilder: (context, i) {
                 return GestureDetector(
                   onTap: () =>
@@ -498,13 +498,13 @@ class FaqScreen extends StatelessWidget {
                             _faqs[i]['q']!,
                             style: GoogleFonts.urbanist(
                               fontSize: 14,
-                              color: AppColors.textPrimary,
+                              color: context.c.textPrimary,
                             ),
                           ),
                         ),
-                        const Icon(
+                        Icon(
                           Icons.chevron_right_rounded,
-                          color: AppColors.textHint,
+                          color: context.c.textHint,
                           size: 20,
                         ),
                       ],
@@ -533,7 +533,7 @@ class FaqDetailScreen extends StatelessWidget {
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et massa mi. Aliquam in hendrerit urna. Pellentesque sit amet sapien fringilla, mattis ligula consectetur, ultrices mauris. Maecenas vitae mattis tellus. Nullam quis imperdiet augue. Vestibulum auctor ornare leo, non suscipit magna interdum eu. Curabitur pellentesque nibh nibh, at maximus ante fermentum sit amet.';
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       body: Column(
         children: [
           _buildGradientAppBar(
@@ -550,7 +550,7 @@ class FaqDetailScreen extends StatelessWidget {
                     lorem,
                     style: GoogleFonts.urbanist(
                       fontSize: 14,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                       height: 1.6,
                     ),
                   ),
@@ -559,7 +559,7 @@ class FaqDetailScreen extends StatelessWidget {
                     lorem,
                     style: GoogleFonts.urbanist(
                       fontSize: 14,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                       height: 1.6,
                     ),
                   ),
@@ -568,7 +568,7 @@ class FaqDetailScreen extends StatelessWidget {
                     lorem,
                     style: GoogleFonts.urbanist(
                       fontSize: 14,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                       height: 1.6,
                     ),
                   ),
@@ -578,7 +578,7 @@ class FaqDetailScreen extends StatelessWidget {
                     style: GoogleFonts.urbanist(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -588,9 +588,9 @@ class FaqDetailScreen extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: context.c.surface,
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: AppColors.border),
+                        border: Border.all(color: context.c.border),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.04),
@@ -605,7 +605,7 @@ class FaqDetailScreen extends StatelessWidget {
                             width: 48,
                             height: 48,
                             decoration: BoxDecoration(
-                              color: AppColors.primaryLight,
+                              color: context.c.primaryLight,
                               borderRadius: BorderRadius.circular(24),
                             ),
                             child: const Icon(
@@ -621,13 +621,13 @@ class FaqDetailScreen extends StatelessWidget {
                               style: GoogleFonts.urbanist(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimary,
+                                color: context.c.textPrimary,
                               ),
                             ),
                           ),
-                          const Icon(
+                          Icon(
                             Icons.chevron_right_rounded,
-                            color: AppColors.textHint,
+                            color: context.c.textHint,
                             size: 20,
                           ),
                         ],
@@ -652,7 +652,7 @@ class CallSupportScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       body: Column(
         children: [
           _buildGradientAppBar(context, title: 'Call Us'),
@@ -672,7 +672,7 @@ class CallSupportScreen extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   decoration: BoxDecoration(
-                    color: AppColors.backgroundLight,
+                    color: context.c.background,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
@@ -693,7 +693,7 @@ class CallSupportScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: GoogleFonts.urbanist(
                       fontSize: 13,
-                      color: AppColors.textSecondary,
+                      color: context.c.textSecondary,
                     ),
                   ),
                 ),
@@ -746,7 +746,7 @@ class _LiveChatScreenState extends State<LiveChatScreen> {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.c.background,
       body: Column(
         children: [
           // Gradient AppBar with agent info
@@ -831,7 +831,7 @@ class _LiveChatScreenState extends State<LiveChatScreen> {
                         msg.time,
                         style: GoogleFonts.urbanist(
                           fontSize: 12,
-                          color: AppColors.textSecondary,
+                          color: context.c.textSecondary,
                         ),
                       ),
                     ),
@@ -847,7 +847,7 @@ class _LiveChatScreenState extends State<LiveChatScreen> {
                           if (!msg.isMe) ...[
                             CircleAvatar(
                               radius: 10,
-                              backgroundColor: AppColors.primaryLight,
+                              backgroundColor: context.c.primaryLight,
                               child: const Icon(
                                 Icons.support_agent_rounded,
                                 size: 12,
@@ -880,7 +880,7 @@ class _LiveChatScreenState extends State<LiveChatScreen> {
                             const SizedBox(width: 6),
                             CircleAvatar(
                               radius: 10,
-                              backgroundColor: AppColors.primaryLight,
+                              backgroundColor: context.c.primaryLight,
                               child: const Icon(
                                 Icons.person,
                                 size: 12,
@@ -899,7 +899,7 @@ class _LiveChatScreenState extends State<LiveChatScreen> {
 
           // Bottom input bar
           Container(
-            color: Colors.white,
+            color: context.c.surface,
             padding: EdgeInsets.fromLTRB(16, 12, 16, bottomPadding + 12),
             child: Row(
               children: [
@@ -907,8 +907,8 @@ class _LiveChatScreenState extends State<LiveChatScreen> {
                 Container(
                   width: 40,
                   height: 40,
-                  decoration: const BoxDecoration(
-                    color: AppColors.primaryLight,
+                  decoration: BoxDecoration(
+                    color: context.c.primaryLight,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.attach_file_rounded,
@@ -920,26 +920,26 @@ class _LiveChatScreenState extends State<LiveChatScreen> {
                   child: Container(
                     height: 40,
                     decoration: BoxDecoration(
-                      color: AppColors.backgroundLight,
+                      color: context.c.background,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: TextField(
                       controller: _messageCtrl,
                       style: GoogleFonts.urbanist(
                           fontSize: 14,
-                          color: AppColors.textPrimary),
+                          color: context.c.textPrimary),
                       decoration: InputDecoration(
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 10),
                         hintText: 'Type a message',
                         hintStyle: GoogleFonts.urbanist(
                           fontSize: 14,
-                          color: AppColors.textHint,
+                          color: context.c.textHint,
                         ),
                         border: InputBorder.none,
-                        suffixIcon: const Icon(
+                        suffixIcon: Icon(
                           Icons.mic_outlined,
-                          color: AppColors.textHint,
+                          color: context.c.textHint,
                           size: 20,
                         ),
                       ),

@@ -17,13 +17,13 @@ class ShimmerPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: AppColors.border,
-      highlightColor: AppColors.divider,
+      baseColor: context.c.border,
+      highlightColor: context.c.divider,
       child: Container(
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.c.surface,
           borderRadius: BorderRadius.circular(borderRadius),
         ),
       ),
@@ -79,11 +79,11 @@ class ShimmerGrid extends StatelessWidget {
       itemCount: itemCount,
       itemBuilder: (context, index) {
         return Shimmer.fromColors(
-          baseColor: AppColors.border,
-          highlightColor: AppColors.divider,
+          baseColor: context.c.border,
+          highlightColor: context.c.divider,
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.c.surface,
               borderRadius: BorderRadius.circular(12),
             ),
           ),

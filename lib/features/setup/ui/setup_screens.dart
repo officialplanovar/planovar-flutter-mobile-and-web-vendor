@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:dio/dio.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/app_colors.dart';
@@ -10,14 +12,13 @@ import '../../../core/router/app_routes.dart';
 import '../../../core/services/upload_service.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_input.dart';
+import '../../../shared/widgets/plan_card.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../shared/models/subscription_plan_model.dart';
 import '../../listings/data/listings_repository.dart';
 import '../../subscription/data/subscription_repository.dart';
 import '../bloc/setup_cubit.dart';
 import 'payment_checkout_screen.dart';
-import '../../auth/bloc/auth_bloc.dart';
-import '../../auth/bloc/auth_state.dart';
 
 // ─── Shared Setup Widgets ────────────────────────────────────────────────────
 
@@ -31,7 +32,7 @@ class _SetupProgressBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 4,
-      color: AppColors.primaryLight,
+      color: context.c.primaryLight,
       child: FractionallySizedBox(
         alignment: Alignment.centerLeft,
         widthFactor: step / total,
@@ -57,7 +58,7 @@ class _SetupHeader extends StatelessWidget {
           style: GoogleFonts.urbanist(
             fontSize: 24,
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: context.c.textPrimary,
           ),
         ),
         const SizedBox(height: 6),
@@ -65,7 +66,7 @@ class _SetupHeader extends StatelessWidget {
           subtitle,
           style: GoogleFonts.urbanist(
             fontSize: 15,
-            color: AppColors.textSecondary,
+            color: context.c.textSecondary,
           ),
         ),
       ],
@@ -79,11 +80,11 @@ PreferredSizeWidget _buildSetupAppBar(
   required int total,
 }) {
   return AppBar(
-    backgroundColor: Colors.white,
+    backgroundColor: context.c.surface,
     elevation: 0,
     leading: IconButton(
-      icon: const Icon(Icons.arrow_back_rounded,
-          color: AppColors.textPrimary),
+      icon: Icon(Icons.arrow_back_rounded,
+          color: context.c.textPrimary),
       onPressed: () => context.pop(),
     ),
     title: Text(
@@ -91,7 +92,7 @@ PreferredSizeWidget _buildSetupAppBar(
       style: GoogleFonts.urbanist(
         fontSize: 17,
         fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
+        color: context.c.textPrimary,
       ),
     ),
     centerTitle: true,
@@ -129,10 +130,10 @@ class _SetupBusinessTypeScreenState extends State<SetupBusinessTypeScreen> {
         width: double.infinity,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primaryLight : Colors.white,
+          color: isSelected ? context.c.primaryLight : context.c.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.border,
+            color: isSelected ? AppColors.primary : context.c.border,
             width: isSelected ? 2 : 1.5,
           ),
         ),
@@ -142,12 +143,12 @@ class _SetupBusinessTypeScreenState extends State<SetupBusinessTypeScreen> {
               width: 52,
               height: 52,
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primary : AppColors.divider,
+                color: isSelected ? AppColors.primary : context.c.divider,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 icon,
-                color: isSelected ? Colors.white : AppColors.textSecondary,
+                color: isSelected ? Colors.white : context.c.textSecondary,
                 size: 26,
               ),
             ),
@@ -163,7 +164,7 @@ class _SetupBusinessTypeScreenState extends State<SetupBusinessTypeScreen> {
                       fontWeight: FontWeight.w700,
                       color: isSelected
                           ? AppColors.primary
-                          : AppColors.textPrimary,
+                          : context.c.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 3),
@@ -171,7 +172,7 @@ class _SetupBusinessTypeScreenState extends State<SetupBusinessTypeScreen> {
                     subtitle,
                     style: GoogleFonts.urbanist(
                       fontSize: 13,
-                      color: AppColors.textSecondary,
+                      color: context.c.textSecondary,
                     ),
                   ),
                 ],
@@ -189,7 +190,7 @@ class _SetupBusinessTypeScreenState extends State<SetupBusinessTypeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       appBar: _buildSetupAppBar(context, step: 1, total: 6),
       body: SafeArea(
         child: Padding(
@@ -358,7 +359,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       appBar: _buildSetupAppBar(context, step: 2, total: 6),
       body: SafeArea(
         child: Column(
@@ -387,7 +388,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                               clipBehavior: Clip.antiAlias,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: AppColors.primaryLight,
+                                color: context.c.primaryLight,
                                 border: Border.all(
                                   color: AppColors.primary,
                                   width: 1.5,
@@ -425,7 +426,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                             'Business logo (optional)',
                             style: GoogleFonts.urbanist(
                               fontSize: 13,
-                              color: AppColors.textSecondary,
+                              color: context.c.textSecondary,
                             ),
                           ),
                         ],
@@ -456,7 +457,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                               style: GoogleFonts.urbanist(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.textSecondary,
+                                color: context.c.textSecondary,
                               ),
                             ),
                             const SizedBox(width: 6),
@@ -464,7 +465,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                               '(optional for freelancers)',
                               style: GoogleFonts.urbanist(
                                 fontSize: 12,
-                                color: AppColors.textHint,
+                                color: context.c.textHint,
                               ),
                             ),
                           ],
@@ -477,13 +478,13 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                             height: 120,
                             decoration: BoxDecoration(
                               color: _proofUrl != null
-                                  ? AppColors.primaryLight
-                                  : AppColors.divider,
+                                  ? context.c.primaryLight
+                                  : context.c.divider,
                               borderRadius: BorderRadius.circular(14),
                               border: Border.all(
                                 color: _proofUrl != null
                                     ? AppColors.primary
-                                    : AppColors.border,
+                                    : context.c.border,
                                 width: 1.5,
                               ),
                             ),
@@ -527,14 +528,14 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                                             'Tap to replace',
                                             style: GoogleFonts.urbanist(
                                               fontSize: 12,
-                                              color: AppColors.textSecondary,
+                                              color: context.c.textSecondary,
                                             ),
                                           ),
                                         ]
                                       : [
-                                          const Icon(
+                                          Icon(
                                             Icons.upload_file_outlined,
-                                            color: AppColors.textHint,
+                                            color: context.c.textHint,
                                             size: 32,
                                           ),
                                           const SizedBox(height: 8),
@@ -543,7 +544,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                                             style: GoogleFonts.urbanist(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w600,
-                                              color: AppColors.textSecondary,
+                                              color: context.c.textSecondary,
                                             ),
                                           ),
                                           const SizedBox(height: 4),
@@ -551,7 +552,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                                             'JPG, PNG or PDF up to 5mb',
                                             style: GoogleFonts.urbanist(
                                               fontSize: 12,
-                                              color: AppColors.textHint,
+                                              color: context.c.textHint,
                                             ),
                                           ),
                                         ],
@@ -568,7 +569,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                       style: GoogleFonts.urbanist(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
+                        color: context.c.textSecondary,
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -588,7 +589,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                           Text(
                             _catsError!,
                             style: GoogleFonts.urbanist(
-                                fontSize: 13, color: AppColors.textSecondary),
+                                fontSize: 13, color: context.c.textSecondary),
                           ),
                           const SizedBox(width: 8),
                           GestureDetector(
@@ -608,7 +609,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                       Text(
                         'No categories available yet',
                         style: GoogleFonts.urbanist(
-                            fontSize: 13, color: AppColors.textHint),
+                            fontSize: 13, color: context.c.textHint),
                       )
                     else
                     Wrap(
@@ -634,7 +635,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                             decoration: BoxDecoration(
                               color: isSelected
                                   ? AppColors.primary
-                                  : const Color(0xFFF2F2F2),
+                                  : context.c.surfaceElevated,
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
@@ -644,7 +645,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                                 fontWeight: FontWeight.w500,
                                 color: isSelected
                                     ? Colors.white
-                                    : AppColors.textSecondary,
+                                    : context.c.textSecondary,
                               ),
                             ),
                           ),
@@ -705,20 +706,89 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
   String _country = 'Nigeria';
   String? _city;
   String _vendorType = 'both';
+  bool _locating = false;
+
+  void _toast(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  /// GPS → reverse-geocode (OpenStreetMap Nominatim, keyless, works on web too)
+  /// → fill the country + city fields.
+  Future<void> _useCurrentLocation() async {
+    setState(() => _locating = true);
+    try {
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        _toast('Turn on location services to use this.');
+        return;
+      }
+      var perm = await Geolocator.checkPermission();
+      if (perm == LocationPermission.denied) {
+        perm = await Geolocator.requestPermission();
+      }
+      if (perm == LocationPermission.denied ||
+          perm == LocationPermission.deniedForever) {
+        _toast('Location permission denied — pick your city manually.');
+        return;
+      }
+
+      final pos = await Geolocator.getCurrentPosition(
+        locationSettings:
+            const LocationSettings(accuracy: LocationAccuracy.medium),
+      );
+
+      final res = await Dio().get(
+        'https://nominatim.openstreetmap.org/reverse',
+        queryParameters: {
+          'format': 'jsonv2',
+          'lat': pos.latitude,
+          'lon': pos.longitude,
+          'zoom': 10,
+          'addressdetails': 1,
+        },
+        options: Options(headers: {'User-Agent': 'PlanovarVendorApp/1.0'}),
+      );
+      final addr = (res.data is Map ? res.data['address'] : null) as Map?;
+      final city = (addr?['city'] ??
+              addr?['town'] ??
+              addr?['village'] ??
+              addr?['county'] ??
+              addr?['state'])
+          ?.toString();
+      final country = addr?['country']?.toString();
+
+      if (!mounted) return;
+      setState(() {
+        if (country != null && country.isNotEmpty) _country = country;
+        if (city != null && city.isNotEmpty) _city = city;
+      });
+      if (city == null || city.isEmpty) {
+        _toast("Couldn't determine your city — please pick it manually.");
+      }
+    } catch (_) {
+      _toast("Couldn't get your location. Please pick your city manually.");
+    } finally {
+      if (mounted) setState(() => _locating = false);
+    }
+  }
 
   void _showCountryDialog() {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
+        backgroundColor: context.c.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           'Select Country',
           style: GoogleFonts.urbanist(
-              fontSize: 17, fontWeight: FontWeight.w700),
+              fontSize: 17, fontWeight: FontWeight.w700,
+              color: context.c.textPrimary),
         ),
         content: ListTile(
           title: Text('Nigeria',
-              style: GoogleFonts.urbanist(fontSize: 15)),
+              style: GoogleFonts.urbanist(
+                  fontSize: 15, color: context.c.textPrimary)),
           leading: const Text('🇳🇬', style: TextStyle(fontSize: 20)),
           trailing: const Icon(Icons.check_rounded,
               color: AppColors.primary, size: 20),
@@ -734,7 +804,7 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
   void _showCitySheet() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -746,7 +816,7 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-                color: AppColors.border,
+                color: context.c.border,
                 borderRadius: BorderRadius.circular(4)),
           ),
           Padding(
@@ -754,7 +824,8 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
             child: Text(
               'Select City',
               style: GoogleFonts.urbanist(
-                  fontSize: 17, fontWeight: FontWeight.w700),
+                  fontSize: 17, fontWeight: FontWeight.w700,
+                  color: context.c.textPrimary),
             ),
           ),
           Flexible(
@@ -762,7 +833,7 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
               shrinkWrap: true,
               itemCount: _nigerianCities.length,
               separatorBuilder: (_, __) =>
-                  const Divider(height: 1, color: AppColors.divider),
+                  Divider(height: 1, color: context.c.divider),
               itemBuilder: (ctx2, i) {
                 final city = _nigerianCities[i];
                 final isSelected = _city == city;
@@ -775,7 +846,7 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
                             : FontWeight.normal,
                         color: isSelected
                             ? AppColors.primary
-                            : AppColors.textPrimary,
+                            : context.c.textPrimary,
                       )),
                   trailing: isSelected
                       ? const Icon(Icons.check_rounded,
@@ -808,7 +879,7 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
           style: GoogleFonts.urbanist(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary),
+              color: context.c.textSecondary),
         ),
         const SizedBox(height: 6),
         GestureDetector(
@@ -817,7 +888,7 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
             height: 52,
             padding: const EdgeInsets.symmetric(horizontal: 18),
             decoration: BoxDecoration(
-              color: const Color(0xFFF2F2F2),
+              color: context.c.surfaceElevated,
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
@@ -827,12 +898,12 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
                     displayValue,
                     style: GoogleFonts.urbanist(
                       fontSize: 15,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                     ),
                   ),
                 ),
-                const Icon(Icons.keyboard_arrow_down_rounded,
-                    color: AppColors.textHint),
+                Icon(Icons.keyboard_arrow_down_rounded,
+                    color: context.c.textHint),
               ],
             ),
           ),
@@ -861,7 +932,7 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
               label,
               style: GoogleFonts.urbanist(
                 fontSize: 15,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
             ),
           ],
@@ -873,7 +944,7 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       appBar: _buildSetupAppBar(context, step: 3, total: 6),
       body: SafeArea(
         child: Column(
@@ -905,29 +976,29 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
                     const SizedBox(height: 20),
                     Row(
                       children: [
-                        const Expanded(
-                            child: Divider(color: AppColors.border)),
+                        Expanded(
+                            child: Divider(color: context.c.border)),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Text(
                             'or',
                             style: GoogleFonts.urbanist(
-                                fontSize: 13, color: AppColors.textHint),
+                                fontSize: 13, color: context.c.textHint),
                           ),
                         ),
-                        const Expanded(
-                            child: Divider(color: AppColors.border)),
+                        Expanded(
+                            child: Divider(color: context.c.border)),
                       ],
                     ),
                     const SizedBox(height: 16),
 
                     // Use current location
                     GestureDetector(
-                      onTap: () {},
+                      onTap: _locating ? null : _useCurrentLocation,
                       child: Container(
                         height: 52,
                         decoration: BoxDecoration(
-                          color: AppColors.primaryLight,
+                          color: context.c.primaryLight,
                           borderRadius: BorderRadius.circular(14),
                           border:
                               Border.all(color: AppColors.primary, width: 1.5),
@@ -935,11 +1006,23 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.my_location_rounded,
-                                color: AppColors.primary, size: 20),
+                            if (_locating)
+                              const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: AppColors.primary,
+                                ),
+                              )
+                            else
+                              const Icon(Icons.my_location_rounded,
+                                  color: AppColors.primary, size: 20),
                             const SizedBox(width: 8),
                             Text(
-                              'Use my current location',
+                              _locating
+                                  ? 'Locating…'
+                                  : 'Use my current location',
                               style: GoogleFonts.urbanist(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
@@ -957,7 +1040,7 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
                       style: GoogleFonts.urbanist(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
+                        color: context.c.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -993,129 +1076,6 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
 
 // ─── Step 4: Plan ─────────────────────────────────────────────────────────────
 
-class _PlanCard extends StatelessWidget {
-  final String name;
-  final String price;
-  final List<String> features;
-  final bool isPopular;
-  final bool isPrimary;
-  final String ctaLabel;
-  final VoidCallback onSelect;
-
-  const _PlanCard({
-    required this.name,
-    required this.price,
-    required this.features,
-    required this.ctaLabel,
-    required this.onSelect,
-    this.isPopular = false,
-    this.isPrimary = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isPopular ? AppColors.primary : AppColors.border,
-          width: isPopular ? 2 : 1.5,
-        ),
-        boxShadow: isPopular
-            ? [
-                BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ]
-            : null,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (isPopular)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              decoration: const BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
-              ),
-              child: Center(
-                child: Text(
-                  'POPULAR',
-                  style: GoogleFonts.urbanist(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                    letterSpacing: 1.5,
-                  ),
-                ),
-              ),
-            ),
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: GoogleFonts.urbanist(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  price,
-                  style: GoogleFonts.urbanist(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.primary,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                ...features.map(
-                  (f) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(Icons.check_rounded,
-                            color: AppColors.success, size: 18),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            f,
-                            style: GoogleFonts.urbanist(
-                              fontSize: 14,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  child: isPrimary
-                      ? AppButton.primary(ctaLabel, onTap: onSelect)
-                      : AppButton.secondary(ctaLabel, onTap: onSelect),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class SetupPlanScreen extends StatefulWidget {
   const SetupPlanScreen({super.key});
 
@@ -1126,11 +1086,17 @@ class SetupPlanScreen extends StatefulWidget {
 class _SetupPlanScreenState extends State<SetupPlanScreen> {
   final _subscriptions = SubscriptionRepository();
   late Future<List<SubscriptionPlanModel>> _plansFuture;
+  bool _yearly = false;
 
   @override
   void initState() {
     super.initState();
     _plansFuture = _subscriptions.listPlans();
+  }
+
+  void _setYearly(bool yearly) {
+    setState(() => _yearly = yearly);
+    context.read<SetupCubit>().setBillingCycle(yearly ? 'YEARLY' : 'MONTHLY');
   }
 
   // Plan selection is carried in SetupCubit; subscribe runs at submit (KYC step).
@@ -1147,7 +1113,7 @@ class _SetupPlanScreenState extends State<SetupPlanScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       appBar: _buildSetupAppBar(context, step: 4, total: 6),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -1159,7 +1125,9 @@ class _SetupPlanScreenState extends State<SetupPlanScreen> {
                 title: 'Choose your plan',
                 subtitle: 'Upgrade anytime. Cancel anytime.',
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 24),
+              BillingToggle(yearly: _yearly, onChanged: _setYearly),
+              const SizedBox(height: 24),
               FutureBuilder<List<SubscriptionPlanModel>>(
                 future: _plansFuture,
                 builder: (context, snap) {
@@ -1175,7 +1143,7 @@ class _SetupPlanScreenState extends State<SetupPlanScreen> {
                         Text(
                           'Could not load plans. Check your connection and try again.',
                           style: GoogleFonts.urbanist(
-                            fontSize: 14, color: AppColors.textSecondary),
+                            fontSize: 14, color: context.c.textSecondary),
                         ),
                         const SizedBox(height: 12),
                         AppButton.secondary('Retry',
@@ -1188,16 +1156,20 @@ class _SetupPlanScreenState extends State<SetupPlanScreen> {
                   return Column(
                     children: [
                       for (final plan in plans) ...[
-                        _PlanCard(
+                        PlanCard(
                           name: plan.name,
-                          price: plan.priceLabel(),
+                          amount: plan.amountLabel(yearly: _yearly),
+                          period: plan.periodLabel(yearly: _yearly),
                           features: plan.features,
+                          style: plan.tier == 'PREMIUM'
+                              ? PlanStyle.popular
+                              : plan.tier == 'GOLD'
+                                  ? PlanStyle.gold
+                                  : PlanStyle.basic,
                           ctaLabel: 'Select ${plan.name}',
-                          isPopular: plan.tier == 'PREMIUM',
-                          isPrimary: plan.tier == 'PREMIUM',
                           onSelect: () => _selectPlan(plan),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 18),
                       ],
                     ],
                   );
@@ -1212,7 +1184,7 @@ class _SetupPlanScreenState extends State<SetupPlanScreen> {
                     style: GoogleFonts.urbanist(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondary,
+                      color: context.c.textSecondary,
                     ),
                   ),
                 ),
@@ -1307,10 +1279,10 @@ class _SetupKycScreenState extends State<SetupKycScreen> {
         margin: const EdgeInsets.only(bottom: 16),
         height: 110,
         decoration: BoxDecoration(
-          color: done ? AppColors.primaryLight : AppColors.divider,
+          color: done ? context.c.primaryLight : context.c.divider,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: done ? AppColors.primary : AppColors.border,
+            color: done ? AppColors.primary : context.c.border,
             width: 1.5,
           ),
         ),
@@ -1344,20 +1316,20 @@ class _SetupKycScreenState extends State<SetupKycScreen> {
                       ),
                       Text('Tap to replace',
                           style: GoogleFonts.urbanist(
-                              fontSize: 12, color: AppColors.textSecondary)),
+                              fontSize: 12, color: context.c.textSecondary)),
                     ]
                   : [
-                      const Icon(Icons.upload_file_outlined,
-                          color: AppColors.textHint, size: 30),
+                      Icon(Icons.upload_file_outlined,
+                          color: context.c.textHint, size: 30),
                       const SizedBox(height: 8),
                       Text(label,
                           style: GoogleFonts.urbanist(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.textSecondary)),
+                              color: context.c.textSecondary)),
                       Text('JPG, PNG or PDF up to 5mb',
                           style: GoogleFonts.urbanist(
-                              fontSize: 12, color: AppColors.textHint)),
+                              fontSize: 12, color: context.c.textHint)),
                     ],
         ),
       ),
@@ -1367,7 +1339,7 @@ class _SetupKycScreenState extends State<SetupKycScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       appBar: _buildSetupAppBar(context, step: 5, total: 6),
       body: SafeArea(
         child: BlocConsumer<SetupCubit, SetupState>(
@@ -1450,10 +1422,6 @@ class _SetupKycScreenState extends State<SetupKycScreen> {
                         onTap: submitting
                             ? null
                             : () {
-                                final auth = context.read<AuthBloc>().state;
-                                final name = auth is AuthAuthenticated
-                                    ? auth.user.name
-                                    : '';
                                 final cubit = context.read<SetupCubit>();
                                 // Keep the proof captured on the profile step if
                                 // no CAC was uploaded here.
@@ -1461,14 +1429,15 @@ class _SetupKycScreenState extends State<SetupKycScreen> {
                                   ninUrl: _ninUrl,
                                   cacUrl: _cacUrl ?? cubit.cacUrl,
                                 );
-                                cubit.submit(businessName: name);
+                                // Business name was captured at registration.
+                                cubit.submit(businessName: cubit.businessName);
                               },
                       ),
                       const SizedBox(height: 8),
                       Text(
                         'You can complete verification later from your profile.',
                         style: GoogleFonts.urbanist(
-                            fontSize: 12, color: AppColors.textHint),
+                            fontSize: 12, color: context.c.textHint),
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -1519,7 +1488,7 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
   void _showBankSheet() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -1531,7 +1500,7 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-                color: AppColors.border,
+                color: context.c.border,
                 borderRadius: BorderRadius.circular(4)),
           ),
           Padding(
@@ -1539,7 +1508,8 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
             child: Text(
               'Select Bank',
               style: GoogleFonts.urbanist(
-                  fontSize: 17, fontWeight: FontWeight.w700),
+                  fontSize: 17, fontWeight: FontWeight.w700,
+                  color: context.c.textPrimary),
             ),
           ),
           Flexible(
@@ -1547,7 +1517,7 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
               shrinkWrap: true,
               itemCount: _nigerianBanks.length,
               separatorBuilder: (_, __) =>
-                  const Divider(height: 1, color: AppColors.divider),
+                  Divider(height: 1, color: context.c.divider),
               itemBuilder: (ctx2, i) {
                 final bank = _nigerianBanks[i];
                 final isSelected = _selectedBank == bank;
@@ -1560,7 +1530,7 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
                             : FontWeight.normal,
                         color: isSelected
                             ? AppColors.primary
-                            : AppColors.textPrimary,
+                            : context.c.textPrimary,
                       )),
                   trailing: isSelected
                       ? const Icon(Icons.check_rounded,
@@ -1593,7 +1563,7 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       appBar: _buildSetupAppBar(context, step: 5, total: 6),
       body: SafeArea(
         child: Column(
@@ -1619,7 +1589,7 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
                           style: GoogleFonts.urbanist(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textSecondary,
+                            color: context.c.textSecondary,
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -1630,7 +1600,7 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 18),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF2F2F2),
+                              color: context.c.surfaceElevated,
                               borderRadius: BorderRadius.circular(14),
                             ),
                             child: Row(
@@ -1641,14 +1611,14 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
                                     style: GoogleFonts.urbanist(
                                       fontSize: 15,
                                       color: _selectedBank != null
-                                          ? AppColors.textPrimary
-                                          : AppColors.textHint,
+                                          ? context.c.textPrimary
+                                          : context.c.textHint,
                                     ),
                                   ),
                                 ),
-                                const Icon(
+                                Icon(
                                     Icons.keyboard_arrow_down_rounded,
-                                    color: AppColors.textHint),
+                                    color: context.c.textHint),
                               ],
                             ),
                           ),
@@ -1684,7 +1654,7 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF6F7FB),
+                        color: context.c.background,
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Column(
@@ -1695,7 +1665,7 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
                             style: GoogleFonts.urbanist(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
+                              color: context.c.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 10),
@@ -1724,7 +1694,7 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
                           style: GoogleFonts.urbanist(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
-                            color: AppColors.textSecondary,
+                            color: context.c.textSecondary,
                           ),
                         ),
                       ],
@@ -1752,14 +1722,14 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, color: AppColors.textSecondary, size: 16),
+        Icon(icon, color: context.c.textSecondary, size: 16),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
             text,
             style: GoogleFonts.urbanist(
               fontSize: 13,
-              color: AppColors.textSecondary,
+              color: context.c.textSecondary,
               height: 1.4,
             ),
           ),
@@ -1777,7 +1747,7 @@ class SetupSuccessScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(24, 48, 24, 40),
@@ -1804,7 +1774,7 @@ class SetupSuccessScreen extends StatelessWidget {
                 style: GoogleFonts.urbanist(
                   fontSize: 28,
                   fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
+                  color: context.c.textPrimary,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -1813,7 +1783,7 @@ class SetupSuccessScreen extends StatelessWidget {
                 'Your vendor profile is live on Planovar. Start adding your products and services to reach thousands of event planners in Lagos.',
                 style: GoogleFonts.urbanist(
                   fontSize: 15,
-                  color: AppColors.textSecondary,
+                  color: context.c.textSecondary,
                   height: 1.6,
                 ),
                 textAlign: TextAlign.center,
@@ -1868,9 +1838,9 @@ class _ActionCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.c.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border, width: 1.5),
+          border: Border.all(color: context.c.border, width: 1.5),
         ),
         child: Row(
           children: [
@@ -1878,7 +1848,7 @@ class _ActionCard extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: AppColors.primaryLight,
+                color: context.c.primaryLight,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: AppColors.primary, size: 24),
@@ -1893,7 +1863,7 @@ class _ActionCard extends StatelessWidget {
                     style: GoogleFonts.urbanist(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -1901,14 +1871,14 @@ class _ActionCard extends StatelessWidget {
                     subtitle,
                     style: GoogleFonts.urbanist(
                       fontSize: 13,
-                      color: AppColors.textSecondary,
+                      color: context.c.textSecondary,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward_ios_rounded,
-                color: AppColors.textHint, size: 16),
+            Icon(Icons.arrow_forward_ios_rounded,
+                color: context.c.textHint, size: 16),
           ],
         ),
       ),

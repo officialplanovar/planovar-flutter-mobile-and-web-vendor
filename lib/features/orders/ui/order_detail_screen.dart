@@ -71,9 +71,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 alignment: Alignment.topRight,
                 child: GestureDetector(
                   onTap: () => Navigator.of(ctx).pop(),
-                  child: const Icon(
+                  child: Icon(
                     Icons.close,
-                    color: AppColors.textSecondary,
+                    color: context.c.textSecondary,
                     size: 22,
                   ),
                 ),
@@ -90,7 +90,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 style: GoogleFonts.urbanist(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: context.c.textPrimary,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -101,7 +101,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   'Are you sure you have received the payment to your bank account?',
                   style: GoogleFonts.urbanist(
                     fontSize: 14,
-                    color: AppColors.textSecondary,
+                    color: context.c.textSecondary,
                     height: 1.5,
                   ),
                   textAlign: TextAlign.center,
@@ -158,9 +158,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 alignment: Alignment.topRight,
                 child: GestureDetector(
                   onTap: () => Navigator.of(ctx).pop(),
-                  child: const Icon(
+                  child: Icon(
                     Icons.close,
-                    color: AppColors.textSecondary,
+                    color: context.c.textSecondary,
                     size: 22,
                   ),
                 ),
@@ -177,7 +177,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 style: GoogleFonts.urbanist(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: context.c.textPrimary,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -188,7 +188,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   'Are you sure you have completed the service in its entirety',
                   style: GoogleFonts.urbanist(
                     fontSize: 14,
-                    color: AppColors.textSecondary,
+                    color: context.c.textSecondary,
                     height: 1.5,
                   ),
                   textAlign: TextAlign.center,
@@ -236,15 +236,15 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     final orders = context.watch<OrdersCubit>().state.orders;
     final idx = orders.indexWhere((o) => o.id == widget.orderId);
     if (idx == -1) {
-      return const Scaffold(
-        backgroundColor: AppColors.backgroundLight,
-        body: Center(child: CircularProgressIndicator()),
+      return Scaffold(
+        backgroundColor: context.c.background,
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
     final order = orders[idx];
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.c.background,
       bottomNavigationBar: _buildBottomBar(context, order),
       body: CustomScrollView(
         slivers: [
@@ -265,7 +265,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             leading: Container(
               margin: const EdgeInsets.only(left: 16, top: 8),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: context.c.surface,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
@@ -276,9 +276,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 ],
               ),
               child: IconButton(
-                icon: const Icon(
+                icon: Icon(
                   Icons.arrow_back_rounded,
-                  color: AppColors.textPrimary,
+                  color: context.c.textPrimary,
                 ),
                 onPressed: () => context.pop(),
               ),
@@ -314,7 +314,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
   Widget _buildEventInfo(OrderModel order) {
     return Container(
-      color: Colors.white,
+      color: context.c.surface,
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -324,7 +324,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             padding:
                 const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
             decoration: BoxDecoration(
-              color: const Color(0xFFEEEEF8),
+              color: context.c.primaryLight,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
@@ -353,7 +353,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             style: GoogleFonts.urbanist(
               fontSize: 26,
               fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
+              color: context.c.textPrimary,
             ),
           ),
           const SizedBox(height: 8),
@@ -384,11 +384,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
   Widget _buildTabToggle() {
     return Container(
-      color: Colors.white,
+      color: context.c.surface,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFFF4F4F8),
+          color: context.c.surfaceElevated,
           borderRadius: BorderRadius.circular(28),
         ),
         padding: const EdgeInsets.all(4),
@@ -417,7 +417,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.c.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -450,7 +450,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       style: GoogleFonts.urbanist(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                        color: context.c.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -458,7 +458,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       order.vendorName,
                       style: GoogleFonts.urbanist(
                         fontSize: 13,
-                        color: AppColors.textSecondary,
+                        color: context.c.textSecondary,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -474,7 +474,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           '${order.clientRating}',
                           style: GoogleFonts.urbanist(
                             fontSize: 13,
-                            color: AppColors.textPrimary,
+                            color: context.c.textPrimary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -487,7 +487,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           ),
 
           const SizedBox(height: 16),
-          const Divider(height: 1, color: AppColors.divider),
+          Divider(height: 1, color: context.c.divider),
           const SizedBox(height: 12),
 
           // Icon-label rows
@@ -530,14 +530,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           ],
 
           const SizedBox(height: 12),
-          const Divider(height: 1, color: AppColors.divider),
+          Divider(height: 1, color: context.c.divider),
           const SizedBox(height: 12),
 
           // "Reach out to Client privately" card
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFF8F8FC),
+              color: context.c.surfaceElevated,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
@@ -547,7 +547,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   'Reach out to Client privately',
                   style: GoogleFonts.urbanist(
                     fontSize: 12,
-                    color: AppColors.textSecondary,
+                    color: context.c.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -555,7 +555,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   children: [
                     CircleAvatar(
                       radius: 22,
-                      backgroundColor: AppColors.divider,
+                      backgroundColor: context.c.divider,
                       child: ClipOval(
                         child: AppNetworkImage(
                           url: order.clientImage,
@@ -573,7 +573,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           style: GoogleFonts.urbanist(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
+                            color: context.c.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 2),
@@ -589,7 +589,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                               '${order.clientRating}',
                               style: GoogleFonts.urbanist(
                                 fontSize: 12,
-                                color: AppColors.textPrimary,
+                                color: context.c.textPrimary,
                               ),
                             ),
                           ],
@@ -677,7 +677,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.c.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -695,7 +695,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             style: GoogleFonts.urbanist(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
+              color: context.c.textPrimary,
             ),
           ),
           const SizedBox(height: 16),
@@ -832,7 +832,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     return Container(
       height: 48,
       decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFE0E0E0)),
+        border: Border.all(color: context.c.border),
         borderRadius: BorderRadius.circular(28),
       ),
       child: Center(
@@ -841,7 +841,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           style: GoogleFonts.urbanist(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Colors.grey,
+            color: context.c.textSecondary,
           ),
         ),
       ),
@@ -868,7 +868,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: isCompleted ? AppColors.primary : Colors.white,
+                color: isCompleted ? AppColors.primary : context.c.surface,
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.primary, width: 1.5),
               ),
@@ -900,7 +900,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     style: GoogleFonts.urbanist(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   if (date != null)
@@ -908,7 +908,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       Formatters.date(date),
                       style: GoogleFonts.urbanist(
                         fontSize: 13,
-                        color: AppColors.textSecondary,
+                        color: context.c.textSecondary,
                       ),
                     ),
                 ],
@@ -947,9 +947,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
   Widget _buildBottomBar(BuildContext context, OrderModel order) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: AppColors.divider)),
+      decoration: BoxDecoration(
+        color: context.c.surface,
+        border: Border(top: BorderSide(color: context.c.divider)),
       ),
       padding: EdgeInsets.fromLTRB(
         16,
@@ -975,10 +975,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     onPressed: _acting
                         ? null
                         : () => _runAction(
-                              () => context
-                                  .read<OrdersCubit>()
-                                  .reject(order.id),
-                              'Inquiry declined',
+                              () => order.isDirectOrder
+                                  ? context
+                                      .read<OrdersCubit>()
+                                      .declineOrder(order.id)
+                                  : context.read<OrdersCubit>().reject(order.id),
+                              order.isDirectOrder
+                                  ? 'Order declined'
+                                  : 'Inquiry declined',
                             ),
                     child: Text('Decline',
                         style: GoogleFonts.urbanist(
@@ -990,16 +994,22 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: _GradientButton(
-                    label: _acting ? 'Working…' : 'Accept Inquiry',
+                    label: _acting
+                        ? 'Working…'
+                        : (order.isDirectOrder ? 'Accept Order' : 'Accept Inquiry'),
                     gradient: const LinearGradient(
                         colors: [AppColors.primary, AppColors.primaryDark]),
                     onTap: _acting
                         ? () {}
                         : () => _runAction(
-                              () => context
-                                  .read<OrdersCubit>()
-                                  .confirm(order.id),
-                              'Inquiry accepted 🎉',
+                              () => order.isDirectOrder
+                                  ? context
+                                      .read<OrdersCubit>()
+                                      .acceptOrder(order.id)
+                                  : context.read<OrdersCubit>().confirm(order.id),
+                              order.isDirectOrder
+                                  ? 'Order accepted — invoice sent 🎉'
+                                  : 'Inquiry accepted 🎉',
                             ),
                   ),
                 ),
@@ -1165,7 +1175,7 @@ class _TabButton extends StatelessWidget {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
-            color: selected ? Colors.white : Colors.transparent,
+            color: selected ? context.c.surface : Colors.transparent,
             borderRadius: BorderRadius.circular(24),
             boxShadow: selected
                 ? [
@@ -1186,7 +1196,7 @@ class _TabButton extends StatelessWidget {
                     selected ? FontWeight.w700 : FontWeight.w500,
                 color: selected
                     ? AppColors.primary
-                    : AppColors.textSecondary,
+                    : context.c.textSecondary,
               ),
             ),
           ),
@@ -1222,7 +1232,7 @@ class _IconLabelRow extends StatelessWidget {
                 label,
                 style: GoogleFonts.urbanist(
                   fontSize: 12,
-                  color: Colors.grey,
+                  color: context.c.textSecondary,
                 ),
               ),
               const SizedBox(height: 2),
@@ -1231,7 +1241,7 @@ class _IconLabelRow extends StatelessWidget {
                 style: GoogleFonts.urbanist(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: context.c.textPrimary,
                 ),
               ),
             ],

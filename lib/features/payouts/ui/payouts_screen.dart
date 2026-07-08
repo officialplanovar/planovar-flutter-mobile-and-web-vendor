@@ -13,7 +13,7 @@ class PayoutsScreen extends StatelessWidget {
     final topPadding = MediaQuery.of(context).padding.top;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.c.background,
       body: Column(
         children: [
           Container(
@@ -59,7 +59,7 @@ class PayoutsScreen extends StatelessWidget {
                       width: 72,
                       height: 72,
                       decoration: BoxDecoration(
-                        color: AppColors.primaryLight,
+                        color: context.c.primaryLight,
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.savings_outlined,
@@ -72,7 +72,7 @@ class PayoutsScreen extends StatelessWidget {
                       style: GoogleFonts.urbanist(
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
+                        color: context.c.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -83,7 +83,7 @@ class PayoutsScreen extends StatelessWidget {
                       style: GoogleFonts.urbanist(
                         fontSize: 14,
                         height: 1.5,
-                        color: AppColors.textSecondary,
+                        color: context.c.textSecondary,
                       ),
                     ),
                   ],

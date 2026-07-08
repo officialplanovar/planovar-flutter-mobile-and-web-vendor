@@ -76,7 +76,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final isLastPage = _currentPage == _slides.length - 1;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       body: SafeArea(
         child: Column(
           children: [
@@ -98,7 +98,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           style: GoogleFonts.urbanist(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textSecondary,
+                            color: context.c.textSecondary,
                           ),
                         ),
                       ),
@@ -133,8 +133,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           errorBuilder: (context, error, stack) => Container(
                             width: 120,
                             height: 120,
-                            decoration: const BoxDecoration(
-                              color: AppColors.primaryLight,
+                            decoration: BoxDecoration(
+                              color: context.c.primaryLight,
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
@@ -151,7 +151,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           style: GoogleFonts.urbanist(
                             fontSize: 28,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
+                            color: context.c.textPrimary,
                             height: 1.25,
                           ),
                         ),
@@ -161,7 +161,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           textAlign: TextAlign.center,
                           style: GoogleFonts.urbanist(
                             fontSize: 15,
-                            color: AppColors.textSecondary,
+                            color: context.c.textSecondary,
                             height: 1.6,
                           ),
                         ),
@@ -180,7 +180,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 count: _slides.length,
                 effect: ExpandingDotsEffect(
                   activeDotColor: AppColors.primary,
-                  dotColor: AppColors.primaryLight,
+                  dotColor: context.c.primaryLight,
                   dotHeight: 8,
                   dotWidth: 8,
                   expansionFactor: 3,

@@ -42,7 +42,7 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
     final bottomInset = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(100),
         child: Container(
@@ -107,7 +107,7 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
             Center(
               child: CircleAvatar(
                 radius: 52,
-                backgroundColor: AppColors.divider,
+                backgroundColor: context.c.divider,
                 child: ClipOval(
                   child: AppNetworkImage(
                     url: clientImage,
@@ -120,7 +120,7 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
                         style: GoogleFonts.urbanist(
                           fontSize: 36,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.textSecondary,
+                          color: context.c.textSecondary,
                         ),
                       ),
                     ),
@@ -137,7 +137,7 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
               style: GoogleFonts.urbanist(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -159,7 +159,7 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
                         size: 44,
                         color: filled
                             ? AppColors.starColor
-                            : const Color(0xFFE0E0E0),
+                            : context.c.border,
                       ),
                     ),
                   );
@@ -175,7 +175,7 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
               style: GoogleFonts.urbanist(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
             ),
             const SizedBox(height: 12),
@@ -187,26 +187,26 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
               maxLines: 10,
               style: GoogleFonts.urbanist(
                 fontSize: 14,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
               decoration: InputDecoration(
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: context.c.surface,
                 hintText: 'Let us know how your experience was',
                 hintStyle: GoogleFonts.urbanist(
                   fontSize: 13,
-                  color: AppColors.textHint,
+                  color: context.c.textHint,
                 ),
                 contentPadding: const EdgeInsets.all(16),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(
-                      color: Color(0xFFE0E0E0), width: 1),
+                  borderSide: BorderSide(
+                      color: context.c.border, width: 1),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(
-                      color: Color(0xFFE0E0E0), width: 1),
+                  borderSide: BorderSide(
+                      color: context.c.border, width: 1),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
@@ -223,7 +223,7 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
 
       // ── Bottom Button ───────────────────────────────────────────────────
       bottomNavigationBar: Container(
-        color: Colors.white,
+        color: context.c.surface,
         padding: EdgeInsets.fromLTRB(24, 12, 24, 12 + bottomInset),
         child: GestureDetector(
           onTap: () {

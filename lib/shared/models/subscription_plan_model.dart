@@ -37,12 +37,20 @@ class SubscriptionPlanModel extends Equatable {
   /// e.g. "Free", "₦32,000/month" or "$20.00/month"
   String priceLabel({bool yearly = false}) {
     if (isFree) return 'Free';
+    return '${amountLabel(yearly: yearly)}/${yearly ? 'year' : 'month'}';
+  }
+
+  /// Just the amount, no period — e.g. "Free", "₦32,000", "$19.99".
+  String amountLabel({bool yearly = false}) {
+    if (isFree) return 'Free';
     final amount = yearly ? priceYearly : priceMonthly;
-    final per = yearly ? 'year' : 'month';
     final isNgn = currency.toUpperCase() == 'NGN';
     final str = isNgn ? _thousands(amount) : amount.toStringAsFixed(2);
-    return '$symbol$str/$per';
+    return '$symbol$str';
   }
+
+  /// The period suffix shown next to the amount — "/ month" or "/ year".
+  String periodLabel({bool yearly = false}) => yearly ? '/ year' : '/ month';
 
   static String _thousands(double n) {
     final s = n.toStringAsFixed(0);

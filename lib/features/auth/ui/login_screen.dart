@@ -29,34 +29,34 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  Widget _buildDivider() {
+  Widget _buildDivider(BuildContext context) {
     return Row(
       children: [
-        const Expanded(child: Divider(color: AppColors.border)),
+        Expanded(child: Divider(color: context.c.border)),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
             'or',
             style: GoogleFonts.urbanist(
               fontSize: 13,
-              color: AppColors.textHint,
+              color: context.c.textHint,
             ),
           ),
         ),
-        const Expanded(child: Divider(color: AppColors.border)),
+        Expanded(child: Divider(color: context.c.border)),
       ],
     );
   }
 
-  Widget _buildGoogleButton() {
+  Widget _buildGoogleButton(BuildContext context) {
     return GestureDetector(
       onTap: () {},
       child: Container(
         height: 52,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.c.surface,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.border, width: 1.5),
+          border: Border.all(color: context.c.border, width: 1.5),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -82,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
               style: GoogleFonts.urbanist(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
             ),
           ],
@@ -94,12 +94,12 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.c.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
+          icon: Icon(Icons.arrow_back_rounded, color: context.c.textPrimary),
           onPressed: () => context.pop(),
         ),
       ),
@@ -113,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
               style: GoogleFonts.urbanist(
                 fontSize: 28,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
             ),
             const SizedBox(height: 6),
@@ -121,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
               'Sign in to your vendor account',
               style: GoogleFonts.urbanist(
                 fontSize: 15,
-                color: AppColors.textSecondary,
+                color: context.c.textSecondary,
               ),
             ),
             const SizedBox(height: 32),
@@ -146,7 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   _obscure
                       ? Icons.visibility_off_outlined
                       : Icons.visibility_outlined,
-                  color: AppColors.textHint,
+                  color: context.c.textHint,
                 ),
                 onPressed: () => setState(() => _obscure = !_obscure),
               ),
@@ -199,10 +199,10 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 20),
 
-            _buildDivider(),
+            _buildDivider(context),
             const SizedBox(height: 20),
 
-            _buildGoogleButton(),
+            _buildGoogleButton(context),
             const SizedBox(height: 32),
 
             // Register link
@@ -213,7 +213,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   "Don't have an account? ",
                   style: GoogleFonts.urbanist(
                     fontSize: 14,
-                    color: AppColors.textSecondary,
+                    color: context.c.textSecondary,
                   ),
                 ),
                 GestureDetector(

@@ -31,7 +31,7 @@ class EmptyState extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: AppColors.primaryLight,
+                color: context.c.primaryLight,
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, size: 38, color: AppColors.primary),
@@ -42,7 +42,7 @@ class EmptyState extends StatelessWidget {
               style: GoogleFonts.urbanist(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -53,7 +53,7 @@ class EmptyState extends StatelessWidget {
                 style: GoogleFonts.urbanist(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
-                  color: AppColors.textSecondary,
+                  color: context.c.textSecondary,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -103,7 +103,7 @@ class ErrorState extends StatelessWidget {
               style: GoogleFonts.urbanist(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
@@ -111,7 +111,7 @@ class ErrorState extends StatelessWidget {
               message,
               style: GoogleFonts.urbanist(
                 fontSize: 14,
-                color: AppColors.textSecondary,
+                color: context.c.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),

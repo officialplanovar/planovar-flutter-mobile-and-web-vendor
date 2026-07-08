@@ -5,10 +5,12 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../shared/widgets/app_icon.dart';
 import '../../../shared/models/listing_model.dart';
 import '../../../shared/widgets/network_image_widget.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../bloc/listings_cubit.dart';
+import '../../vendor/data/vendor_repository.dart';
 
 class ListingsScreen extends StatefulWidget {
   const ListingsScreen({super.key});
@@ -23,10 +25,18 @@ class _ListingsScreenState extends State<ListingsScreen> {
   /// Live listings from the API (set from cubit state in build).
   List<ListingModel> _all = const [];
 
+  /// While unverified, this vendor's listings are hidden from clients.
+  bool _vendorVerified = true; // optimistic — avoids a badge flash before load
+
   @override
   void initState() {
     super.initState();
     context.read<ListingsCubit>().load();
+    VendorRepository().getMe().then((v) {
+      if (mounted && v != null) {
+        setState(() => _vendorVerified = v.isVerified);
+      }
+    }).catchError((_) {});
   }
 
   // ── Computed counts ──────────────────────────────────────────────────────────
@@ -176,10 +186,10 @@ class _ListingsScreenState extends State<ListingsScreen> {
               duration: const Duration(milliseconds: 200),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: isActive ? AppColors.primary : Colors.white,
+                color: isActive ? AppColors.primary : context.c.surface,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: isActive ? AppColors.primary : AppColors.border,
+                  color: isActive ? AppColors.primary : context.c.border,
                 ),
               ),
               child: Text(
@@ -187,7 +197,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
                 style: GoogleFonts.urbanist(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: isActive ? Colors.white : AppColors.textSecondary,
+                  color: isActive ? Colors.white : context.c.textSecondary,
                 ),
               ),
             ),
@@ -233,7 +243,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
                   style: GoogleFonts.urbanist(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: context.c.textPrimary,
                   ),
                   children: [
                     TextSpan(
@@ -251,9 +261,9 @@ class _ListingsScreenState extends State<ListingsScreen> {
                 ),
               ),
             ),
-            const Icon(
+            Icon(
               Icons.chevron_right_rounded,
-              color: AppColors.textHint,
+              color: context.c.textHint,
               size: 18,
             ),
           ],
@@ -274,7 +284,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.c.surface,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -312,7 +322,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
                       style: GoogleFonts.urbanist(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                        color: context.c.textPrimary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -326,7 +336,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            color: AppColors.primaryLight,
+                            color: context.c.primaryLight,
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -345,7 +355,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
                               listing.categoryName!,
                               style: GoogleFonts.urbanist(
                                 fontSize: 12,
-                                color: AppColors.textSecondary,
+                                color: context.c.textSecondary,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -362,7 +372,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
                       style: GoogleFonts.urbanist(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                        color: context.c.textPrimary,
                       ),
                     ),
                   ],
@@ -375,42 +385,73 @@ class _ListingsScreenState extends State<ListingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Status chip
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: isActive
-                          ? const Color(0xFFDCFCE7)
-                          : const Color(0xFFFFF7ED),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      isActive ? 'Active' : 'Inactive',
-                      style: GoogleFonts.urbanist(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: isActive
-                            ? const Color(0xFF16A34A)
-                            : const Color(0xFFEA580C),
+                  // Status chip (+ hidden-until-verified pill)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: isActive
+                              ? const Color(0xFFDCFCE7)
+                              : const Color(0xFFFFF7ED),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          isActive ? 'Active' : 'Inactive',
+                          style: GoogleFonts.urbanist(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: isActive
+                                ? const Color(0xFF16A34A)
+                                : const Color(0xFFEA580C),
+                          ),
+                        ),
                       ),
-                    ),
+                      if (!_vendorVerified) ...[
+                        const SizedBox(height: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFF7ED),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Icon(Icons.visibility_off_outlined,
+                                  size: 11, color: Color(0xFFEA580C)),
+                              SizedBox(width: 3),
+                              Text('Pending review',
+                                  style: TextStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFFEA580C),
+                                  )),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                   const SizedBox(height: 24),
                   // Eye + view count
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.remove_red_eye_outlined,
                         size: 13,
-                        color: AppColors.textHint,
+                        color: context.c.textHint,
                       ),
                       const SizedBox(width: 3),
                       Text(
                         '${listing.viewCount}',
                         style: GoogleFonts.urbanist(
                           fontSize: 12,
-                          color: AppColors.textSecondary,
+                          color: context.c.textSecondary,
                         ),
                       ),
                     ],
@@ -431,10 +472,10 @@ class _ListingsScreenState extends State<ListingsScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
+          Icon(
             Icons.store_outlined,
             size: 56,
-            color: AppColors.textHint,
+            color: context.c.textHint,
           ),
           const SizedBox(height: 12),
           Text(
@@ -442,7 +483,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
             style: GoogleFonts.urbanist(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
+              color: context.c.textSecondary,
             ),
           ),
           const SizedBox(height: 4),
@@ -450,7 +491,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
             'Tap + to add your first listing',
             style: GoogleFonts.urbanist(
               fontSize: 13,
-              color: AppColors.textHint,
+              color: context.c.textHint,
             ),
           ),
         ],
@@ -487,7 +528,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
               ),
             ],
           ),
-          child: const Icon(Icons.add, color: Colors.white, size: 26),
+          child: const AppIcon('add', size: 26, color: Colors.white),
         ),
       ),
     );
@@ -504,7 +545,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
         lState.status == ListingsStatus.loading && _all.isEmpty;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.c.background,
       body: Column(
         children: [
           _buildAppBar(context),
@@ -544,13 +585,13 @@ class _ListingsScreenState extends State<ListingsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.cloud_off_rounded,
-                size: 44, color: AppColors.textHint),
+            Icon(Icons.cloud_off_rounded,
+                size: 44, color: context.c.textHint),
             const SizedBox(height: 12),
             Text(
               error ?? 'Could not load your listings',
               style: GoogleFonts.urbanist(
-                  fontSize: 14, color: AppColors.textSecondary),
+                  fontSize: 14, color: context.c.textSecondary),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
@@ -580,9 +621,9 @@ class _ListingTypeSheetState extends State<_ListingTypeSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: context.c.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.fromLTRB(
         24,
@@ -599,7 +640,7 @@ class _ListingTypeSheetState extends State<_ListingTypeSheet> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.border,
+              color: context.c.border,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -630,7 +671,7 @@ class _ListingTypeSheetState extends State<_ListingTypeSheet> {
             style: GoogleFonts.urbanist(
               fontSize: 22,
               fontWeight: FontWeight.w800,
-              color: AppColors.textPrimary,
+              color: context.c.textPrimary,
             ),
           ),
           const SizedBox(height: 6),
@@ -638,7 +679,7 @@ class _ListingTypeSheetState extends State<_ListingTypeSheet> {
             'Select the type of listing you want to create',
             style: GoogleFonts.urbanist(
               fontSize: 14,
-              color: AppColors.textSecondary,
+              color: context.c.textSecondary,
             ),
             textAlign: TextAlign.center,
           ),
@@ -712,10 +753,10 @@ class _TypeCard extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primaryLight : Colors.white,
+          color: isSelected ? context.c.primaryLight : context.c.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.border,
+            color: isSelected ? AppColors.primary : context.c.border,
             width: isSelected ? 1.5 : 1,
           ),
         ),
@@ -725,7 +766,7 @@ class _TypeCard extends StatelessWidget {
               width: 52,
               height: 52,
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primary : AppColors.primaryLight,
+                color: isSelected ? AppColors.primary : context.c.primaryLight,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(
@@ -744,7 +785,7 @@ class _TypeCard extends StatelessWidget {
                     style: GoogleFonts.urbanist(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -752,7 +793,7 @@ class _TypeCard extends StatelessWidget {
                     subtitle,
                     style: GoogleFonts.urbanist(
                       fontSize: 13,
-                      color: AppColors.textSecondary,
+                      color: context.c.textSecondary,
                     ),
                   ),
                 ],
@@ -762,7 +803,7 @@ class _TypeCard extends StatelessWidget {
               isSelected
                   ? Icons.radio_button_checked_rounded
                   : Icons.radio_button_off_rounded,
-              color: isSelected ? AppColors.primary : AppColors.textHint,
+              color: isSelected ? AppColors.primary : context.c.textHint,
               size: 22,
             ),
           ],

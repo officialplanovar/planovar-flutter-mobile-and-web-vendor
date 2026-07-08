@@ -6,11 +6,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/services/upload_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../shared/widgets/app_icon.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_input.dart';
 import '../../../shared/widgets/tag_input_field.dart';
 import '../bloc/listings_cubit.dart';
 import '../data/listings_repository.dart';
+import '../../vendor/data/vendor_repository.dart';
 
 class AddProductScreen extends StatefulWidget {
   const AddProductScreen({super.key});
@@ -67,8 +69,67 @@ class _AddProductScreenState extends State<AddProductScreen> {
   List<String> _tags = [];
   bool _publishing = false;
 
+  // Categories (admin-managed), limited to the vendor's registered ones.
+  List<CategoryOption> _apiCategories = [];
+  List<String> _vendorTags = [];
+  String? _selectedCategory;
+
+  List<CategoryOption> get _pickableCategories => _vendorTags.isEmpty
+      ? _apiCategories
+      : _apiCategories.where((c) => _vendorTags.contains(c.name)).toList();
+
   double? _parseAmount(String text) =>
       double.tryParse(text.replaceAll(',', '').trim());
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.addListener(_onFieldChanged);
+    _descController.addListener(_onFieldChanged);
+    ListingsRepository().categories().then((cats) {
+      if (mounted) setState(() => _apiCategories = cats);
+    }).catchError((_) {});
+    VendorRepository().getMe().then((v) {
+      if (mounted && v != null) {
+        setState(() => _vendorTags = List<String>.from(v.tags));
+      }
+    }).catchError((_) {});
+  }
+
+  void _onFieldChanged() => setState(() {});
+
+  /// Submit is enabled only once the mandatory fields are filled.
+  bool get _canPublish =>
+      _nameController.text.trim().isNotEmpty &&
+      _descController.text.trim().isNotEmpty &&
+      _selectedCategory != null;
+
+  /// Builds a unique SKU from the product name (required) + a category/tag
+  /// prefix + a time-based suffix. Requires the name to be entered first.
+  void _generateSku() {
+    final name = _nameController.text.trim();
+    if (name.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content:
+                Text('Enter the product name first, then generate an SKU.')),
+      );
+      return;
+    }
+    String part(String s, int n) {
+      final cleaned = s.toUpperCase().replaceAll(RegExp(r'[^A-Z0-9]'), '');
+      return cleaned.isEmpty
+          ? 'X' * n
+          : cleaned.padRight(n, 'X').substring(0, n);
+    }
+
+    final tagPart = _tags.isNotEmpty ? part(_tags.first, 3) : 'GEN';
+    final namePart = part(name, 3);
+    final suffix = (DateTime.now().millisecondsSinceEpoch % 100000)
+        .toString()
+        .padLeft(5, '0');
+    setState(() => _skuController.text = '$tagPart-$namePart-$suffix');
+  }
 
   Future<void> _publish() async {
     final name = _nameController.text.trim();
@@ -79,17 +140,20 @@ class _AddProductScreenState extends State<AddProductScreen> {
       );
       return;
     }
+    if (_selectedCategory == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a category')),
+      );
+      return;
+    }
     setState(() => _publishing = true);
     try {
       final repo = ListingsRepository();
-      // No category picker in this design yet — best-effort match from tags,
-      // falling back to the first active category.
-      final cats = await repo.categories();
+      final cats =
+          _apiCategories.isNotEmpty ? _apiCategories : await repo.categories();
       if (cats.isEmpty) throw Exception('No categories available');
       final match = cats.firstWhere(
-        (c) => _tags.any((t) =>
-            c.name.toLowerCase().contains(t.toLowerCase()) ||
-            t.toLowerCase().contains(c.name.toLowerCase())),
+        (c) => c.name == _selectedCategory,
         orElse: () => cats.first,
       );
       final listing = await repo.create(
@@ -101,6 +165,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
         isRentable: _isForRent,
         perDayRate: _isForRent ? _parseAmount(_perDayController.text) : null,
         depositAmount: _isForRent ? _parseAmount(_depositController.text) : null,
+        sku: _skuController.text.trim().isEmpty
+            ? null
+            : _skuController.text.trim(),
+        stockQuantity: int.tryParse(_quantityController.text.trim()),
         tags: _tags,
         mediaUrls: _imageSlots.whereType<String>().toList(),
       );
@@ -146,9 +214,159 @@ class _AddProductScreenState extends State<AddProductScreen> {
         style: GoogleFonts.urbanist(
           fontSize: 15,
           fontWeight: FontWeight.w700,
-          color: AppColors.textPrimary,
+          color: context.c.textPrimary,
         ),
       ),
+    );
+  }
+
+  Widget _buildCategorySelector() {
+    return GestureDetector(
+      onTap: _showCategoryBottomSheet,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Category',
+            style: GoogleFonts.urbanist(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: context.c.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+            decoration: BoxDecoration(
+              color: context.c.surfaceElevated,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    _selectedCategory ?? 'Select a category',
+                    style: GoogleFonts.urbanist(
+                      fontSize: 15,
+                      color: _selectedCategory != null
+                          ? context.c.textPrimary
+                          : context.c.textHint,
+                    ),
+                  ),
+                ),
+                Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  color: context.c.textSecondary,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCategoryBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(ctx).size.height * 0.6,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+                  child: Text(
+                    'Select Category',
+                    style: GoogleFonts.urbanist(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      color: context.c.textPrimary,
+                    ),
+                  ),
+                ),
+                const Divider(height: 1),
+                Flexible(
+                  child: _apiCategories.isEmpty
+                      ? const Padding(
+                          padding: EdgeInsets.all(28),
+                          child: Center(child: CircularProgressIndicator()),
+                        )
+                      : _pickableCategories.isEmpty
+                          ? Padding(
+                              padding: const EdgeInsets.all(24),
+                              child: Text(
+                                "You haven't added any categories to your profile yet. "
+                                'Add them under Profile → Business Details to list products here.',
+                                style: GoogleFonts.urbanist(
+                                  fontSize: 14,
+                                  color: context.c.textSecondary,
+                                  height: 1.5,
+                                ),
+                              ),
+                            )
+                          : ListView(
+                              shrinkWrap: true,
+                              padding: const EdgeInsets.only(bottom: 12),
+                              children: _pickableCategories
+                                  .map(
+                                    (cat) => ListTile(
+                                      title: Text(
+                                        cat.name,
+                                        style: GoogleFonts.urbanist(
+                                          fontSize: 15,
+                                          color: context.c.textPrimary,
+                                        ),
+                                      ),
+                                      trailing: _selectedCategory == cat.name
+                                          ? const Icon(Icons.check_rounded,
+                                              color: AppColors.primary)
+                                          : null,
+                                      onTap: () {
+                                        setState(
+                                            () => _selectedCategory = cat.name);
+                                        Navigator.pop(ctx);
+                                      },
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+                  child: Row(
+                    children: [
+                      Icon(Icons.info_outline_rounded,
+                          size: 16, color: context.c.textSecondary),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Only your registered categories are shown. Add more in '
+                          'Profile → Business Details.',
+                          style: GoogleFonts.urbanist(
+                            fontSize: 12,
+                            color: context.c.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -156,7 +374,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     return Container(
       height: 44,
       decoration: BoxDecoration(
-        color: AppColors.divider,
+        color: context.c.divider,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -180,7 +398,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
           duration: const Duration(milliseconds: 200),
           margin: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: isActive ? Colors.white : Colors.transparent,
+            color: isActive ? context.c.surface : Colors.transparent,
             borderRadius: BorderRadius.circular(9),
             boxShadow: isActive
                 ? [
@@ -198,7 +416,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               style: GoogleFonts.urbanist(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: isActive ? AppColors.primary : AppColors.textSecondary,
+                color: isActive ? AppColors.primary : context.c.textSecondary,
               ),
             ),
           ),
@@ -216,10 +434,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
         height: 90,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: AppColors.divider,
+          color: context.c.divider,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: AppColors.border,
+            color: context.c.border,
             style: BorderStyle.solid,
             width: 1.5,
           ),
@@ -259,17 +477,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 : Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
-                        Icons.add_photo_alternate_outlined,
-                        color: AppColors.textHint,
-                        size: 24,
-                      ),
+                      AppIcon('gallery',
+                          size: 24, color: context.c.textHint),
                       const SizedBox(height: 4),
                       Text(
                         label,
                         style: GoogleFonts.urbanist(
                           fontSize: 11,
-                          color: AppColors.textSecondary,
+                          color: context.c.textSecondary,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -300,10 +515,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
             width: 48,
             height: 40,
             decoration: BoxDecoration(
-              color: isSelected ? AppColors.primary : Colors.white,
+              color: isSelected ? AppColors.primary : context.c.surface,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: isSelected ? AppColors.primary : AppColors.border,
+                color: isSelected ? AppColors.primary : context.c.border,
               ),
             ),
             child: Center(
@@ -312,7 +527,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 style: GoogleFonts.urbanist(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: isSelected ? Colors.white : AppColors.textSecondary,
+                  color: isSelected ? Colors.white : context.c.textSecondary,
                 ),
               ),
             ),
@@ -325,22 +540,22 @@ class _AddProductScreenState extends State<AddProductScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.c.surface,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: GestureDetector(
           onTap: () => context.pop(),
           child: Container(
             margin: const EdgeInsets.all(8),
-            decoration: const BoxDecoration(
-              color: AppColors.divider,
+            decoration: BoxDecoration(
+              color: context.c.divider,
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.arrow_back_rounded,
-              color: AppColors.textPrimary,
+              color: context.c.textPrimary,
               size: 20,
             ),
           ),
@@ -353,14 +568,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
               style: GoogleFonts.urbanist(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
             ),
             Text(
               'Add a product to your catalogue',
               style: GoogleFonts.urbanist(
                 fontSize: 12,
-                color: AppColors.textSecondary,
+                color: context.c.textSecondary,
               ),
             ),
           ],
@@ -390,6 +605,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     keyboardType: TextInputType.multiline,
                     textInputAction: TextInputAction.newline,
                   ),
+                  const SizedBox(height: 16),
+                  _buildCategorySelector(),
                   const SizedBox(height: 16),
                   AppInput(
                     label: 'Product Price',
@@ -433,7 +650,23 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     hint: 'Enter product SKU...',
                     controller: _skuController,
                   ),
-                  const SizedBox(height: 16),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton.icon(
+                      onPressed: _generateSku,
+                      icon: const Icon(Icons.auto_awesome_rounded, size: 16),
+                      label: const Text('Generate for me'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        textStyle: GoogleFonts.urbanist(
+                            fontSize: 13, fontWeight: FontWeight.w700),
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        minimumSize: const Size(0, 32),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
                   AppInput(
                     label: 'Quantity in Stock',
                     hint: 'How many do you have in stock',
@@ -475,15 +708,15 @@ class _AddProductScreenState extends State<AddProductScreen> {
           Container(
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: const Border(
-                top: BorderSide(color: AppColors.border),
+              color: context.c.surface,
+              border: Border(
+                top: BorderSide(color: context.c.border),
               ),
             ),
             child: AppButton.primary(
               _publishing ? 'Publishing…' : 'Publish Product',
               loading: _publishing,
-              onTap: _publishing ? null : _publish,
+              onTap: (_publishing || !_canPublish) ? null : _publish,
             ),
           ),
         ],

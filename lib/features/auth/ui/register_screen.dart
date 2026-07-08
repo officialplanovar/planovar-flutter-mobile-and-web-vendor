@@ -9,6 +9,7 @@ import '../../../shared/widgets/app_input.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
+import '../../setup/bloc/setup_cubit.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -18,15 +19,43 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final _firstNameCtrl = TextEditingController();
+  final _lastNameCtrl = TextEditingController();
   final _businessNameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
+  DateTime? _dob;
   bool _obscurePassword = true;
   bool _agreed = false;
 
+  static const _months = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ];
+  String _fmtDobDisplay(DateTime d) =>
+      '${d.day} ${_months[d.month - 1]} ${d.year}';
+  String _fmtDobSend(DateTime d) =>
+      '${d.year.toString().padLeft(4, '0')}-'
+      '${d.month.toString().padLeft(2, '0')}-'
+      '${d.day.toString().padLeft(2, '0')}';
+
+  Future<void> _pickDob() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _dob ?? DateTime(now.year - 25),
+      firstDate: DateTime(now.year - 100),
+      lastDate: DateTime(now.year - 13), // 13+ minimum age
+      helpText: 'Select your date of birth',
+    );
+    if (picked != null) setState(() => _dob = picked);
+  }
+
   @override
   void dispose() {
+    _firstNameCtrl.dispose();
+    _lastNameCtrl.dispose();
     _businessNameCtrl.dispose();
     _emailCtrl.dispose();
     _phoneCtrl.dispose();
@@ -34,34 +63,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  Widget _buildDivider() {
+  Widget _buildDivider(BuildContext context) {
     return Row(
       children: [
-        const Expanded(child: Divider(color: AppColors.border)),
+        Expanded(child: Divider(color: context.c.border)),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
             'or',
             style: GoogleFonts.urbanist(
               fontSize: 13,
-              color: AppColors.textHint,
+              color: context.c.textHint,
             ),
           ),
         ),
-        const Expanded(child: Divider(color: AppColors.border)),
+        Expanded(child: Divider(color: context.c.border)),
       ],
     );
   }
 
-  Widget _buildGoogleButton() {
+  Widget _buildGoogleButton(BuildContext context) {
     return GestureDetector(
       onTap: () {},
       child: Container(
         height: 52,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.c.surface,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.border, width: 1.5),
+          border: Border.all(color: context.c.border, width: 1.5),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -87,7 +116,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               style: GoogleFonts.urbanist(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
             ),
           ],
@@ -99,12 +128,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.c.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
+          icon: Icon(Icons.arrow_back_rounded, color: context.c.textPrimary),
           onPressed: () => context.pop(),
         ),
       ),
@@ -118,7 +147,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               style: GoogleFonts.urbanist(
                 fontSize: 26,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
             ),
             const SizedBox(height: 6),
@@ -126,16 +155,88 @@ class _RegisterScreenState extends State<RegisterScreen> {
               'Start listing your business on Planovar',
               style: GoogleFonts.urbanist(
                 fontSize: 15,
-                color: AppColors.textSecondary,
+                color: context.c.textSecondary,
               ),
             ),
             const SizedBox(height: 32),
+
+            // First & last name of the contact person behind the business
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: AppInput(
+                    label: 'First Name',
+                    hint: 'e.g. Ada',
+                    controller: _firstNameCtrl,
+                    keyboardType: TextInputType.name,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: AppInput(
+                    label: 'Last Name',
+                    hint: 'e.g. Obi',
+                    controller: _lastNameCtrl,
+                    keyboardType: TextInputType.name,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
 
             // Business Name
             AppInput(
               label: 'Business Name',
               hint: 'e.g. Sugared Dreams Cakery',
               controller: _businessNameCtrl,
+            ),
+            const SizedBox(height: 16),
+
+            // Date of Birth
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Date of Birth',
+                  style: GoogleFonts.urbanist(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: context.c.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                GestureDetector(
+                  onTap: _pickDob,
+                  child: Container(
+                    height: 52,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: context.c.surfaceElevated,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            _dob == null
+                                ? 'DD / MM / YYYY'
+                                : _fmtDobDisplay(_dob!),
+                            style: GoogleFonts.urbanist(
+                              fontSize: 15,
+                              color: _dob == null
+                                  ? context.c.textHint
+                                  : context.c.textPrimary,
+                            ),
+                          ),
+                        ),
+                        Icon(Icons.calendar_today_outlined,
+                            size: 18, color: context.c.textSecondary),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
 
@@ -157,7 +258,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   style: GoogleFonts.urbanist(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
+                    color: context.c.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -167,7 +268,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       height: 52,
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF2F2F2),
+                        color: context.c.surfaceElevated,
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Row(
@@ -182,7 +283,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             style: GoogleFonts.urbanist(
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
-                              color: AppColors.textPrimary,
+                              color: context.c.textPrimary,
                             ),
                           ),
                         ],
@@ -213,7 +314,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   _obscurePassword
                       ? Icons.visibility_off_outlined
                       : Icons.visibility_outlined,
-                  color: AppColors.textHint,
+                  color: context.c.textHint,
                 ),
                 onPressed: () =>
                     setState(() => _obscurePassword = !_obscurePassword),
@@ -243,7 +344,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     text: TextSpan(
                       style: GoogleFonts.urbanist(
                         fontSize: 13,
-                        color: AppColors.textSecondary,
+                        color: context.c.textSecondary,
                         height: 1.5,
                       ),
                       children: [
@@ -302,8 +403,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           final phone = _phoneCtrl.text
                               .trim()
                               .replaceAll(RegExp(r'^0+'), '');
+                          // Carry the business name into the setup flow so it
+                          // reaches onboard (the setup steps don't re-collect it).
+                          context
+                              .read<SetupCubit>()
+                              .setBusinessName(_businessNameCtrl.text.trim());
                           context.read<AuthBloc>().add(
                                 AuthSignUpRequested(
+                                  firstName: _firstNameCtrl.text.trim(),
+                                  lastName: _lastNameCtrl.text.trim(),
+                                  dateOfBirth:
+                                      _dob == null ? null : _fmtDobSend(_dob!),
                                   businessName: _businessNameCtrl.text.trim(),
                                   email: _emailCtrl.text.trim(),
                                   password: _passwordCtrl.text,
@@ -317,10 +427,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 20),
 
-            _buildDivider(),
+            _buildDivider(context),
             const SizedBox(height: 20),
 
-            _buildGoogleButton(),
+            _buildGoogleButton(context),
             const SizedBox(height: 28),
 
             // Sign in link — Wrap so it never overflows on narrow screens.
@@ -332,7 +442,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   'Already have an account? ',
                   style: GoogleFonts.urbanist(
                     fontSize: 14,
-                    color: AppColors.textSecondary,
+                    color: context.c.textSecondary,
                   ),
                 ),
                 GestureDetector(

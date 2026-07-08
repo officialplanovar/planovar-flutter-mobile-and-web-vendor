@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../shared/widgets/app_button.dart';
+import '../../../shared/widgets/app_icon.dart';
 
 class AddListingTypeScreen extends StatefulWidget {
   const AddListingTypeScreen({super.key});
@@ -18,9 +19,9 @@ class _AddListingTypeScreenState extends State<AddListingTypeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.c.surface,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: GestureDetector(
@@ -28,12 +29,12 @@ class _AddListingTypeScreenState extends State<AddListingTypeScreen> {
           child: Container(
             margin: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.divider,
+              color: context.c.divider,
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.arrow_back_rounded,
-              color: AppColors.textPrimary,
+              color: context.c.textPrimary,
               size: 20,
             ),
           ),
@@ -43,7 +44,7 @@ class _AddListingTypeScreenState extends State<AddListingTypeScreen> {
           style: GoogleFonts.urbanist(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: context.c.textPrimary,
           ),
         ),
       ),
@@ -58,7 +59,7 @@ class _AddListingTypeScreenState extends State<AddListingTypeScreen> {
                 style: GoogleFonts.urbanist(
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
+                  color: context.c.textPrimary,
                 ),
               ),
               const SizedBox(height: 6),
@@ -66,20 +67,20 @@ class _AddListingTypeScreenState extends State<AddListingTypeScreen> {
                 'Select the type of listing you want to create',
                 style: GoogleFonts.urbanist(
                   fontSize: 14,
-                  color: AppColors.textSecondary,
+                  color: context.c.textSecondary,
                 ),
               ),
               const SizedBox(height: 32),
               _buildTypeCard(
                 type: 'service',
-                icon: Icons.design_services_rounded,
+                asset: 'service',
                 title: 'Service',
                 subtitle: 'Bookable appointment',
               ),
               const SizedBox(height: 16),
               _buildTypeCard(
                 type: 'product',
-                icon: Icons.inventory_2_rounded,
+                asset: 'product',
                 title: 'Product',
                 subtitle: 'Physical item for rent or sale',
               ),
@@ -105,7 +106,7 @@ class _AddListingTypeScreenState extends State<AddListingTypeScreen> {
 
   Widget _buildTypeCard({
     required String type,
-    required IconData icon,
+    required String asset,
     required String title,
     required String subtitle,
   }) {
@@ -116,10 +117,10 @@ class _AddListingTypeScreenState extends State<AddListingTypeScreen> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primaryLight : Colors.white,
+          color: isSelected ? context.c.primaryLight : context.c.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.border,
+            color: isSelected ? AppColors.primary : context.c.border,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -131,13 +132,13 @@ class _AddListingTypeScreenState extends State<AddListingTypeScreen> {
               decoration: BoxDecoration(
                 color: isSelected
                     ? AppColors.primary
-                    : AppColors.primaryLight,
+                    : context.c.primaryLight,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                icon,
-                color: isSelected ? Colors.white : AppColors.primary,
+              child: AppIcon(
+                asset,
                 size: 26,
+                color: isSelected ? Colors.white : AppColors.primary,
               ),
             ),
             const SizedBox(width: 16),
@@ -150,7 +151,7 @@ class _AddListingTypeScreenState extends State<AddListingTypeScreen> {
                     style: GoogleFonts.urbanist(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -158,7 +159,7 @@ class _AddListingTypeScreenState extends State<AddListingTypeScreen> {
                     subtitle,
                     style: GoogleFonts.urbanist(
                       fontSize: 13,
-                      color: AppColors.textSecondary,
+                      color: context.c.textSecondary,
                     ),
                   ),
                 ],
@@ -168,7 +169,7 @@ class _AddListingTypeScreenState extends State<AddListingTypeScreen> {
               isSelected
                   ? Icons.radio_button_checked_rounded
                   : Icons.radio_button_off_rounded,
-              color: isSelected ? AppColors.primary : AppColors.textHint,
+              color: isSelected ? AppColors.primary : context.c.textHint,
               size: 22,
             ),
           ],

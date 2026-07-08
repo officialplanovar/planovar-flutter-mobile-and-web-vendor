@@ -43,6 +43,11 @@ class ListingsRepository {
     List<String>? tags,
     Map<String, dynamic>? location,
     List<String>? mediaUrls,
+    String? sku,
+    int? stockQuantity,
+    int? durationValue,
+    String? durationUnit,
+    String? cancellationPolicy,
   }) async {
     final res = await _api.dio.post('/listings', data: {
       'categoryId': categoryId,
@@ -56,6 +61,13 @@ class ListingsRepository {
       if (tags != null) 'tags': tags,
       if (location != null) 'location': location,
       if (mediaUrls != null && mediaUrls.isNotEmpty) 'mediaUrls': mediaUrls,
+      if (sku != null && sku.isNotEmpty) 'sku': sku,
+      if (stockQuantity != null) 'stockQuantity': stockQuantity,
+      if (durationValue != null) 'durationValue': durationValue,
+      if (durationUnit != null && durationUnit.isNotEmpty)
+        'durationUnit': durationUnit,
+      if (cancellationPolicy != null && cancellationPolicy.isNotEmpty)
+        'cancellationPolicy': cancellationPolicy,
     });
     ensureOk(res);
     return ListingModel.fromJson(Map<String, dynamic>.from(res.data));

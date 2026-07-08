@@ -1,17 +1,25 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/router/app_routes.dart';
+import '../../../shared/widgets/app_icon.dart';
 import '../../../core/services/chat_socket.dart';
 import '../../../core/services/messaging_service.dart';
-import '../../vendor/data/vendor_repository.dart';
 import '../../calls/call_screen.dart';
+import '../../../core/services/bank_service.dart';
+import '../../orders/data/bookings_repository.dart';
+import '../../listings/data/listings_repository.dart';
+import '../../../shared/models/bank_models.dart';
+import '../../../shared/widgets/add_bank_account_sheet.dart';
+import 'create_quote_screen.dart';
+import '../data/quotes_repository.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../shared/models/chat_card_models.dart';
 import '../../../shared/models/conversation_model.dart';
+import '../../../shared/models/listing_model.dart';
 import '../../../shared/models/message_model.dart';
+import '../../../shared/widgets/chat_cards.dart';
 import '../../../shared/widgets/network_image_widget.dart';
 import '../../auth/bloc/auth_bloc.dart';
 import '../../auth/bloc/auth_state.dart';
@@ -27,6 +35,7 @@ class ConversationScreen extends StatefulWidget {
 
 class _ConversationScreenState extends State<ConversationScreen> {
   final _service = MessagingService();
+  final _quotes = QuotesRepository();
   final _socket = ChatSocket();
   List<MessageModel> _messages = [];
   ConversationModel _conv = const ConversationModel(
@@ -35,19 +44,19 @@ class _ConversationScreenState extends State<ConversationScreen> {
     unreadCount: 0,
   );
   String _currentUserId = '';
-  String _vendorName = '';
   final _scrollController = ScrollController();
   final _textController = TextEditingController();
   bool _hasDraft = false;
+  BankAccount? _bankAccount;
+  bool _bankLoaded = false;
 
   @override
   void initState() {
     super.initState();
     final auth = context.read<AuthBloc>().state;
     if (auth is AuthAuthenticated) _currentUserId = auth.user.id;
-    VendorRepository().getMe().then((v) {
-      if (mounted && v != null) setState(() => _vendorName = v.businessName);
-    }).catchError((_) {});
+    _resolveMyId();
+    _loadBank();
     _load();
     _connectSocket();
     _textController.addListener(() {
@@ -65,6 +74,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
     _scrollController.dispose();
     _textController.dispose();
     super.dispose();
+  }
+
+  Future<void> _resolveMyId() async {
+    final id = await _service.myId();
+    if (id != null && id.isNotEmpty && mounted && id != _currentUserId) {
+      _currentUserId = id;
+      await _load(); // re-parse — isMe is baked at parse time
+    }
   }
 
   Future<void> _load() async {
@@ -101,6 +118,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   Future<void> _connectSocket() async {
     await _socket.connect();
+    _socket.onReady(() => _socket.join(widget.conversationId));
     _socket.join(widget.conversationId);
     _socket.onCallIncoming((d) {
       if (d['conversationId'] != widget.conversationId) return;
@@ -154,7 +172,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     final conv = _conv;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: context.c.background,
       body: Column(
         children: [
           // ── Gradient AppBar ──────────────────────────────────────────────
@@ -175,27 +193,19 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   controller: _scrollController,
                   padding: const EdgeInsets.symmetric(
                       horizontal: 16, vertical: 16),
-                  itemCount: _messages.length + _specialBubbleCount(conv),
-                  itemBuilder: (context, index) {
-                    if (index < _messages.length) {
-                      return _MessageBubble(message: _messages[index]);
-                    }
-                    // Special bubbles after messages
-                    final specialIndex = index - _messages.length;
-                    return _buildSpecialBubble(conv, specialIndex);
-                  },
+                  itemCount: _messages.length,
+                  itemBuilder: (context, index) =>
+                      _buildMessage(_messages[index]),
                 ),
               ],
             ),
           ),
 
-          // ── Status Bar ───────────────────────────────────────────────────
-          if (conv.quoteStatus != null)
-            _StatusBar(quoteStatus: conv.quoteStatus!),
+          // ── Bank-setup warning (a quote was accepted, no account yet) ────
+          if (_needsBankAccount) _buildBankBanner(),
 
-          // ── Action Card ──────────────────────────────────────────────────
-          if (conv.quoteStatus != 'INVOICE_SENT')
-            _ActionCard(conv: conv),
+          // ── Contextual vendor action (quote / fulfilment) ────────────────
+          if (conv.type != 'group') _buildBottomAction(conv),
 
           // ── Input Bar ────────────────────────────────────────────────────
           _InputBar(
@@ -208,19 +218,461 @@ class _ConversationScreenState extends State<ConversationScreen> {
     );
   }
 
-  int _specialBubbleCount(ConversationModel conv) {
-    final qs = conv.quoteStatus;
-    if (qs == null) return 0;
-    if (qs == 'INVOICE_SENT') return 2; // quote + invoice
-    return 1; // quote only
+  Widget _buildMessage(MessageModel msg) {
+    final t = msg.typeLower;
+    if (t == 'todo' && msg.todo != null) {
+      return TodoCard(
+        todo: msg.todo!,
+        currentUserId: _currentUserId,
+        onToggle: () => _toggleTodo(msg.todo!.id),
+      );
+    }
+    if ((t == 'quote' || t == 'quote_revised') && msg.quote != null) {
+      final q = msg.quote!;
+      return QuoteCard(
+        quote: q,
+        onRevise: (q.isActive && q.status == 'pending' && !q.isExpired)
+            ? () => _reviseQuote(q)
+            : null,
+      );
+    }
+    if (t == 'invoice' && msg.invoice != null) {
+      return InvoiceCard(invoice: msg.invoice!);
+    }
+    if (t == 'order_request' && msg.booking != null) {
+      final b = msg.booking!;
+      return OrderRequestCard(
+        booking: b,
+        onAccept: b.status == 'pending' ? () => _acceptOrder(b.id) : null,
+        onDecline: b.status == 'pending' ? () => _declineOrder(b.id) : null,
+      );
+    }
+    if (t == 'quote_accepted' ||
+        t == 'invoice_accepted' ||
+        t == 'order_accepted' ||
+        t == 'booking_confirmed') {
+      return const ChatSystemBanner(
+          label: 'Confirmed', color: Color(0xFF047857), bg: Color(0xFFF0FDF4));
+    }
+    if (t == 'quote_declined' ||
+        t == 'quote_expired' ||
+        t == 'order_declined' ||
+        t == 'invoice_declined') {
+      return ChatSystemBanner(
+        label: t == 'quote_expired' ? 'Quote expired' : 'Declined',
+        color: const Color(0xFFDC2626),
+        bg: const Color(0xFFFEF2F2),
+        icon: Icons.cancel_rounded,
+      );
+    }
+    if (t == 'milestone_paid' || t == 'deposit_refunded') {
+      final amt = msg.metadata['amount'];
+      final refund = t == 'deposit_refunded';
+      return ChatSystemBanner(
+        label: refund
+            ? (amt != null ? 'Deposit refunded · ₦$amt' : 'Deposit refunded')
+            : (amt != null ? 'Payment received · ₦$amt' : 'Payment received'),
+        color: const Color(0xFF047857),
+        bg: const Color(0xFFF0FDF4),
+        icon: Icons.payments_rounded,
+      );
+    }
+    if (t == 'timeline_update') {
+      return ChatSystemBanner(
+        label: msg.content ?? 'Order update',
+        color: AppColors.primary,
+        bg: context.c.primaryLight,
+        icon: Icons.local_shipping_rounded,
+      );
+    }
+    if (t == 'review_requested') {
+      return const ChatSystemBanner(
+        label: 'Review requested',
+        color: Color(0xFFB45309),
+        bg: Color(0xFFFFFBEB),
+        icon: Icons.star_rounded,
+      );
+    }
+    if (t == 'review_submitted') {
+      final r = msg.metadata['rating'];
+      return ChatSystemBanner(
+        label: r != null ? 'Client left a review · $r★' : 'Client left a review',
+        color: const Color(0xFFB45309),
+        bg: const Color(0xFFFFFBEB),
+        icon: Icons.star_rounded,
+      );
+    }
+    return _MessageBubble(message: msg);
   }
 
-  Widget _buildSpecialBubble(ConversationModel conv, int specialIndex) {
-    if (specialIndex == 0) {
-      return _QuoteBubble(vendorName: _vendorName);
+  /// The latest active (pending, not-expired) quote in this chat, if any.
+  ChatQuote? _activeQuote() {
+    for (final m in _messages.reversed) {
+      final q = m.quote;
+      if (q != null && q.isActive && q.status == 'pending' && !q.isExpired) {
+        return q;
+      }
     }
-    // specialIndex == 1: invoice
-    return const _InvoiceBubble();
+    return null;
+  }
+
+  Future<void> _loadBank() async {
+    try {
+      final a = await BankService().getMine();
+      if (mounted) setState(() { _bankAccount = a; _bankLoaded = true; });
+    } catch (_) {
+      if (mounted) setState(() => _bankLoaded = true);
+    }
+  }
+
+  bool get _needsBankAccount =>
+      _bankLoaded &&
+      _bankAccount == null &&
+      _messages.any(
+          (m) => m.typeLower == 'invoice' || m.typeLower == 'quote_accepted');
+
+  Widget _buildBankBanner() {
+    return Container(
+      color: const Color(0xFFFEF3C7),
+      padding: const EdgeInsets.fromLTRB(16, 10, 12, 10),
+      child: Row(
+        children: [
+          const Icon(Icons.account_balance_rounded, size: 20, color: Color(0xFFB45309)),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Quote accepted — add your bank account to get paid.',
+              style: GoogleFonts.urbanist(
+                  fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF92400E)),
+            ),
+          ),
+          const SizedBox(width: 8),
+          TextButton(
+            onPressed: () => showAddBankAccountSheet(
+              context,
+              onSaved: (a) {
+                if (mounted) setState(() => _bankAccount = a);
+              },
+            ),
+            style: TextButton.styleFrom(
+              backgroundColor: const Color(0xFFB45309),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            child: Text('Add', style: GoogleFonts.urbanist(fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// A booking that's confirmed but not yet delivered (fulfilment pending).
+  ChatBookingRef? _fulfilableBooking() {
+    if (_messages.any((m) =>
+        m.typeLower == 'review_requested' || m.typeLower == 'review_submitted')) {
+      return null; // already delivered
+    }
+    for (final m in _messages.reversed) {
+      final b = m.booking;
+      if (b != null && m.typeLower == 'invoice') return b;
+    }
+    return null;
+  }
+
+  Widget _buildBottomAction(ConversationModel conv) {
+    final booking = _fulfilableBooking();
+    if (booking != null) return _buildFulfilmentBar(booking);
+    if (conv.clientId != null) return _buildQuoteActionBar();
+    return const SizedBox.shrink();
+  }
+
+  Widget _buildFulfilmentBar(ChatBookingRef booking) {
+    final isRental = booking.fulfilmentType == 'rental';
+    final label = isRental ? 'Confirm return' : 'Mark delivered';
+    return Container(
+      color: context.c.surface,
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+      child: Row(
+        children: [
+          Expanded(
+            child: OutlinedButton(
+              onPressed: () => _postUpdate(booking.id),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                side: const BorderSide(color: AppColors.primary),
+                minimumSize: const Size(double.infinity, 48),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+              child: Text('Post update',
+                  style: GoogleFonts.urbanist(fontWeight: FontWeight.w700)),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: GestureDetector(
+              onTap: () => isRental ? _confirmReturn(booking.id) : _markDelivered(booking.id),
+              child: Container(
+                height: 48,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                      colors: [Color(0xFF5756F5), Color(0xFF3332D4)]),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Text(label,
+                    style: GoogleFonts.urbanist(
+                        fontWeight: FontWeight.w700, color: Colors.white)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _confirmReturn(String bookingId) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: ctx.c.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text('Confirm rental return?',
+            style: GoogleFonts.urbanist(fontWeight: FontWeight.w800, color: ctx.c.textPrimary)),
+        content: Text(
+          'This completes the rental and refunds the client\'s deposit. '
+          'Send the deposit back to the client from your bank.',
+          style: GoogleFonts.urbanist(color: ctx.c.textSecondary),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text('Confirm return',
+                  style: GoogleFonts.urbanist(fontWeight: FontWeight.w700, color: AppColors.primary))),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    try {
+      await BookingsRepository().confirmReturn(bookingId);
+      await _load();
+      _snack('Rental completed — deposit refunded 🎉');
+    } catch (e) {
+      _snack(e.toString().replaceFirst('Exception: ', ''));
+    }
+  }
+
+  Future<void> _postUpdate(String bookingId) async {
+    final ctrl = TextEditingController();
+    final message = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: ctx.c.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text('Post an update',
+            style: GoogleFonts.urbanist(fontWeight: FontWeight.w800, color: ctx.c.textPrimary)),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          maxLines: 2,
+          style: GoogleFonts.urbanist(color: ctx.c.textPrimary),
+          decoration: InputDecoration(
+            hintText: 'e.g. Out for delivery — arriving by 4pm',
+            hintStyle: GoogleFonts.urbanist(color: ctx.c.textHint),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
+              child: const Text('Post')),
+        ],
+      ),
+    );
+    if (message == null || message.isEmpty) return;
+    try {
+      await BookingsRepository().postUpdate(bookingId, message);
+      await _load();
+      _snack('Update posted');
+    } catch (e) {
+      _snack(e.toString().replaceFirst('Exception: ', ''));
+    }
+  }
+
+  Future<void> _markDelivered(String bookingId) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: ctx.c.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text('Mark as delivered?',
+            style: GoogleFonts.urbanist(fontWeight: FontWeight.w800, color: ctx.c.textPrimary)),
+        content: Text(
+          'This completes the booking and asks the client to leave a review.',
+          style: GoogleFonts.urbanist(color: ctx.c.textSecondary),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text('Mark delivered',
+                  style: GoogleFonts.urbanist(fontWeight: FontWeight.w700, color: AppColors.primary))),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    try {
+      await BookingsRepository().markDelivered(bookingId);
+      await _load();
+      _snack('Marked as delivered 🎉');
+    } catch (e) {
+      _snack(e.toString().replaceFirst('Exception: ', ''));
+    }
+  }
+
+  Widget _buildQuoteActionBar() {
+    // Once a quote exists (active), the vendor revises it instead of creating new.
+    final active = _activeQuote();
+    final revising = active != null;
+    return Container(
+      color: context.c.surface,
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+      child: OutlinedButton.icon(
+        onPressed: revising ? () => _reviseQuote(active) : _openCreateQuote,
+        icon: Icon(revising ? Icons.edit_rounded : Icons.description_outlined,
+            size: 18, color: AppColors.primary),
+        label: Text(revising ? 'Revise quote' : 'Create & send quote',
+            style: GoogleFonts.urbanist(
+                fontWeight: FontWeight.w700, color: AppColors.primary)),
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: AppColors.primary),
+          minimumSize: const Size(double.infinity, 48),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        ),
+      ),
+    );
+  }
+
+  void _snack(String m) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m)));
+    }
+  }
+
+  Future<void> _acceptOrder(String bookingId) async {
+    try {
+      await BookingsRepository().acceptOrder(bookingId);
+      await _load();
+      _snack('Order accepted — invoice sent 🎉');
+    } catch (e) {
+      _snack(e.toString().replaceFirst('Exception: ', ''));
+    }
+  }
+
+  Future<void> _declineOrder(String bookingId) async {
+    try {
+      await BookingsRepository().declineOrder(bookingId);
+      await _load();
+      _snack('Order declined');
+    } catch (e) {
+      _snack(e.toString().replaceFirst('Exception: ', ''));
+    }
+  }
+
+  Future<void> _openCreateQuote() async {
+    final clientId = _conv.clientId;
+    if (clientId == null) {
+      _snack('Could not identify the client');
+      return;
+    }
+    final listingId = await _pickListing();
+    if (listingId == null || !mounted) return;
+    await Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => CreateQuoteScreen(
+        conversationId: widget.conversationId,
+        clientId: clientId,
+        listingId: listingId,
+      ),
+    ));
+    await _load();
+  }
+
+  Future<void> _reviseQuote(ChatQuote quote) async {
+    await Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => CreateQuoteScreen(
+        conversationId: widget.conversationId,
+        reviseQuoteId: quote.id,
+        initialQuote: quote,
+      ),
+    ));
+    await _load();
+  }
+
+  /// Tick/untick the vendor's own task on a group to-do, then refresh.
+  Future<void> _toggleTodo(String todoId) async {
+    try {
+      await _quotes.toggleTodo(todoId);
+      await _load();
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Couldn't update the task")),
+        );
+      }
+    }
+  }
+
+  /// Bottom-sheet picker of the vendor's own listings to quote against.
+  Future<String?> _pickListing() async {
+    List<ListingModel> listings;
+    try {
+      listings = await ListingsRepository().listMine();
+    } catch (_) {
+      _snack('Could not load your listings');
+      return null;
+    }
+    if (!mounted) return null;
+    if (listings.isEmpty) {
+      _snack('Add a listing first to send a quote');
+      return null;
+    }
+    return showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: context.c.surface,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 14),
+            Text('Quote for which listing?',
+                style: GoogleFonts.urbanist(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: ctx.c.textPrimary)),
+            const SizedBox(height: 8),
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  for (final l in listings)
+                    ListTile(
+                      title: Text(l.title,
+                          style: GoogleFonts.urbanist(
+                              fontWeight: FontWeight.w600,
+                              color: ctx.c.textPrimary)),
+                      onTap: () => Navigator.pop(ctx, l.id),
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -234,8 +686,6 @@ class _ConversationAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
-    final isOnline = conv.isOnline;
-    final rating = conv.ratingAvg.toStringAsFixed(1);
 
     return Container(
       decoration: const BoxDecoration(
@@ -327,34 +777,14 @@ class _ConversationAppBar extends StatelessWidget {
                       color: Colors.white70,
                     ),
                   )
-                else
-                  Row(
-                    children: [
-                      Text(
-                        isOnline ? 'Online' : 'Offline',
-                        style: GoogleFonts.urbanist(
-                          fontSize: 12,
-                          color: Colors.white70,
-                        ),
-                      ),
-                      Text(
-                        ' · ',
-                        style: GoogleFonts.urbanist(
-                          fontSize: 12,
-                          color: Colors.white70,
-                        ),
-                      ),
-                      Text(
-                        rating,
-                        style: GoogleFonts.urbanist(
-                          fontSize: 12,
-                          color: Colors.white70,
-                        ),
-                      ),
-                      const SizedBox(width: 2),
-                      const Icon(Icons.star_rounded,
-                          color: AppColors.starColor, size: 13),
-                    ],
+                else if (conv.eventName != null && conv.eventName!.isNotEmpty)
+                  Text(
+                    conv.eventName!,
+                    style: GoogleFonts.urbanist(
+                      fontSize: 12,
+                      color: Colors.white70,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
               ],
             ),
@@ -370,8 +800,9 @@ class _ConversationAppBar extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.white, width: 1),
               ),
-              child: const Icon(Icons.call_outlined,
-                  color: Colors.white, size: 20),
+              child: const Center(
+                child: AppIcon('call', size: 17, color: Colors.white),
+              ),
             ),
           ),
         ],
@@ -445,7 +876,14 @@ class _MessageBubble extends StatelessWidget {
             BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          gradient: isMe
+              ? const LinearGradient(
+                  colors: [Color(0xFF5756F5), Color(0xFF3332D4)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null,
+          color: isMe ? null : context.c.surface,
           borderRadius: isMe
               ? const BorderRadius.only(
                   topLeft: Radius.circular(16),
@@ -476,7 +914,7 @@ class _MessageBubble extends StatelessWidget {
               message.content ?? '',
               style: GoogleFonts.urbanist(
                 fontSize: 14,
-                color: AppColors.textPrimary,
+                color: isMe ? Colors.white : context.c.textPrimary,
               ),
             ),
             const SizedBox(height: 4),
@@ -484,7 +922,7 @@ class _MessageBubble extends StatelessWidget {
               timeStr,
               style: GoogleFonts.urbanist(
                 fontSize: 10,
-                color: AppColors.textHint,
+                color: isMe ? Colors.white70 : context.c.textHint,
               ),
             ),
           ],
@@ -495,653 +933,6 @@ class _MessageBubble extends StatelessWidget {
 }
 
 // ── Quote Bubble ──────────────────────────────────────────────────────────────
-class _QuoteBubble extends StatelessWidget {
-  final String vendorName;
-
-  const _QuoteBubble({required this.vendorName});
-
-  @override
-  Widget build(BuildContext context) {
-    const gold = Color(0xFFF5A623);
-
-    return Align(
-      alignment: Alignment.centerRight,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 16, left: 40),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: gold, width: 1.5),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.06),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Header
-                  Row(
-                    children: [
-                      const Icon(Icons.description_outlined,
-                          color: gold, size: 20),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Quote from $vendorName',
-                              style: GoogleFonts.urbanist(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Row(
-                              children: [
-                                const Icon(Icons.access_time_rounded,
-                                    size: 12, color: gold),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'Valid till Midnight',
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 12,
-                                    color: gold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  const Divider(height: 1, color: AppColors.divider),
-                  const SizedBox(height: 12),
-                  // Line items
-                  _QuoteLineRow(label: 'Man power', amount: '₦85,000'),
-                  const SizedBox(height: 6),
-                  _QuoteLineRow(
-                    label: 'Setup & delivery (Lekki)',
-                    amount: '₦15,000',
-                  ),
-                  const SizedBox(height: 12),
-                  const Divider(height: 1, color: AppColors.divider),
-                  const SizedBox(height: 12),
-                  // Total
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Total',
-                        style: GoogleFonts.urbanist(
-                          fontSize: 13,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                      Text(
-                        '₦100,000',
-                        style: GoogleFonts.urbanist(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: gold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            // Vendor avatar bottom-right outside card
-            Positioned(
-              bottom: -16,
-              right: -8,
-              child: CircleAvatar(
-                radius: 16,
-                backgroundColor: AppColors.divider,
-                child: ClipOval(
-                  child: AppNetworkImage(
-                    url: null,
-                    width: 32,
-                    height: 32,
-                    fit: BoxFit.cover,
-                    errorWidget: Container(
-                      width: 32,
-                      height: 32,
-                      color: AppColors.primaryLight,
-                      child: Center(
-                        child: Text(
-                          vendorName.isNotEmpty ? vendorName[0] : 'V',
-                          style: GoogleFonts.urbanist(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _QuoteLineRow extends StatelessWidget {
-  final String label;
-  final String amount;
-
-  const _QuoteLineRow({required this.label, required this.amount});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Text(
-            label,
-            style: GoogleFonts.urbanist(
-              fontSize: 13,
-              color: AppColors.textSecondary,
-            ),
-          ),
-        ),
-        Text(
-          amount,
-          style: GoogleFonts.urbanist(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-// ── Invoice Bubble ────────────────────────────────────────────────────────────
-class _InvoiceBubble extends StatelessWidget {
-  const _InvoiceBubble();
-
-  @override
-  Widget build(BuildContext context) {
-    const green = Color(0xFF27AE60);
-
-    return Align(
-      alignment: Alignment.centerRight,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 16, left: 24),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: green, width: 1.5),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Header row
-            Row(
-              children: [
-                const Icon(Icons.description_outlined,
-                    color: green, size: 20),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'INVOICE · INV-2026-047',
-                        style: GoogleFonts.urbanist(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      Text(
-                        'Sugared Dreams Cakery · 18 Feb 2026',
-                        style: GoogleFonts.urbanist(
-                          fontSize: 11,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                // Sent pill
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: green,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    'Sent',
-                    style: GoogleFonts.urbanist(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            const Divider(height: 1, color: AppColors.divider),
-            const SizedBox(height: 12),
-            // Line items
-            _QuoteLineRow(
-              label: '3-tier fondant',
-              amount: '₦85,000',
-            ),
-            const SizedBox(height: 6),
-            _QuoteLineRow(
-              label: 'Table centerpieces (20)',
-              amount: '₦120,000',
-            ),
-            const SizedBox(height: 6),
-            _QuoteLineRow(label: 'Setup', amount: '₦15,000'),
-            const SizedBox(height: 12),
-            // Payment schedule card
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFFE8F5E9),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '📅 Payment Schedule',
-                    style: GoogleFonts.urbanist(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: green,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _PaymentMilestoneRow(
-                    label: 'Milestone 1 · Now',
-                    amount: '₦110,000',
-                    pct: '50%',
-                  ),
-                  const SizedBox(height: 4),
-                  _PaymentMilestoneRow(
-                    label: 'Milestone 2 · 7 Mar',
-                    amount: '₦110,000',
-                    pct: '50%',
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _PaymentMilestoneRow extends StatelessWidget {
-  final String label;
-  final String amount;
-  final String pct;
-
-  const _PaymentMilestoneRow({
-    required this.label,
-    required this.amount,
-    required this.pct,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.urbanist(
-            fontSize: 12,
-            color: AppColors.textSecondary,
-          ),
-        ),
-        Text(
-          '$amount / $pct',
-          style: GoogleFonts.urbanist(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-// ── Status Bar ────────────────────────────────────────────────────────────────
-class _StatusBar extends StatelessWidget {
-  final String quoteStatus;
-
-  const _StatusBar({required this.quoteStatus});
-
-  @override
-  Widget build(BuildContext context) {
-    Widget content;
-
-    if (quoteStatus == 'QUOTE_SENT') {
-      content = Row(
-        children: [
-          const Icon(Icons.check_circle_rounded,
-              color: Color(0xFF27AE60), size: 18),
-          const SizedBox(width: 8),
-          Expanded(
-            child: RichText(
-              text: TextSpan(
-                children: [
-                  TextSpan(
-                    text: 'Quote Sent',
-                    style: GoogleFonts.urbanist(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                  TextSpan(
-                    text: ' Awaiting client response',
-                    style: GoogleFonts.urbanist(
-                      fontSize: 13,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      );
-    } else if (quoteStatus == 'QUOTE_ACCEPTED') {
-      content = Row(
-        children: [
-          const Icon(Icons.check_circle_rounded,
-              color: Color(0xFF27AE60), size: 18),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Ngozi accepted this quote!',
-                  style: GoogleFonts.urbanist(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF27AE60),
-                  ),
-                ),
-                Text(
-                  'Today at 10:05 AM · Ready to invoice',
-                  style: GoogleFonts.urbanist(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      );
-    } else {
-      // INVOICE_SENT
-      content = Row(
-        children: [
-          const Icon(Icons.check_circle_rounded,
-              color: Color(0xFF27AE60), size: 18),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Deposit ₦110k received · Next ₦110k on 7 Mar',
-                  style: GoogleFonts.urbanist(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF27AE60),
-                  ),
-                ),
-                Text(
-                  'Today at 10:05 AM',
-                  style: GoogleFonts.urbanist(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      );
-    }
-
-    return Container(
-      color: const Color(0xFFE8F5E9),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      child: content,
-    );
-  }
-}
-
-// ── Action Card ───────────────────────────────────────────────────────────────
-class _ActionCard extends StatelessWidget {
-  final ConversationModel conv;
-
-  const _ActionCard({required this.conv});
-
-  @override
-  Widget build(BuildContext context) {
-    // KYC required
-    if (conv.isKycRequired) {
-      return Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: AppColors.border, width: 1)),
-        ),
-        padding: const EdgeInsets.all(16),
-        child: GestureDetector(
-          onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                  content: Text('Please complete your KYC to continue.')),
-            );
-          },
-          child: Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFF0F0),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                  color: AppColors.error.withValues(alpha: 0.4), width: 1),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.warning_amber_rounded,
-                    color: AppColors.error, size: 24),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Incomplete KYC',
-                        style: GoogleFonts.urbanist(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.error,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Complete your KYC to accept this request and generate a quote',
-                        style: GoogleFonts.urbanist(
-                          fontSize: 13,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(Icons.chevron_right_rounded,
-                    color: AppColors.error, size: 20),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
-    // No quote yet
-    if (conv.quoteStatus == null) {
-      return Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: AppColors.border, width: 1)),
-        ),
-        padding: const EdgeInsets.all(16),
-        child: GestureDetector(
-          onTap: () =>
-              context.push('${AppRoutes.createQuote}?convId=${conv.id}'),
-          child: Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF4544F4),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(Icons.description_rounded,
-                    color: Colors.white, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Create & send quote',
-                      style: GoogleFonts.urbanist(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    Text(
-                      'With Flexible payment terms',
-                      style: GoogleFonts.urbanist(
-                        fontSize: 13,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Icon(Icons.chevron_right_rounded,
-                  color: AppColors.textSecondary, size: 20),
-            ],
-          ),
-        ),
-      );
-    }
-
-    // Quote sent or accepted → invoice action
-    if (conv.quoteStatus == 'QUOTE_SENT' ||
-        conv.quoteStatus == 'QUOTE_ACCEPTED') {
-      return Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: AppColors.border, width: 1)),
-        ),
-        padding: const EdgeInsets.all(16),
-        child: GestureDetector(
-          onTap: () =>
-              context.push('${AppRoutes.createInvoice}?convId=${conv.id}'),
-          child: Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF4544F4),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(Icons.receipt_long_rounded,
-                    color: Colors.white, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Create & send Invoice',
-                      style: GoogleFonts.urbanist(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    Text(
-                      'Done negotiating? send a final invoice',
-                      style: GoogleFonts.urbanist(
-                        fontSize: 13,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Icon(Icons.chevron_right_rounded,
-                  color: AppColors.textSecondary, size: 20),
-            ],
-          ),
-        ),
-      );
-    }
-
-    return const SizedBox.shrink();
-  }
-}
-
 // ── Input Bar ─────────────────────────────────────────────────────────────────
 class _InputBar extends StatelessWidget {
   final TextEditingController textController;
@@ -1160,9 +951,9 @@ class _InputBar extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.fromLTRB(12, 8, 12, bottomPadding + 8),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: AppColors.border, width: 1)),
+      decoration: BoxDecoration(
+        color: context.c.surface,
+        border: Border(top: BorderSide(color: context.c.border, width: 1)),
       ),
       child: Row(
         children: [
@@ -1171,18 +962,19 @@ class _InputBar extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: AppColors.primaryLight,
+              color: context.c.primaryLight,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(Icons.attach_file_rounded,
-                color: AppColors.primary, size: 20),
+            child: const Center(
+              child: AppIcon('attach', size: 17, color: AppColors.primary),
+            ),
           ),
           const SizedBox(width: 8),
           // Text field
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: const Color(0xFFF2F2F2),
+                color: context.c.surfaceElevated,
                 borderRadius: BorderRadius.circular(24),
               ),
               child: TextField(
@@ -1192,19 +984,24 @@ class _InputBar extends StatelessWidget {
                 textCapitalization: TextCapitalization.sentences,
                 style: GoogleFonts.urbanist(
                   fontSize: 15,
-                  color: AppColors.textPrimary,
+                  color: context.c.textPrimary,
                 ),
                 decoration: InputDecoration(
                   hintText: 'Type a message',
                   hintStyle: GoogleFonts.urbanist(
                     fontSize: 15,
-                    color: AppColors.textHint,
+                    color: context.c.textHint,
                   ),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16, vertical: 10),
-                  suffixIcon: const Icon(Icons.mic_rounded,
-                      color: AppColors.textSecondary, size: 20),
+                  suffixIcon: Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: AppIcon('mic',
+                        size: 15, color: context.c.textSecondary),
+                  ),
+                  suffixIconConstraints:
+                      const BoxConstraints(minWidth: 32, minHeight: 32),
                 ),
               ),
             ),
@@ -1224,12 +1021,8 @@ class _InputBar extends StatelessWidget {
                 ),
                 shape: BoxShape.circle,
               ),
-              child: Center(
-                child: Transform.rotate(
-                  angle: -math.pi / 4,
-                  child: const Icon(Icons.send_rounded,
-                      color: Colors.white, size: 20),
-                ),
+              child: const Center(
+                child: AppIcon('send', size: 20, color: Colors.white),
               ),
             ),
           ),

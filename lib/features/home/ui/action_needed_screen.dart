@@ -20,7 +20,7 @@ class ActionNeededScreen extends StatelessWidget {
         state.status == OrdersStatus.loading && state.orders.isEmpty;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.c.background,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
         child: Container(
@@ -77,14 +77,14 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.inbox_outlined, size: 56, color: AppColors.textHint),
+            Icon(Icons.inbox_outlined, size: 56, color: context.c.textHint),
             const SizedBox(height: 12),
             Text(
               'You’re all caught up',
               style: GoogleFonts.urbanist(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
             ),
             const SizedBox(height: 4),
@@ -93,7 +93,7 @@ class _EmptyState extends StatelessWidget {
               textAlign: TextAlign.center,
               style: GoogleFonts.urbanist(
                 fontSize: 14,
-                color: AppColors.textSecondary,
+                color: context.c.textSecondary,
               ),
             ),
           ],
@@ -119,7 +119,7 @@ class _ActionCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.c.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -156,7 +156,7 @@ class _ActionCard extends StatelessWidget {
                           width: 52,
                           height: 52,
                           decoration: BoxDecoration(
-                            color: AppColors.primaryLight,
+                            color: context.c.primaryLight,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Icon(Icons.chat_bubble_outline_rounded,
@@ -172,7 +172,7 @@ class _ActionCard extends StatelessWidget {
                                 style: GoogleFonts.urbanist(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w700,
-                                  color: AppColors.textPrimary,
+                                  color: context.c.textPrimary,
                                 ),
                               ),
                               const SizedBox(height: 3),
@@ -180,7 +180,7 @@ class _ActionCard extends StatelessWidget {
                                 subtitle,
                                 style: GoogleFonts.urbanist(
                                   fontSize: 13,
-                                  color: AppColors.textSecondary,
+                                  color: context.c.textSecondary,
                                 ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -192,7 +192,7 @@ class _ActionCard extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: AppColors.primaryLight,
+                            color: context.c.primaryLight,
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
@@ -213,7 +213,7 @@ class _ActionCard extends StatelessWidget {
                         width: double.infinity,
                         height: 44,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.c.surface,
                           borderRadius: BorderRadius.circular(22),
                           border: Border.all(color: AppColors.primary, width: 1.5),
                         ),

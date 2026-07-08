@@ -3,13 +3,19 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../core/services/bank_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/theme_cubit.dart';
+import '../../../shared/models/bank_models.dart';
 import '../../../shared/models/subscription_plan_model.dart';
+import '../../../shared/widgets/add_bank_account_sheet.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/network_image_widget.dart';
+import '../../../shared/widgets/plan_card.dart';
 import '../../auth/bloc/auth_bloc.dart';
 import '../../auth/bloc/auth_state.dart';
+import '../../auth/data/auth_repository.dart';
+import '../../listings/data/listings_repository.dart';
 import '../../setup/ui/payment_checkout_screen.dart';
 import '../../subscription/data/subscription_repository.dart';
 import '../../vendor/data/vendor_repository.dart';
@@ -89,24 +95,25 @@ Widget _gradientButton({
   );
 }
 
-Widget _fieldLabel(String label) => Padding(
+Widget _fieldLabel(BuildContext context, String label) => Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         label,
         style: GoogleFonts.urbanist(
           fontSize: 14,
           fontWeight: FontWeight.w700,
-          color: AppColors.textPrimary,
+          color: context.c.textPrimary,
         ),
       ),
     );
 
-InputDecoration _filledDecoration({String? hint, Widget? prefix, Widget? suffix}) =>
+InputDecoration _filledDecoration(BuildContext context,
+        {String? hint, Widget? prefix, Widget? suffix}) =>
     InputDecoration(
       hintText: hint,
-      hintStyle: GoogleFonts.urbanist(fontSize: 14, color: AppColors.textHint),
+      hintStyle: GoogleFonts.urbanist(fontSize: 14, color: context.c.textHint),
       filled: true,
-      fillColor: AppColors.backgroundLight,
+      fillColor: context.c.background,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,
@@ -161,8 +168,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if ((auth.user.phone ?? '').isNotEmpty) {
         _phoneCtrl.text = auth.user.phone!.replaceFirst('+234', '');
       }
-      _businessNameCtrl.text = auth.user.name;
+      _prefillDob(auth.user.dateOfBirth);
     }
+    // Authoritative personal details (email / phone / DOB) come from the account.
+    AuthRepository().getMe().then((user) {
+      if (!mounted) return;
+      setState(() {
+        if (user.email.isNotEmpty) _emailCtrl.text = user.email;
+        if ((user.phone ?? '').isNotEmpty) {
+          _phoneCtrl.text = user.phone!.replaceFirst('+234', '');
+        }
+      });
+      _prefillDob(user.dateOfBirth);
+    }).catchError((_) {});
+    // Business details come from the vendor profile.
     VendorRepository().getMe().then((v) {
       if (!mounted || v == null) return;
       setState(() {
@@ -170,25 +189,41 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _descCtrl.text = v.description ?? '';
         _selectedTags = List<String>.from(v.tags);
         _logoUrl = v.logoUrl;
-        if ((v.email ?? '').isNotEmpty) _emailCtrl.text = v.email!;
-        if ((v.phone ?? '').isNotEmpty) {
-          _phoneCtrl.text = v.phone!.replaceFirst('+234', '');
-        }
       });
+    }).catchError((_) {});
+    // Category tags — the real list from the backend.
+    ListingsRepository().categories().then((cats) {
+      if (!mounted) return;
+      setState(() => _categoryPool = cats.map((c) => c.name).toList());
     }).catchError((_) {});
   }
 
-  static const _tagPool = [
-    'Cakes',
-    'Desserts',
-    'Photography',
-    'Catering',
-    'Decor',
-    'DJs',
-    'Bands',
-    'Products',
-    'Rentals',
-  ];
+  /// Parse a stored ISO date (YYYY-MM-DD) into the DOB dropdowns; ignores if
+  /// absent/invalid so we never show a fabricated default.
+  void _prefillDob(String? iso) {
+    if (iso == null || iso.isEmpty) return;
+    final parts = iso.split('-');
+    if (parts.length != 3) return;
+    final y = int.tryParse(parts[0]);
+    final m = int.tryParse(parts[1]);
+    final d = int.tryParse(parts[2]);
+    if (y == null || m == null || d == null || m < 1 || m > 12) return;
+    setState(() {
+      _dobYear = y.clamp(1950, 2010);
+      _dobMonth = _months[m - 1];
+      _dobDay = d.clamp(1, 31);
+    });
+  }
+
+  // Category tags come from the backend (managed in the admin console).
+  List<String> _categoryPool = [];
+
+  /// Categories to render as chips: the backend list plus any already-selected
+  /// tag that isn't in it (so existing selections always stay visible).
+  List<String> get _displayTags => <String>[
+        ..._categoryPool,
+        ..._selectedTags.where((t) => !_categoryPool.contains(t)),
+      ];
 
   static const _months = [
     'January',
@@ -212,6 +247,39 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _businessNameCtrl.dispose();
     _descCtrl.dispose();
     super.dispose();
+  }
+
+  /// Personal details (phone + date of birth) live on the account/user record.
+  /// Email is account-managed by Better Auth, so it's display-only here.
+  Future<void> _savePersonal() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final phone = _phoneCtrl.text.trim().replaceFirst(RegExp(r'^0+'), '');
+    final month = (_months.indexOf(_dobMonth) + 1).toString().padLeft(2, '0');
+    final dob = '${_dobYear.toString().padLeft(4, '0')}-$month-'
+        '${_dobDay.toString().padLeft(2, '0')}';
+    try {
+      await AuthRepository().updateMe({
+        if (phone.isNotEmpty) 'phone': '$_countryCode$phone',
+        'dateOfBirth': dob,
+      });
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content:
+              Text('Profile updated', style: GoogleFonts.urbanist(fontSize: 14)),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: AppColors.activeText,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceFirst('Exception: ', '')),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 
   Future<void> _save(Map<String, dynamic> changes) async {
@@ -244,14 +312,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _fieldLabel('Email Address'),
+          _fieldLabel(context, 'Email Address'),
           TextField(
             controller: _emailCtrl,
-            style: GoogleFonts.urbanist(fontSize: 14, color: AppColors.textPrimary),
-            decoration: _filledDecoration(hint: 'Email address'),
+            style: GoogleFonts.urbanist(fontSize: 14, color: context.c.textPrimary),
+            decoration: _filledDecoration(context, hint: 'Email address'),
           ),
           const SizedBox(height: 16),
-          _fieldLabel('Phone Number'),
+          _fieldLabel(context, 'Phone Number'),
           Row(
             children: [
               GestureDetector(
@@ -264,9 +332,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   width: 72,
                   height: 52,
                   decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.divider),
+                    border: Border.all(color: context.c.divider),
                     borderRadius: BorderRadius.circular(12),
-                    color: Colors.white,
+                    color: context.c.surface,
                   ),
                   child: Center(
                     child: Text(
@@ -274,7 +342,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       style: GoogleFonts.urbanist(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
+                        color: context.c.textPrimary,
                       ),
                     ),
                   ),
@@ -285,10 +353,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 child: TextField(
                   controller: _phoneCtrl,
                   keyboardType: TextInputType.phone,
-                  style: GoogleFonts.urbanist(fontSize: 14, color: AppColors.textPrimary),
+                  style: GoogleFonts.urbanist(fontSize: 14, color: context.c.textPrimary),
                   decoration: _filledDecoration(
+                    context,
                     hint: 'Phone number',
-                    prefix: const Icon(Icons.phone_outlined, size: 18, color: AppColors.textHint),
+                    prefix: Icon(Icons.phone_outlined, size: 18, color: context.c.textHint),
                     suffix: const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 12),
                       child: Text('🇳🇬', style: TextStyle(fontSize: 20)),
@@ -299,7 +368,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          _fieldLabel('Date of Birth'),
+          _fieldLabel(context, 'Date of Birth'),
           Row(
             children: [
               // Day
@@ -307,7 +376,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 child: Container(
                   height: 52,
                   decoration: BoxDecoration(
-                    color: AppColors.backgroundLight,
+                    color: context.c.background,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -315,7 +384,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     child: DropdownButton<int>(
                       value: _dobDay,
                       isExpanded: true,
-                      style: GoogleFonts.urbanist(fontSize: 14, color: AppColors.textPrimary),
+                      style: GoogleFonts.urbanist(fontSize: 14, color: context.c.textPrimary),
                       items: List.generate(
                         31,
                         (i) => DropdownMenuItem(value: i + 1, child: Text('${i + 1}')),
@@ -332,7 +401,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 child: Container(
                   height: 52,
                   decoration: BoxDecoration(
-                    color: AppColors.backgroundLight,
+                    color: context.c.background,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -340,7 +409,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     child: DropdownButton<String>(
                       value: _dobMonth,
                       isExpanded: true,
-                      style: GoogleFonts.urbanist(fontSize: 14, color: AppColors.textPrimary),
+                      style: GoogleFonts.urbanist(fontSize: 14, color: context.c.textPrimary),
                       items: _months
                           .map((m) => DropdownMenuItem(value: m, child: Text(m)))
                           .toList(),
@@ -355,7 +424,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 child: Container(
                   height: 52,
                   decoration: BoxDecoration(
-                    color: AppColors.backgroundLight,
+                    color: context.c.background,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -363,7 +432,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     child: DropdownButton<int>(
                       value: _dobYear,
                       isExpanded: true,
-                      style: GoogleFonts.urbanist(fontSize: 14, color: AppColors.textPrimary),
+                      style: GoogleFonts.urbanist(fontSize: 14, color: context.c.textPrimary),
                       items: List.generate(
                         61,
                         (i) => DropdownMenuItem(
@@ -382,14 +451,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           _gradientButton(
             context: context,
             label: 'Update Details',
-            onTap: () {
-              final email = _emailCtrl.text.trim();
-              final phone = _phoneCtrl.text.trim().replaceFirst(RegExp(r'^0+'), '');
-              _save({
-                if (email.isNotEmpty) 'email': email,
-                if (phone.isNotEmpty) 'phone': '$_countryCode$phone',
-              });
-            },
+            onTap: _savePersonal,
           ),
         ],
       ),
@@ -402,14 +464,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _fieldLabel('Business Name'),
+          _fieldLabel(context, 'Business Name'),
           TextField(
             controller: _businessNameCtrl,
-            style: GoogleFonts.urbanist(fontSize: 14, color: AppColors.textPrimary),
-            decoration: _filledDecoration(hint: 'Business name'),
+            style: GoogleFonts.urbanist(fontSize: 14, color: context.c.textPrimary),
+            decoration: _filledDecoration(context, hint: 'Business name'),
           ),
           const SizedBox(height: 16),
-          _fieldLabel('Business Type'),
+          _fieldLabel(context, 'Business Type'),
           Row(
             children: ['Licensed Business', 'Freelancer'].map((type) {
               final selected = _businessType == type;
@@ -422,9 +484,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     height: 44,
                     decoration: BoxDecoration(
-                      color: selected ? AppColors.primary : Colors.white,
+                      color: selected ? AppColors.primary : context.c.surface,
                       border: Border.all(
-                        color: selected ? AppColors.primary : AppColors.border,
+                        color: selected ? AppColors.primary : context.c.border,
                       ),
                       borderRadius: BorderRadius.circular(22),
                     ),
@@ -434,7 +496,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         style: GoogleFonts.urbanist(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: selected ? Colors.white : AppColors.textPrimary,
+                          color: selected ? Colors.white : context.c.textPrimary,
                         ),
                       ),
                     ),
@@ -444,19 +506,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             }).toList(),
           ),
           const SizedBox(height: 16),
-          _fieldLabel('Business Description'),
+          _fieldLabel(context, 'Business Description'),
           TextField(
             controller: _descCtrl,
             maxLines: 4,
-            style: GoogleFonts.urbanist(fontSize: 14, color: AppColors.textPrimary),
-            decoration: _filledDecoration(hint: 'Short description of your business'),
+            style: GoogleFonts.urbanist(fontSize: 14, color: context.c.textPrimary),
+            decoration: _filledDecoration(context, hint: 'Short description of your business'),
           ),
           const SizedBox(height: 16),
-          _fieldLabel('Category Tags'),
+          _fieldLabel(context, 'Category Tags'),
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: _tagPool.map((tag) {
+            children: _displayTags.map((tag) {
               final selected = _selectedTags.contains(tag);
               return GestureDetector(
                 onTap: () {
@@ -471,9 +533,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
-                    color: selected ? AppColors.primary : Colors.white,
+                    color: selected ? AppColors.primary : context.c.surface,
                     border: Border.all(
-                      color: selected ? AppColors.primary : AppColors.border,
+                      color: selected ? AppColors.primary : context.c.border,
                     ),
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -487,7 +549,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                         const SizedBox(width: 4),
                       ] else ...[
-                        const Icon(Icons.add, size: 14, color: AppColors.textPrimary),
+                        Icon(Icons.add, size: 14, color: context.c.textPrimary),
                         const SizedBox(width: 4),
                       ],
                       Text(
@@ -495,7 +557,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         style: GoogleFonts.urbanist(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: selected ? Colors.white : AppColors.textPrimary,
+                          color: selected ? Colors.white : context.c.textPrimary,
                         ),
                       ),
                     ],
@@ -525,7 +587,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.c.background,
       body: Column(
         children: [
           // Gradient AppBar
@@ -546,7 +608,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
           // Avatar section
           Container(
-            color: Colors.white,
+            color: context.c.surface,
             padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
             child: Column(
               children: [
@@ -590,7 +652,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   style: GoogleFonts.urbanist(
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
+                    color: context.c.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -600,7 +662,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       : _selectedTags.take(2).join(' · '),
                   style: GoogleFonts.urbanist(
                     fontSize: 13,
-                    color: AppColors.textSecondary,
+                    color: context.c.textSecondary,
                   ),
                 ),
               ],
@@ -609,7 +671,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
           // Tab toggle
           Container(
-            color: Colors.white,
+            color: context.c.surface,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               children: [
@@ -620,7 +682,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
           ),
 
-          const Divider(height: 1, color: AppColors.divider),
+          Divider(height: 1, color: context.c.divider),
 
           // Tab content
           Expanded(
@@ -639,7 +701,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         child: Container(
           height: 40,
           decoration: BoxDecoration(
-            color: selected ? AppColors.primaryLight : Colors.transparent,
+            color: selected ? context.c.primaryLight : Colors.transparent,
             borderRadius: BorderRadius.circular(20),
           ),
           child: Center(
@@ -648,7 +710,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               style: GoogleFonts.urbanist(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: selected ? AppColors.primary : AppColors.textSecondary,
+                color: selected ? AppColors.primary : context.c.textSecondary,
               ),
             ),
           ),
@@ -666,7 +728,7 @@ class SecurityScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.c.background,
       body: Column(
         children: [
           _buildGradientAppBar(
@@ -694,7 +756,7 @@ class SecurityScreen extends StatelessWidget {
                           width: 48,
                           height: 48,
                           decoration: BoxDecoration(
-                            color: AppColors.primaryLight,
+                            color: context.c.primaryLight,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Icon(
@@ -795,7 +857,7 @@ class _SecurityCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.c.surface,
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
@@ -819,7 +881,7 @@ class _SecurityCard extends StatelessWidget {
                     style: GoogleFonts.urbanist(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -827,13 +889,13 @@ class _SecurityCard extends StatelessWidget {
                     subtitle,
                     style: GoogleFonts.urbanist(
                       fontSize: 13,
-                      color: AppColors.textSecondary,
+                      color: context.c.textSecondary,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: AppColors.textHint, size: 20),
+            Icon(Icons.chevron_right, color: context.c.textHint, size: 20),
           ],
         ),
       ),
@@ -877,18 +939,18 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   }
 
   Color _segmentColor(int index) {
-    if (_strengthLevel == 0) return AppColors.divider;
+    if (_strengthLevel == 0) return context.c.divider;
     if (_strengthLevel >= 3 && index == 3) return const Color(0xFF22C55E);
     if (_strengthLevel >= 1 && index < 2) return const Color(0xFFF59E0B);
     if (_strengthLevel >= 2 && index == 2) return const Color(0xFFF59E0B);
-    return AppColors.divider;
+    return context.c.divider;
   }
 
   @override
   Widget build(BuildContext context) {
     final bottomPad = MediaQuery.of(context).padding.bottom;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.background,
       body: Column(
         children: [
           _buildGradientAppBar(
@@ -911,13 +973,14 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Spacer(),
-                  _fieldLabel('New Password'),
+                  _fieldLabel(context, 'New Password'),
                   TextField(
                     controller: _newPwCtrl,
                     obscureText: !_showNew,
                     style: GoogleFonts.urbanist(
-                        fontSize: 14, color: AppColors.textPrimary),
+                        fontSize: 14, color: context.c.textPrimary),
                     decoration: _filledDecoration(
+                      context,
                       hint: 'Enter new password',
                       suffix: GestureDetector(
                         onTap: () => setState(() => _showNew = !_showNew),
@@ -925,20 +988,21 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           _showNew
                               ? Icons.visibility_outlined
                               : Icons.visibility_off_outlined,
-                          color: AppColors.textHint,
+                          color: context.c.textHint,
                           size: 20,
                         ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _fieldLabel('Confirm Password'),
+                  _fieldLabel(context, 'Confirm Password'),
                   TextField(
                     controller: _confirmPwCtrl,
                     obscureText: !_showConfirm,
                     style: GoogleFonts.urbanist(
-                        fontSize: 14, color: AppColors.textPrimary),
+                        fontSize: 14, color: context.c.textPrimary),
                     decoration: _filledDecoration(
+                      context,
                       hint: 'Confirm new password',
                       suffix: GestureDetector(
                         onTap: () =>
@@ -947,7 +1011,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           _showConfirm
                               ? Icons.visibility_outlined
                               : Icons.visibility_off_outlined,
-                          color: AppColors.textHint,
+                          color: context.c.textHint,
                           size: 20,
                         ),
                       ),
@@ -1010,7 +1074,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         Icon(
           Icons.check_circle_rounded,
           size: 16,
-          color: met ? AppColors.primary : AppColors.textHint,
+          color: met ? AppColors.primary : context.c.textHint,
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -1018,7 +1082,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             label,
             style: GoogleFonts.urbanist(
               fontSize: 13,
-              color: met ? AppColors.textPrimary : AppColors.textSecondary,
+              color: met ? context.c.textPrimary : context.c.textSecondary,
             ),
           ),
         ),
@@ -1042,7 +1106,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.c.background,
       body: Column(
         children: [
           _buildGradientAppBar(
@@ -1075,7 +1139,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: context.c.surface,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     padding: const EdgeInsets.all(16),
@@ -1138,7 +1202,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
                     borderRadius: BorderRadius.circular(16),
                     border: selected
                         ? Border.all(color: AppColors.primary, width: 2)
-                        : Border.all(color: AppColors.border),
+                        : Border.all(color: context.c.border),
                   ),
                 ),
                 if (selected)
@@ -1159,7 +1223,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
               style: GoogleFonts.urbanist(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
             ),
             const SizedBox(height: 4),
@@ -1185,7 +1249,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
                 height: 20,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.border, width: 2),
+                  border: Border.all(color: context.c.border, width: 2),
                 ),
               ),
           ],
@@ -1210,7 +1274,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
                     borderRadius: BorderRadius.circular(16),
                     border: selected
                         ? Border.all(color: AppColors.primary, width: 2)
-                        : Border.all(color: AppColors.border),
+                        : Border.all(color: context.c.border),
                     gradient: const LinearGradient(
                       colors: [Color(0xFFF5F5F5), Color(0xFF1A1A2E)],
                       begin: Alignment.centerLeft,
@@ -1236,7 +1300,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
               style: GoogleFonts.urbanist(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
             ),
             const SizedBox(height: 4),
@@ -1262,7 +1326,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
                 height: 20,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.border, width: 2),
+                  border: Border.all(color: context.c.border, width: 2),
                 ),
               ),
           ],
@@ -1296,7 +1360,7 @@ class _NotificationSettingsScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.c.background,
       body: Column(
         children: [
           _buildGradientAppBar(
@@ -1339,7 +1403,7 @@ class _NotificationSettingsScreenState
                           height: 120,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: AppColors.primaryLight.withValues(alpha: 0.3),
+                            color: context.c.primaryLight.withValues(alpha: 0.3),
                           ),
                         ),
                         Container(
@@ -1347,7 +1411,7 @@ class _NotificationSettingsScreenState
                           height: 80,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: AppColors.primaryLight.withValues(alpha: 0.5),
+                            color: context.c.primaryLight.withValues(alpha: 0.5),
                           ),
                         ),
                         Container(
@@ -1377,7 +1441,7 @@ class _NotificationSettingsScreenState
                           style: GoogleFonts.urbanist(
                             fontSize: 16,
                             fontWeight: FontWeight.w800,
-                            color: AppColors.textPrimary,
+                            color: context.c.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -1385,7 +1449,7 @@ class _NotificationSettingsScreenState
                           'Chose where you want to receive notifications',
                           style: GoogleFonts.urbanist(
                             fontSize: 13,
-                            color: AppColors.textSecondary,
+                            color: context.c.textSecondary,
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -1393,7 +1457,7 @@ class _NotificationSettingsScreenState
                         Container(
                           height: 48,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: context.c.surface,
                             borderRadius: BorderRadius.circular(28),
                           ),
                           padding: const EdgeInsets.all(4),
@@ -1419,7 +1483,7 @@ class _NotificationSettingsScreenState
                                           fontWeight: FontWeight.w600,
                                           color: sel
                                               ? Colors.white
-                                              : AppColors.textSecondary,
+                                              : context.c.textSecondary,
                                         ),
                                       ),
                                     ),
@@ -1494,14 +1558,14 @@ class _NotificationSettingsScreenState
                     style: GoogleFonts.urbanist(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   Text(
                     subtitle,
                     style: GoogleFonts.urbanist(
                       fontSize: 12,
-                      color: AppColors.textSecondary,
+                      color: context.c.textSecondary,
                     ),
                   ),
                 ],
@@ -1515,9 +1579,9 @@ class _NotificationSettingsScreenState
           ],
         ),
         if (!isLast)
-          const SizedBox(
+          SizedBox(
             height: 1,
-            child: ColoredBox(color: AppColors.divider),
+            child: ColoredBox(color: context.c.divider),
           ),
         const SizedBox(height: 8),
       ],
@@ -1535,111 +1599,40 @@ class BankDetailsScreen extends StatefulWidget {
 }
 
 class _BankDetailsScreenState extends State<BankDetailsScreen> {
-  final List<Map<String, dynamic>> _accounts = [
-    {
-      'bank': 'GTBank',
-      'number': '2385******',
-      'name': 'Halima Fatokun',
-      'isDefault': true,
-    },
-    {
-      'bank': 'FirstBank',
-      'number': '8573******',
-      'name': 'Halima Fatokun',
-      'isDefault': false,
-    },
-    {
-      'bank': 'Ecobank',
-      'number': '8485******',
-      'name': 'Halima Fatokun',
-      'isDefault': false,
-    },
-  ];
-
-  bool _showAddForm = false;
-  String? _selectedBank;
-  final _accountCtrl = TextEditingController();
-  bool _setAsDefault = true;
-
-  static const _bankColors = {
-    'GTBank': Color(0xFFE97520),
-    'FirstBank': Color(0xFF003082),
-    'Ecobank': Color(0xFF008751),
-    'Zenith Bank': Color(0xFF8B0000),
-    'Access Bank': Color(0xFFDD0000),
-    'UBA': Color(0xFFD50032),
-  };
-
-  static const _bankOptions = [
-    'GTBank',
-    'FirstBank',
-    'Ecobank',
-    'Zenith Bank',
-    'Access Bank',
-    'UBA',
-  ];
+  final _service = BankService();
+  BankAccount? _account;
+  bool _loading = true;
 
   @override
-  void dispose() {
-    _accountCtrl.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _load();
   }
 
-  Color _bankColor(String bank) =>
-      _bankColors[bank] ?? AppColors.primary;
+  Future<void> _load() async {
+    try {
+      final a = await _service.getMine();
+      if (mounted) setState(() { _account = a; _loading = false; });
+    } catch (_) {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
 
-  String _bankInitials(String bank) =>
-      bank.length >= 2 ? bank.substring(0, 2).toUpperCase() : bank.toUpperCase();
-
-  void _showBankPicker() {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (ctx) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            margin: const EdgeInsets.only(top: 12),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: AppColors.border,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              'Select Bank',
-              style: GoogleFonts.urbanist(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-              ),
-            ),
-          ),
-          ..._bankOptions.map((bank) => ListTile(
-                title: Text(bank,
-                    style: GoogleFonts.urbanist(
-                        fontSize: 14, color: AppColors.textPrimary)),
-                onTap: () {
-                  setState(() => _selectedBank = bank);
-                  Navigator.pop(ctx);
-                },
-              )),
-          const SizedBox(height: 24),
-        ],
-      ),
+  void _addOrChange() {
+    showAddBankAccountSheet(
+      context,
+      onSaved: (a) {
+        if (mounted) setState(() => _account = a);
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final bottomPad = MediaQuery.of(context).padding.bottom;
+    final a = _account;
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.c.background,
       body: Column(
         children: [
           _buildGradientAppBar(
@@ -1647,248 +1640,102 @@ class _BankDetailsScreenState extends State<BankDetailsScreen> {
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Linked Bank Accounts',
-                  style: GoogleFonts.urbanist(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                  ),
-                ),
-                Text(
-                  'Manage your accounts',
-                  style: GoogleFonts.urbanist(
-                    fontSize: 13,
-                    color: Colors.white.withValues(alpha: 0.7),
-                  ),
-                ),
+                Text('Linked Bank Account',
+                    style: GoogleFonts.urbanist(
+                        fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white)),
+                Text('Where clients pay you directly',
+                    style: GoogleFonts.urbanist(fontSize: 12, color: Colors.white70)),
               ],
             ),
           ),
           Expanded(
-            child: _showAddForm ? _buildAddForm(bottomPad) : _buildAccountList(bottomPad),
+            child: _loading
+                ? const Center(child: CircularProgressIndicator())
+                : ListView(
+                    padding: EdgeInsets.fromLTRB(20, 20, 20, bottomPad + 20),
+                    children: [
+                      if (a == null) _emptyState(context) else _accountCard(context, a),
+                      const SizedBox(height: 20),
+                      AppButton.primary(
+                        a == null ? 'Add bank account' : 'Change bank account',
+                        onTap: _addOrChange,
+                      ),
+                    ],
+                  ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildAccountList(double bottomPad) {
-    return Stack(
-      children: [
-        ListView.builder(
-          padding: EdgeInsets.fromLTRB(16, 16, 16, bottomPad + 80),
-          itemCount: _accounts.length,
-          itemBuilder: (ctx, i) {
-            final acc = _accounts[i];
-            final bankColor = _bankColor(acc['bank'] as String);
-            return Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: bankColor,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Text(
-                        _bankInitials(acc['bank'] as String),
-                        style: GoogleFonts.urbanist(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          acc['number'] as String,
-                          style: GoogleFonts.urbanist(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        Text(
-                          acc['name'] as String,
-                          style: GoogleFonts.urbanist(
-                            fontSize: 13,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (acc['isDefault'] as bool) ...[
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryLight,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        'Default',
-                        style: GoogleFonts.urbanist(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                  ],
-                  GestureDetector(
-                    onTap: () {
-                      setState(() => _accounts.removeAt(i));
-                    },
-                    child: const Icon(
-                      Icons.delete_outline_rounded,
-                      color: Color(0xFFE53935),
-                      size: 20,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
-        Positioned(
-          bottom: bottomPad + 16,
-          left: 16,
-          right: 16,
-          child: _gradientButton(
-            context: context,
-            label: 'Add a new account',
-            onTap: () => setState(() => _showAddForm = true),
-          ),
-        ),
-      ],
+  Widget _emptyState(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: context.c.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: context.c.border),
+      ),
+      child: Column(
+        children: [
+          Icon(Icons.account_balance_rounded, size: 40, color: context.c.textHint),
+          const SizedBox(height: 10),
+          Text('No bank account yet',
+              style: GoogleFonts.urbanist(
+                  fontSize: 15, fontWeight: FontWeight.w700, color: context.c.textPrimary)),
+          const SizedBox(height: 4),
+          Text('Add one so clients can pay you directly when they accept your quotes.',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.urbanist(fontSize: 13, color: context.c.textSecondary)),
+        ],
+      ),
     );
   }
 
-  Widget _buildAddForm(double bottomPad) {
-    return Stack(
-      children: [
-        SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(16, 24, 16, bottomPad + 80),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _fieldLabel('Select Bank'),
-              GestureDetector(
-                onTap: _showBankPicker,
-                child: Container(
-                  height: 52,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.divider),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          _selectedBank ?? 'Select your bank',
-                          style: GoogleFonts.urbanist(
-                            fontSize: 14,
-                            color: _selectedBank != null
-                                ? AppColors.textPrimary
-                                : AppColors.textHint,
-                          ),
-                        ),
-                      ),
-                      const Icon(
-                        Icons.keyboard_arrow_down_rounded,
-                        color: AppColors.textHint,
-                        size: 20,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              _fieldLabel('Enter account'),
-              TextField(
-                controller: _accountCtrl,
-                keyboardType: TextInputType.number,
-                style: GoogleFonts.urbanist(
-                    fontSize: 14, color: AppColors.textPrimary),
-                decoration:
-                    _filledDecoration(hint: 'Enter your account number'),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Checkbox(
-                    value: _setAsDefault,
-                    onChanged: (v) =>
-                        setState(() => _setAsDefault = v ?? false),
-                    activeColor: AppColors.primary,
-                  ),
-                  Text(
-                    'Set as default',
+  Widget _accountCard(BuildContext context, BankAccount a) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: context.c.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: context.c.border),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+                color: context.c.primaryLight, borderRadius: BorderRadius.circular(12)),
+            child: const Icon(Icons.account_balance_rounded, color: AppColors.primary),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(a.bankName ?? 'Bank',
                     style: GoogleFonts.urbanist(
-                      fontSize: 14,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                        fontSize: 15, fontWeight: FontWeight.w800, color: context.c.textPrimary)),
+                const SizedBox(height: 2),
+                Text('${a.maskedNumber}  ·  ${a.accountName ?? ''}',
+                    style: GoogleFonts.urbanist(fontSize: 13, color: context.c.textSecondary)),
+                const SizedBox(height: 6),
+                Row(mainAxisSize: MainAxisSize.min, children: [
+                  Icon(a.active ? Icons.check_circle_rounded : Icons.schedule_rounded,
+                      size: 13, color: a.active ? const Color(0xFF047857) : context.c.textHint),
+                  const SizedBox(width: 4),
+                  Text(a.active ? 'Ready to receive payments' : 'Setting up…',
+                      style: GoogleFonts.urbanist(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w600,
+                          color: a.active ? const Color(0xFF047857) : context.c.textHint)),
+                ]),
+              ],
+            ),
           ),
-        ),
-        Positioned(
-          bottom: bottomPad + 16,
-          left: 16,
-          right: 16,
-          child: _gradientButton(
-            context: context,
-            label: 'Save Account',
-            onTap: () {
-              if (_selectedBank == null || _accountCtrl.text.isEmpty) return;
-              setState(() {
-                if (_setAsDefault) {
-                  for (final acc in _accounts) {
-                    acc['isDefault'] = false;
-                  }
-                }
-                _accounts.add({
-                  'bank': _selectedBank!,
-                  'number': '${_accountCtrl.text.substring(0, _accountCtrl.text.length > 4 ? 4 : _accountCtrl.text.length)}******',
-                  'name': 'Halima Fatokun',
-                  'isDefault': _setAsDefault,
-                });
-                _showAddForm = false;
-                _selectedBank = null;
-                _accountCtrl.clear();
-                _setAsDefault = true;
-              });
-            },
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -1934,7 +1781,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.border,
+              color: context.c.border,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -1945,14 +1792,14 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
               style: GoogleFonts.urbanist(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
             ),
           ),
           ..._reasons.map((r) => ListTile(
                 title: Text(r,
                     style: GoogleFonts.urbanist(
-                        fontSize: 14, color: AppColors.textPrimary)),
+                        fontSize: 14, color: context.c.textPrimary)),
                 onTap: () {
                   setState(() => _selectedReason = r);
                   Navigator.pop(ctx);
@@ -1979,7 +1826,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
               style: GoogleFonts.urbanist(
                 fontSize: 17,
                 fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -2008,8 +1855,8 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                           margin: const EdgeInsets.only(top: 5),
                           width: 6,
                           height: 6,
-                          decoration: const BoxDecoration(
-                            color: AppColors.textSecondary,
+                          decoration: BoxDecoration(
+                            color: context.c.textSecondary,
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -2019,7 +1866,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                             item,
                             style: GoogleFonts.urbanist(
                               fontSize: 13,
-                              color: AppColors.textPrimary,
+                              color: context.c.textPrimary,
                             ),
                           ),
                         ),
@@ -2111,7 +1958,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
               style: GoogleFonts.urbanist(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -2120,7 +1967,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
               'Your account has been deleted successfully. We\'re sorry to see you go and we hope to see you soon',
               style: GoogleFonts.urbanist(
                 fontSize: 14,
-                color: AppColors.textSecondary,
+                color: context.c.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -2144,7 +1991,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     final auth = context.watch<AuthBloc>().state;
     final accountName = auth is AuthAuthenticated ? auth.user.name : 'Your account';
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.background,
       body: Column(
         children: [
           _buildGradientAppBar(
@@ -2187,7 +2034,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                                 errorWidget: Container(
                                   width: 88,
                                   height: 88,
-                                  color: AppColors.primaryLight,
+                                  color: context.c.primaryLight,
                                   child: Center(
                                     child: Text(
                                       accountName.isNotEmpty
@@ -2234,7 +2081,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                       style: GoogleFonts.urbanist(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
+                        color: context.c.textPrimary,
                       ),
                     ),
                   ),
@@ -2244,7 +2091,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                     style: GoogleFonts.urbanist(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -2253,9 +2100,9 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                     child: Container(
                       height: 52,
                       decoration: BoxDecoration(
-                        color: AppColors.backgroundLight,
+                        color: context.c.background,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.divider),
+                        border: Border.all(color: context.c.divider),
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(
@@ -2266,14 +2113,14 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                               style: GoogleFonts.urbanist(
                                 fontSize: 14,
                                 color: _selectedReason != null
-                                    ? AppColors.textPrimary
-                                    : AppColors.textHint,
+                                    ? context.c.textPrimary
+                                    : context.c.textHint,
                               ),
                             ),
                           ),
-                          const Icon(
+                          Icon(
                             Icons.keyboard_arrow_down_rounded,
-                            color: AppColors.textHint,
+                            color: context.c.textHint,
                             size: 20,
                           ),
                         ],
@@ -2286,7 +2133,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                     style: GoogleFonts.urbanist(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -2294,8 +2141,8 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                     controller: _otherCtrl,
                     maxLines: 4,
                     style: GoogleFonts.urbanist(
-                        fontSize: 14, color: AppColors.textPrimary),
-                    decoration: _filledDecoration(hint: 'Type your message'),
+                        fontSize: 14, color: context.c.textPrimary),
+                    decoration: _filledDecoration(context, hint: 'Type your message'),
                   ),
                   const SizedBox(height: 32),
                   _gradientButton(
@@ -2356,6 +2203,7 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
   bool _loading = true;
   String? _error;
   String? _busyTier;
+  bool _yearly = false;
 
   @override
   void initState() {
@@ -2397,7 +2245,7 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
     try {
       final res = await _repo.changePlan(
         planId: plan.id,
-        billingCycle: 'MONTHLY',
+        billingCycle: _yearly ? 'YEARLY' : 'MONTHLY',
         callbackUrl: _callbackUrl,
       );
       final checkoutUrl = res['checkoutUrl'] as String?;
@@ -2458,7 +2306,7 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.c.background,
       body: Column(
         children: [
           _buildGradientAppBar(
@@ -2484,7 +2332,7 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
                           children: [
                             Text(_error!,
                                 style: GoogleFonts.urbanist(
-                                    color: AppColors.textSecondary)),
+                                    color: context.c.textSecondary)),
                             const SizedBox(height: 12),
                             AppButton.secondary('Retry', onTap: _load, width: 140),
                           ],
@@ -2497,10 +2345,15 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
                             'Choose the plan that fits your business. Upgrade or switch anytime.',
                             style: GoogleFonts.urbanist(
                               fontSize: 14,
-                              color: AppColors.textSecondary,
+                              color: context.c.textSecondary,
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 20),
+                          BillingToggle(
+                            yearly: _yearly,
+                            onChanged: (v) => setState(() => _yearly = v),
+                          ),
+                          const SizedBox(height: 20),
                           ..._plans.map(_buildPlanCard),
                         ],
                       ),
@@ -2513,108 +2366,27 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
   Widget _buildPlanCard(SubscriptionPlanModel plan) {
     final isCurrent = plan.tier == _currentTier;
     final busy = _busyTier == plan.tier;
-    final limit = plan.listingLimit == null
-        ? 'Unlimited listings'
-        : plan.listingLimit == 0
-            ? 'No listings'
-            : '${plan.listingLimit} active listings';
+    final style = plan.tier == 'PREMIUM'
+        ? PlanStyle.popular
+        : plan.tier == 'GOLD'
+            ? PlanStyle.gold
+            : PlanStyle.basic;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isCurrent ? AppColors.primary : AppColors.border,
-          width: isCurrent ? 1.6 : 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  plan.name,
-                  style: GoogleFonts.urbanist(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ),
-              if (isCurrent)
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryLight,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    _currentStatus?.toUpperCase() == 'TRIALING'
-                        ? 'On trial'
-                        : 'Current',
-                    style: GoogleFonts.urbanist(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            plan.isFree ? 'Free' : plan.priceLabel(),
-            style: GoogleFonts.urbanist(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: AppColors.primary,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const Icon(Icons.check_circle_outline_rounded,
-                  size: 16, color: AppColors.textSecondary),
-              const SizedBox(width: 6),
-              Text(limit,
-                  style: GoogleFonts.urbanist(
-                      fontSize: 13, color: AppColors.textSecondary)),
-            ],
-          ),
-          ...plan.features.take(4).map(
-                (f) => Padding(
-                  padding: const EdgeInsets.only(top: 6),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Icon(Icons.check_circle_outline_rounded,
-                          size: 16, color: AppColors.textSecondary),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(f,
-                            style: GoogleFonts.urbanist(
-                                fontSize: 13,
-                                color: AppColors.textSecondary)),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-          const SizedBox(height: 14),
-          if (isCurrent)
-            AppButton.secondary('Current Plan', onTap: null)
-          else
-            AppButton.primary(
-              plan.isFree ? 'Switch to ${plan.name}' : 'Upgrade to ${plan.name}',
-              loading: busy,
-              onTap: busy ? null : () => _changeTo(plan),
-            ),
-        ],
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 18),
+      child: PlanCard(
+        name: plan.name,
+        amount: plan.amountLabel(yearly: _yearly),
+        period: plan.periodLabel(yearly: _yearly),
+        features: plan.features,
+        style: style,
+        isCurrent: isCurrent,
+        currentBadgeLabel:
+            _currentStatus?.toUpperCase() == 'TRIALING' ? 'On trial' : 'Current',
+        loading: busy,
+        ctaLabel:
+            plan.isFree ? 'Switch to ${plan.name}' : 'Upgrade to ${plan.name}',
+        onSelect: () => _changeTo(plan),
       ),
     );
   }

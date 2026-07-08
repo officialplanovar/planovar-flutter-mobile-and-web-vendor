@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../core/services/messaging_service.dart';
+import '../../../core/services/chat_socket.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../shared/models/conversation_model.dart';
 import '../../../shared/widgets/network_image_widget.dart';
@@ -18,26 +19,88 @@ class MessagesScreen extends StatefulWidget {
 class _MessagesScreenState extends State<MessagesScreen> {
   final _searchController = TextEditingController();
   final _service = MessagingService();
+  final _socket = ChatSocket();
   String _searchQuery = '';
+  String _myId = '';
   List<ConversationModel> _all = [];
 
   @override
   void initState() {
     super.initState();
+    _resolveMyId();
     _load();
+    _connectSocket();
+  }
+
+  Future<void> _resolveMyId() async {
+    final id = await _service.myId();
+    if (id != null && mounted) _myId = id;
   }
 
   Future<void> _load() async {
     try {
       final convos = await _service.getConversations();
-      if (mounted) setState(() => _all = convos);
+      if (!mounted) return;
+      setState(() => _all = convos);
+      _joinAll(); // join rooms for any new conversations
     } catch (_) {
       // keep empty on error
     }
   }
 
+  /// Live-updates the list: joins every conversation room and refetches on any
+  /// incoming message (updates preview, ordering and unread counts).
+  Future<void> _connectSocket() async {
+    await _socket.connect();
+    _socket.onReady(_joinAll);
+    _socket.onMessage(_onSocketMessage);
+    _joinAll();
+  }
+
+  void _joinAll() {
+    for (final c in _all) {
+      _socket.join(c.id);
+    }
+  }
+
+  /// Optimistically bump unread + preview + ordering on an incoming message
+  /// (race-free vs a refetch). Unknown conversations trigger a refetch.
+  void _onSocketMessage(Map<String, dynamic> data) {
+    if (!mounted) return;
+    final convId = data['conversationId'] as String?;
+    if (convId == null) return;
+    final idx = _all.indexWhere((c) => c.id == convId);
+    if (idx < 0) {
+      _load();
+      return;
+    }
+    final senderId = data['senderId'] as String?;
+    final content = data['content'] as String?;
+    final mine = senderId != null && senderId == _myId;
+    final bumped = _all[idx].copyWith(
+      unreadCount: mine ? _all[idx].unreadCount : _all[idx].unreadCount + 1,
+      lastMessage: content ?? _all[idx].lastMessage,
+      lastMessageAt: DateTime.now(),
+    );
+    final list = [..._all]
+      ..removeAt(idx)
+      ..insert(0, bumped);
+    setState(() => _all = list);
+  }
+
+  /// Clears a conversation's unread locally when opened.
+  void _markReadLocal(String convId) {
+    final idx = _all.indexWhere((c) => c.id == convId);
+    if (idx >= 0 && _all[idx].unreadCount > 0) {
+      final list = [..._all];
+      list[idx] = list[idx].copyWith(unreadCount: 0);
+      setState(() => _all = list);
+    }
+  }
+
   @override
   void dispose() {
+    _socket.dispose();
     _searchController.dispose();
     super.dispose();
   }
@@ -55,7 +118,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.background,
       body: Column(
         children: [
           // ── Gradient Header ──────────────────────────────────────────────
@@ -70,14 +133,14 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.chat_bubble_outline_rounded,
-                            size: 56, color: AppColors.textHint),
+                        Icon(Icons.chat_bubble_outline_rounded,
+                            size: 56, color: context.c.textHint),
                         const SizedBox(height: 12),
                         Text(
                           'No conversations found',
                           style: GoogleFonts.urbanist(
                             fontSize: 16,
-                            color: AppColors.textSecondary,
+                            color: context.c.textSecondary,
                           ),
                         ),
                       ],
@@ -88,7 +151,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     itemCount: conversations.length,
                     itemBuilder: (context, index) {
                       final conv = conversations[index];
-                      return _ConversationTile(conv: conv);
+                      return _ConversationTile(
+                        conv: conv,
+                        onOpen: () => _markReadLocal(conv.id),
+                      );
                     },
                   ),
           ),
@@ -239,8 +305,9 @@ class _MessagesHeader extends StatelessWidget {
 // ── Conversation Tile ─────────────────────────────────────────────────────────
 class _ConversationTile extends StatelessWidget {
   final ConversationModel conv;
+  final VoidCallback? onOpen;
 
-  const _ConversationTile({required this.conv});
+  const _ConversationTile({required this.conv, this.onOpen});
 
   Color? _statusDotColor() {
     switch (conv.status) {
@@ -266,7 +333,7 @@ class _ConversationTile extends StatelessWidget {
     } else if (conv.status == 'disputed') {
       previewColor = const Color(0xFFE53935);
     } else {
-      previewColor = AppColors.textSecondary;
+      previewColor = context.c.textSecondary;
     }
 
     final previewText = conv.statusLabel ?? conv.lastMessage ?? '';
@@ -275,12 +342,15 @@ class _ConversationTile extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         GestureDetector(
-          onTap: () => context.push(AppRoutes.conversationPath(conv.id)),
+          onTap: () {
+            onOpen?.call();
+            context.push(AppRoutes.conversationPath(conv.id));
+          },
           behavior: HitTestBehavior.opaque,
           child: Container(
             color: hasUnread
-                ? AppColors.primaryLight.withValues(alpha: 0.5)
-                : Colors.white,
+                ? context.c.primaryLight.withValues(alpha: 0.5)
+                : context.c.surface,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -297,7 +367,7 @@ class _ConversationTile extends StatelessWidget {
                         radius: 28,
                         backgroundColor: conv.type == 'support'
                             ? AppColors.primary
-                            : AppColors.divider,
+                            : context.c.divider,
                         child: ClipOval(
                           child: AppNetworkImage(
                             url: conv.participantImage,
@@ -309,7 +379,7 @@ class _ConversationTile extends StatelessWidget {
                               height: 56,
                               color: conv.type == 'support'
                                   ? AppColors.primary
-                                  : AppColors.primaryLight,
+                                  : context.c.primaryLight,
                               child: Center(
                                 child: Icon(
                                   conv.type == 'support'
@@ -369,11 +439,11 @@ class _ConversationTile extends StatelessWidget {
                             child: Row(
                               children: [
                                 if (conv.isGroup)
-                                  const Padding(
-                                    padding: EdgeInsets.only(right: 4),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 4),
                                     child: Icon(Icons.group_rounded,
                                         size: 14,
-                                        color: AppColors.textSecondary),
+                                        color: context.c.textSecondary),
                                   ),
                                 Expanded(
                                   child: Text(
@@ -381,7 +451,7 @@ class _ConversationTile extends StatelessWidget {
                                     style: GoogleFonts.urbanist(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
-                                      color: AppColors.textPrimary,
+                                      color: context.c.textPrimary,
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -395,7 +465,7 @@ class _ConversationTile extends StatelessWidget {
                               Formatters.messageTime(conv.lastMessageAt!),
                               style: GoogleFonts.urbanist(
                                 fontSize: 12,
-                                color: AppColors.textSecondary,
+                                color: context.c.textSecondary,
                               ),
                             ),
                         ],
@@ -445,7 +515,7 @@ class _ConversationTile extends StatelessWidget {
                           '${conv.groupParticipantCount} participants',
                           style: GoogleFonts.urbanist(
                             fontSize: 11,
-                            color: AppColors.textHint,
+                            color: context.c.textHint,
                           ),
                         ),
                       ],
@@ -456,7 +526,7 @@ class _ConversationTile extends StatelessWidget {
             ),
           ),
         ),
-        const Divider(height: 1, thickness: 1, color: AppColors.divider),
+        Divider(height: 1, thickness: 1, color: context.c.divider),
       ],
     );
   }
@@ -480,7 +550,7 @@ class _GroupAvatarStack extends StatelessWidget {
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: AppColors.primaryLight,
+          color: context.c.primaryLight,
           shape: BoxShape.circle,
         ),
         child: const Icon(Icons.group_rounded,
@@ -511,7 +581,7 @@ class _GroupAvatarStack extends StatelessWidget {
                   height: miniSize,
                   fit: BoxFit.cover,
                   errorWidget: Container(
-                    color: AppColors.primaryLight,
+                    color: context.c.primaryLight,
                     child: Center(
                       child: Text(
                         '?',

@@ -37,9 +37,9 @@ class QuoteRequestCard extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: context.c.border),
       ),
-      color: AppColors.surface,
+      color: context.c.surface,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -49,7 +49,7 @@ class QuoteRequestCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 20,
-                  backgroundColor: AppColors.divider,
+                  backgroundColor: context.c.divider,
                   backgroundImage: (clientImage != null && clientImage.isNotEmpty)
                       ? NetworkImage(clientImage)
                       : null,
@@ -59,7 +59,7 @@ class QuoteRequestCard extends StatelessWidget {
                           style: GoogleFonts.urbanist(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.textSecondary,
+                            color: context.c.textSecondary,
                           ),
                         )
                       : null,
@@ -74,7 +74,7 @@ class QuoteRequestCard extends StatelessWidget {
                         style: GoogleFonts.urbanist(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
+                          color: context.c.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -82,7 +82,7 @@ class QuoteRequestCard extends StatelessWidget {
                         '$eventName · ${Formatters.timeAgo(createdAt)}',
                         style: GoogleFonts.urbanist(
                           fontSize: 12,
-                          color: AppColors.textSecondary,
+                          color: context.c.textSecondary,
                           fontWeight: FontWeight.w400,
                         ),
                         maxLines: 1,
@@ -117,7 +117,7 @@ class QuoteRequestCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.urbanist(
                   fontSize: 13,
-                  color: AppColors.textSecondary,
+                  color: context.c.textSecondary,
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -128,7 +128,7 @@ class QuoteRequestCard extends StatelessWidget {
                   : 'Budget: TBD',
               style: GoogleFonts.urbanist(
                 fontSize: 13,
-                color: AppColors.textSecondary,
+                color: context.c.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),

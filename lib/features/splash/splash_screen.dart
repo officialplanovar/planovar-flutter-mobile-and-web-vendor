@@ -43,17 +43,17 @@ class _SplashScreenState extends State<SplashScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: context.c.surface,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const PlanovarLogo(dark: false, width: 260),
+            PlanovarLogo(dark: context.isDark, width: 260),
             const SizedBox(height: 4),
             Text(
               'VENDOR',
               style: GoogleFonts.urbanist(
-                color: AppColors.textSecondary,
+                color: context.c.textSecondary,
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 6,

@@ -24,16 +24,64 @@ class ListingDetailScreen extends StatelessWidget {
   }
 
   void _showDeleteDialog(BuildContext context, ListingModel listing) {
-    showDialog(
+    final cubit = context.read<ListingsCubit>();
+    final messenger = ScaffoldMessenger.of(context);
+    final router = GoRouter.of(context);
+    final noun = _isService(listing) ? 'Service' : 'Product';
+    showDialog<void>(
       context: context,
-      builder: (_) => _DeleteDialog(listing: listing),
+      builder: (dialogCtx) => _DeleteDialog(
+        listing: listing,
+        onConfirm: () async {
+          Navigator.of(dialogCtx).pop();
+          try {
+            await cubit.remove(listing.id);
+            messenger.showSnackBar(
+              SnackBar(
+                content: Text('$noun deleted'),
+                backgroundColor: AppColors.success,
+              ),
+            );
+            if (router.canPop()) router.pop(); // leave the (now-gone) detail
+          } catch (e) {
+            messenger.showSnackBar(
+              SnackBar(
+                content: Text(e.toString().replaceFirst('Exception: ', '')),
+              ),
+            );
+          }
+        },
+      ),
     );
   }
 
   void _showDeactivateDialog(BuildContext context, ListingModel listing) {
-    showDialog(
+    final cubit = context.read<ListingsCubit>();
+    final messenger = ScaffoldMessenger.of(context);
+    final noun = _isService(listing) ? 'Service' : 'Product';
+    showDialog<void>(
       context: context,
-      builder: (_) => _DeactivateDialog(listing: listing),
+      builder: (dialogCtx) => _DeactivateDialog(
+        listing: listing,
+        onConfirm: () async {
+          Navigator.of(dialogCtx).pop();
+          try {
+            await cubit.toggleActive(listing.id, false);
+            messenger.showSnackBar(
+              SnackBar(
+                content: Text('$noun deactivated'),
+                backgroundColor: AppColors.success,
+              ),
+            );
+          } catch (e) {
+            messenger.showSnackBar(
+              SnackBar(
+                content: Text(e.toString().replaceFirst('Exception: ', '')),
+              ),
+            );
+          }
+        },
+      ),
     );
   }
 
@@ -43,18 +91,18 @@ class ListingDetailScreen extends StatelessWidget {
     final matches = lState.listings.where((l) => l.id == listingId);
     if (matches.isEmpty) {
       return Scaffold(
-        backgroundColor: AppColors.backgroundLight,
+        backgroundColor: context.c.background,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          iconTheme: const IconThemeData(color: AppColors.textPrimary),
+          iconTheme: IconThemeData(color: context.c.textPrimary),
         ),
         body: Center(
           child: Text(
             lState.status == ListingsStatus.loading
                 ? 'Loading…'
                 : 'Listing not found',
-            style: GoogleFonts.urbanist(color: AppColors.textSecondary),
+            style: GoogleFonts.urbanist(color: context.c.textSecondary),
           ),
         ),
       );
@@ -65,7 +113,7 @@ class ListingDetailScreen extends StatelessWidget {
     final typeLabel = _typeLabel(listing);
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.c.background,
       body: CustomScrollView(
         slivers: [
           // ── 1. Hero Image ────────────────────────────────────────────────
@@ -92,7 +140,7 @@ class ListingDetailScreen extends StatelessWidget {
                   width: 42,
                   height: 42,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: context.c.surface,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
@@ -102,9 +150,9 @@ class ListingDetailScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.arrow_back_rounded,
-                    color: AppColors.textPrimary,
+                    color: context.c.textPrimary,
                     size: 22,
                   ),
                 ),
@@ -158,14 +206,14 @@ class ListingDetailScreen extends StatelessWidget {
                     style: GoogleFonts.urbanist(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                     ),
                   ),
 
                   const SizedBox(height: 16),
 
                   // Metric cards row
-                  _MetricCards(listing: listing, isService: isService),
+                  _MetricCards(listing: listing),
 
                   const SizedBox(height: 16),
 
@@ -174,7 +222,7 @@ class ListingDetailScreen extends StatelessWidget {
                     listing.description ?? '',
                     style: GoogleFonts.urbanist(
                       fontSize: 14,
-                      color: AppColors.textSecondary,
+                      color: context.c.textSecondary,
                       height: 1.5,
                     ),
                   ),
@@ -307,34 +355,24 @@ class _StatusChip extends StatelessWidget {
 
 class _MetricCards extends StatelessWidget {
   final ListingModel listing;
-  final bool isService;
 
-  const _MetricCards({required this.listing, required this.isService});
+  const _MetricCards({required this.listing});
 
   @override
   Widget build(BuildContext context) {
-    final String label1;
-    final String value1;
-    final String label2;
-    final String value2;
-
-    if (isService) {
-      label1 = 'Total Earned';
-      value1 = '₦13,000';
-      label2 = 'Total Orders';
-      value2 = '2';
-    } else {
-      label1 = 'Total Earned';
-      value1 = '₦140,000';
-      label2 = 'Qty in Stock';
-      value2 = '49';
-    }
-
+    // Real listing metrics. (Earnings/orders would need per-listing order
+    // aggregation from the backend, which isn't available yet.)
+    final rating = listing.reviewCount > 0
+        ? '${listing.ratingAvg.toStringAsFixed(1)} (${listing.reviewCount})'
+        : 'No reviews yet';
     return Row(
       children: [
-        Expanded(child: _MetricCard(label: label1, value: value1)),
+        Expanded(
+          child: _MetricCard(
+              label: 'Views (30d)', value: '${listing.viewCount}'),
+        ),
         const SizedBox(width: 12),
-        Expanded(child: _MetricCard(label: label2, value: value2)),
+        Expanded(child: _MetricCard(label: 'Rating', value: rating)),
       ],
     );
   }
@@ -351,9 +389,9 @@ class _MetricCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.c.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.c.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -372,7 +410,7 @@ class _MetricCard extends StatelessWidget {
             style: GoogleFonts.urbanist(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
+              color: context.c.textPrimary,
             ),
           ),
         ],
@@ -394,11 +432,34 @@ class _DetailsTable extends StatelessWidget {
     required this.typeLabel,
   });
 
+  String get _pricingTypeLabel {
+    switch (listing.pricingType) {
+      case 'FIXED':
+        return 'Fixed price';
+      case 'STARTING_FROM':
+        return 'Starting from';
+      case 'QUOTE':
+        return 'Quote on request';
+      default:
+        return listing.pricingType;
+    }
+  }
+
+  String get _durationLabel {
+    if (listing.durationValue == null) return '—';
+    final unit = listing.durationUnit ?? '';
+    return '${listing.durationValue}${unit.isNotEmpty ? ' $unit' : ''}';
+  }
+
   List<(String, String)> _buildRows() {
     final rows = <(String, String)>[];
 
     // ALL listings
     rows.add(('Type', typeLabel));
+
+    String tagsValue() => listing.tags.isNotEmpty
+        ? listing.tags.map((t) => '#$t').join(' ')
+        : '—';
 
     if (listing.isRentable) {
       // Rental
@@ -414,38 +475,32 @@ class _DetailsTable extends StatelessWidget {
             ? Formatters.currency(listing.depositAmount!)
             : '—',
       ));
-      rows.add(('SKU', 'PRD001'));
-      rows.add(('Rental Duration', '39 days'));
+      if (listing.sku != null && listing.sku!.isNotEmpty) {
+        rows.add(('SKU', listing.sku!));
+      }
+      if (listing.stockQuantity != null) {
+        rows.add(('Stock', '${listing.stockQuantity}'));
+      }
+      if (listing.cancellationPolicy != null &&
+          listing.cancellationPolicy!.isNotEmpty) {
+        rows.add(('Cancellation policy', listing.cancellationPolicy!));
+      }
       rows.add(('Category', listing.categoryName ?? '—'));
-      rows.add(('Views (30d)', '${listing.viewCount}'));
-      rows.add(('Color', 'Red, Green and Pink'));
-      rows.add((
-        'Size',
-        listing.tags.isNotEmpty ? listing.tags.join(', ') : 'M, L, XL',
-      ));
-      rows.add((
-        'Tags',
-        listing.tags.isNotEmpty
-            ? listing.tags.map((t) => '#$t').join(' ')
-            : '—',
-      ));
     } else if (isService) {
-      // Service (QUOTE / HOURLY, !isRentable)
+      // Service (STARTING_FROM / QUOTE, !isRentable)
       final base = listing.basePrice ?? 0;
-      final priceRange = base > 0
-          ? '${Formatters.currency(base)} – ${Formatters.currency(base * 1.7)}'
-          : '—';
-      rows.add(('Price', priceRange));
+      final price =
+          base > 0 ? 'From ${Formatters.currency(base)}' : 'Quote on request';
+      rows.add(('Price', price));
+      rows.add(('Pricing', _pricingTypeLabel));
+      if (listing.durationValue != null) {
+        rows.add(('Duration', _durationLabel));
+      }
+      if (listing.cancellationPolicy != null &&
+          listing.cancellationPolicy!.isNotEmpty) {
+        rows.add(('Cancellation policy', listing.cancellationPolicy!));
+      }
       rows.add(('Category', listing.categoryName ?? '—'));
-      rows.add(('Views (30d)', '${listing.viewCount}'));
-      rows.add(('Cancellation Policy', 'Medium'));
-      rows.add(('Service Duration', '2 hours'));
-      rows.add((
-        'Tags',
-        listing.tags.isNotEmpty
-            ? listing.tags.map((t) => '#$t').join(' ')
-            : '—',
-      ));
     } else {
       // Product (FIXED, !isRentable)
       rows.add((
@@ -454,21 +509,20 @@ class _DetailsTable extends StatelessWidget {
             ? Formatters.currency(listing.basePrice!)
             : '—',
       ));
-      rows.add(('SKU', 'PRD001'));
+      if (listing.sku != null && listing.sku!.isNotEmpty) {
+        rows.add(('SKU', listing.sku!));
+      }
+      if (listing.stockQuantity != null) {
+        rows.add(('Stock', '${listing.stockQuantity} in stock'));
+      }
       rows.add(('Category', listing.categoryName ?? '—'));
-      rows.add(('Views (30d)', '${listing.viewCount}'));
-      rows.add(('Color', 'Red, Green and Pink'));
-      rows.add((
-        'Size',
-        listing.tags.isNotEmpty ? listing.tags.join(', ') : 'M, L, XL',
-      ));
-      rows.add((
-        'Tags',
-        listing.tags.isNotEmpty
-            ? listing.tags.map((t) => '#$t').join(' ')
-            : '—',
-      ));
     }
+
+    // Common footer rows for every listing
+    rows.add(('Status', listing.isActive ? 'Active' : 'Inactive'));
+    rows.add(('Listed', Formatters.date(listing.createdAt)));
+    rows.add(('Views (30d)', '${listing.viewCount}'));
+    rows.add(('Tags', tagsValue()));
 
     return rows;
   }
@@ -479,9 +533,9 @@ class _DetailsTable extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.c.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.c.border),
       ),
       child: Column(
         children: rows.asMap().entries.map((entry) {
@@ -503,7 +557,7 @@ class _DetailsTable extends StatelessWidget {
                       label,
                       style: GoogleFonts.urbanist(
                         fontSize: 13,
-                        color: AppColors.textSecondary,
+                        color: context.c.textSecondary,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
@@ -515,7 +569,7 @@ class _DetailsTable extends StatelessWidget {
                         style: GoogleFonts.urbanist(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                          color: context.c.textPrimary,
                         ),
                       ),
                     ),
@@ -523,7 +577,7 @@ class _DetailsTable extends StatelessWidget {
                 ),
               ),
               if (!isLast)
-                const Divider(height: 1, color: AppColors.divider),
+                Divider(height: 1, color: context.c.divider),
             ],
           );
         }).toList(),
@@ -536,8 +590,9 @@ class _DetailsTable extends StatelessWidget {
 
 class _DeleteDialog extends StatelessWidget {
   final ListingModel listing;
+  final VoidCallback onConfirm;
 
-  const _DeleteDialog({required this.listing});
+  const _DeleteDialog({required this.listing, required this.onConfirm});
 
   bool get _isService =>
       listing.pricingType != 'FIXED' && !listing.isRentable;
@@ -580,7 +635,7 @@ class _DeleteDialog extends StatelessWidget {
               style: GoogleFonts.urbanist(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
             ),
 
@@ -592,7 +647,7 @@ class _DeleteDialog extends StatelessWidget {
               textAlign: TextAlign.center,
               style: GoogleFonts.urbanist(
                 fontSize: 14,
-                color: AppColors.textSecondary,
+                color: context.c.textSecondary,
                 height: 1.4,
               ),
             ),
@@ -611,7 +666,7 @@ class _DeleteDialog extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: GestureDetector(
-                    onTap: () => Navigator.of(context).pop(),
+                    onTap: onConfirm,
                     child: Container(
                       height: 52,
                       decoration: BoxDecoration(
@@ -648,8 +703,9 @@ class _DeleteDialog extends StatelessWidget {
 
 class _DeactivateDialog extends StatefulWidget {
   final ListingModel listing;
+  final VoidCallback onConfirm;
 
-  const _DeactivateDialog({required this.listing});
+  const _DeactivateDialog({required this.listing, required this.onConfirm});
 
   @override
   State<_DeactivateDialog> createState() => _DeactivateDialogState();
@@ -682,7 +738,7 @@ class _DeactivateDialogState extends State<_DeactivateDialog> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.border,
+                  color: context.c.border,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -692,7 +748,7 @@ class _DeactivateDialogState extends State<_DeactivateDialog> {
                 style: GoogleFonts.urbanist(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: context.c.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
@@ -702,7 +758,7 @@ class _DeactivateDialogState extends State<_DeactivateDialog> {
                     d,
                     style: GoogleFonts.urbanist(
                       fontSize: 15,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   trailing: _selectedDuration == d
@@ -749,13 +805,13 @@ class _DeactivateDialogState extends State<_DeactivateDialog> {
                       width: 32,
                       height: 32,
                       decoration: BoxDecoration(
-                        color: AppColors.divider,
+                        color: context.c.divider,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.close_rounded,
                         size: 18,
-                        color: AppColors.textSecondary,
+                        color: context.c.textSecondary,
                       ),
                     ),
                   ),
@@ -788,7 +844,7 @@ class _DeactivateDialogState extends State<_DeactivateDialog> {
               style: GoogleFonts.urbanist(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
             ),
 
@@ -800,7 +856,7 @@ class _DeactivateDialogState extends State<_DeactivateDialog> {
               textAlign: TextAlign.center,
               style: GoogleFonts.urbanist(
                 fontSize: 14,
-                color: AppColors.textSecondary,
+                color: context.c.textSecondary,
                 height: 1.4,
               ),
             ),
@@ -815,7 +871,7 @@ class _DeactivateDialogState extends State<_DeactivateDialog> {
                 style: GoogleFonts.urbanist(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondary,
+                  color: context.c.textSecondary,
                 ),
               ),
             ),
@@ -829,9 +885,9 @@ class _DeactivateDialogState extends State<_DeactivateDialog> {
                 height: 48,
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 decoration: BoxDecoration(
-                  color: AppColors.backgroundLight,
+                  color: context.c.background,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.border),
+                  border: Border.all(color: context.c.border),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -841,13 +897,13 @@ class _DeactivateDialogState extends State<_DeactivateDialog> {
                       style: GoogleFonts.urbanist(
                         fontSize: 14,
                         color: _selectedDuration != null
-                            ? AppColors.textPrimary
-                            : AppColors.textHint,
+                            ? context.c.textPrimary
+                            : context.c.textHint,
                       ),
                     ),
-                    const Icon(
+                    Icon(
                       Icons.keyboard_arrow_down_rounded,
-                      color: AppColors.textSecondary,
+                      color: context.c.textSecondary,
                       size: 20,
                     ),
                   ],
@@ -869,7 +925,7 @@ class _DeactivateDialogState extends State<_DeactivateDialog> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: GestureDetector(
-                    onTap: () => Navigator.of(context).pop(),
+                    onTap: widget.onConfirm,
                     child: Container(
                       height: 52,
                       decoration: BoxDecoration(

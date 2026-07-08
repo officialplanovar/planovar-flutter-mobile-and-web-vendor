@@ -57,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final summary = context.watch<OrdersCubit>().state.summary;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.c.background,
       body: Column(
         children: [
           // ── Primary gradient header ─────────────────────────────────────
@@ -339,7 +339,7 @@ class _AlertBanner extends StatelessWidget {
                     style: GoogleFonts.urbanist(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -347,7 +347,7 @@ class _AlertBanner extends StatelessWidget {
                     'You have $count new requests for your listings',
                     style: GoogleFonts.urbanist(
                       fontSize: 12,
-                      color: AppColors.textSecondary,
+                      color: context.c.textSecondary,
                     ),
                   ),
                 ],
@@ -440,7 +440,7 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.c.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -458,7 +458,7 @@ class _StatCard extends StatelessWidget {
             label,
             style: GoogleFonts.urbanist(
               fontSize: 12,
-              color: AppColors.textSecondary,
+              color: context.c.textSecondary,
               fontWeight: FontWeight.w400,
             ),
           ),
@@ -476,7 +476,7 @@ class _StatCard extends StatelessWidget {
                   style: GoogleFonts.urbanist(
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
+                    color: context.c.textPrimary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -540,7 +540,7 @@ class _SectionHeader extends StatelessWidget {
             style: GoogleFonts.urbanist(
               fontSize: 17,
               fontWeight: FontWeight.w800,
-              color: AppColors.textPrimary,
+              color: context.c.textPrimary,
             ),
           ),
         ),
@@ -574,16 +574,16 @@ class _ScheduleSection extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.c.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: context.c.border),
         ),
         child: Center(
           child: Text(
             'No schedule for today',
             style: GoogleFonts.urbanist(
               fontSize: 14,
-              color: AppColors.textSecondary,
+              color: context.c.textSecondary,
             ),
           ),
         ),
@@ -592,9 +592,9 @@ class _ScheduleSection extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.c.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.c.border),
       ),
       child: Column(
         children: schedule.asMap().entries.map((entry) {
@@ -658,7 +658,7 @@ class _ScheduleSection extends StatelessWidget {
                               style: GoogleFonts.urbanist(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary,
+                                color: context.c.textPrimary,
                               ),
                             ),
                             const SizedBox(height: 3),
@@ -666,15 +666,15 @@ class _ScheduleSection extends StatelessWidget {
                               item.clientName,
                               style: GoogleFonts.urbanist(
                                 fontSize: 12,
-                                color: AppColors.textSecondary,
+                                color: context.c.textSecondary,
                               ),
                             ),
                           ],
                         ),
                       ),
-                      const Icon(
+                      Icon(
                         Icons.chevron_right_rounded,
-                        color: AppColors.textHint,
+                        color: context.c.textHint,
                         size: 20,
                       ),
                     ],
@@ -682,7 +682,7 @@ class _ScheduleSection extends StatelessWidget {
                 ),
               ),
               if (i < schedule.length - 1)
-                const Divider(height: 1, indent: 16, endIndent: 16, color: AppColors.divider),
+                Divider(height: 1, indent: 16, endIndent: 16, color: context.c.divider),
             ],
           );
         }).toList(),
@@ -745,9 +745,9 @@ class _QuickActions extends StatelessWidget {
           child: Container(
             padding: EdgeInsets.all(12.0),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.c.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: context.c.border),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -768,7 +768,7 @@ class _QuickActions extends StatelessWidget {
                   style: GoogleFonts.urbanist(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: context.c.textPrimary,
                   ),
                 ),
               ],
@@ -821,9 +821,9 @@ class _ListingTypeSheetState extends State<_ListingTypeSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: context.c.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.fromLTRB(
         24, 0, 24, MediaQuery.of(context).padding.bottom + 24,
@@ -837,7 +837,7 @@ class _ListingTypeSheetState extends State<_ListingTypeSheet> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.border,
+              color: context.c.border,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -868,7 +868,7 @@ class _ListingTypeSheetState extends State<_ListingTypeSheet> {
             style: GoogleFonts.urbanist(
               fontSize: 22,
               fontWeight: FontWeight.w800,
-              color: AppColors.textPrimary,
+              color: context.c.textPrimary,
             ),
           ),
           const SizedBox(height: 6),
@@ -876,7 +876,7 @@ class _ListingTypeSheetState extends State<_ListingTypeSheet> {
             'Select the type of listing you want to create',
             style: GoogleFonts.urbanist(
               fontSize: 14,
-              color: AppColors.textSecondary,
+              color: context.c.textSecondary,
             ),
             textAlign: TextAlign.center,
           ),
@@ -950,10 +950,10 @@ class _TypeCard extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primaryLight : Colors.white,
+          color: isSelected ? context.c.primaryLight : context.c.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.border,
+            color: isSelected ? AppColors.primary : context.c.border,
             width: isSelected ? 1.5 : 1,
           ),
         ),
@@ -963,7 +963,7 @@ class _TypeCard extends StatelessWidget {
               width: 52,
               height: 52,
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primary : AppColors.primaryLight,
+                color: isSelected ? AppColors.primary : context.c.primaryLight,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(
@@ -982,7 +982,7 @@ class _TypeCard extends StatelessWidget {
                     style: GoogleFonts.urbanist(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -990,7 +990,7 @@ class _TypeCard extends StatelessWidget {
                     subtitle,
                     style: GoogleFonts.urbanist(
                       fontSize: 13,
-                      color: AppColors.textSecondary,
+                      color: context.c.textSecondary,
                     ),
                   ),
                 ],
@@ -1000,7 +1000,7 @@ class _TypeCard extends StatelessWidget {
               isSelected
                   ? Icons.radio_button_checked_rounded
                   : Icons.radio_button_off_rounded,
-              color: isSelected ? AppColors.primary : AppColors.textHint,
+              color: isSelected ? AppColors.primary : context.c.textHint,
               size: 22,
             ),
           ],

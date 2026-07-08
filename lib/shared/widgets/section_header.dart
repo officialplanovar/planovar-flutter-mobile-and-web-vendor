@@ -29,7 +29,7 @@ class SectionHeader extends StatelessWidget {
             style: GoogleFonts.urbanist(
               fontSize: 16,
               fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
+              color: context.c.textPrimary,
             ),
           ),
           if (actionLabel != null && onActionTap != null)

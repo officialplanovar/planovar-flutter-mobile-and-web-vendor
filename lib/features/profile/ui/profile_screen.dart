@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,6 +9,7 @@ import '../../../core/router/app_routes.dart';
 import '../../../shared/models/vendor_model.dart';
 import '../../../shared/widgets/network_image_widget.dart';
 import '../../auth/bloc/auth_bloc.dart';
+import '../../auth/bloc/auth_event.dart';
 import '../../auth/bloc/auth_state.dart';
 import '../../vendor/data/vendor_repository.dart';
 
@@ -27,6 +29,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     VendorRepository().getMe().then((v) {
       if (mounted && v != null) setState(() => _vendor = v);
     }).catchError((_) {});
+  }
+
+  void _comingSoon(String feature) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('$feature is coming soon')),
+    );
   }
 
   String _locationLabel(VendorModel? v) {
@@ -56,7 +64,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         : '${tier[0]}${tier.substring(1).toLowerCase()} Plan';
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.background,
       body: ListView(
         padding: const EdgeInsets.only(bottom: 100),
         children: [
@@ -68,12 +76,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(24),
+                bottomRight: Radius.circular(24),
+              ),
             ),
             padding: EdgeInsets.only(
               top: topPadding + 16,
               left: 20,
               right: 20,
-              bottom: 20,
+              bottom: 24,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,7 +96,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     CircleAvatar(
                       radius: 28,
-                      backgroundColor: AppColors.primaryLight,
+                      backgroundColor: context.c.primaryLight,
                       child: ClipOval(
                         child: AppNetworkImage(
                           url: vendor?.logoUrl ?? user?.image,
@@ -94,7 +106,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           errorWidget: Container(
                             width: 56,
                             height: 56,
-                            color: AppColors.primaryLight,
+                            color: context.c.primaryLight,
                             child: Center(
                               child: Text(
                                 businessName.isNotEmpty
@@ -163,15 +175,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.star_rounded, color: Colors.amber, size: 12),
                             Text(
-                              ' ${vendor!.ratingAvg.toStringAsFixed(1)}',
+                              vendor!.ratingAvg.toStringAsFixed(1),
                               style: GoogleFonts.urbanist(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.white,
                               ),
                             ),
+                            const SizedBox(width: 3),
+                            const Icon(Icons.star_rounded,
+                                color: Color(0xFFFFB800), size: 13),
                           ],
                         ),
                       ),
@@ -182,9 +196,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.verified_rounded, color: Colors.white, size: 12),
+                            SvgPicture.asset(
+                              'assets/icons/verified.svg',
+                              width: 13,
+                              height: 13,
+                              colorFilter: const ColorFilter.mode(
+                                  Colors.white, BlendMode.srcIn),
+                            ),
+                            const SizedBox(width: 4),
                             Text(
-                              ' Verified',
+                              'Verified',
+                              style: GoogleFonts.urbanist(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      _PillBadge(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.schedule_rounded,
+                                size: 13, color: Colors.white),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Unverified',
                               style: GoogleFonts.urbanist(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
@@ -205,34 +245,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _MenuSection(
             items: [
               _MenuItem(
-                icon: Icons.person_outline_rounded,
+                asset: 'assets/icons/update-profile.svg',
                 label: 'Update your Profile',
                 onTap: () => context.push(AppRoutes.editProfile),
               ),
               _MenuItem(
-                icon: Icons.workspace_premium_outlined,
-                label: 'Subscription & Plan',
-                onTap: () => context.push(AppRoutes.subscriptionPlan),
-              ),
-              _MenuItem(
-                icon: Icons.shield_outlined,
+                asset: 'assets/icons/security.svg',
                 label: 'Security',
                 onTap: () => context.push(AppRoutes.security),
               ),
               _MenuItem(
-                icon: Icons.star_border_rounded,
+                asset: 'assets/icons/reviews.svg',
                 label: 'Reviews',
                 onTap: () => context.push(AppRoutes.reviews),
               ),
               _MenuItem(
-                icon: Icons.account_balance_outlined,
+                asset: 'assets/icons/hugeicons_bank.svg',
                 label: 'Linked Bank accounts',
                 onTap: () => context.push(AppRoutes.bankDetails),
               ),
               _MenuItem(
-                icon: Icons.photo_library_outlined,
+                asset: 'assets/icons/gallery.svg',
                 label: 'Gallery',
                 onTap: () => context.push(AppRoutes.gallery),
+              ),
+              _MenuItem(
+                asset: 'assets/icons/subscriptions.svg',
+                label: 'Subscription Plans',
+                onTap: () => context.push(AppRoutes.subscriptionPlan),
+              ),
+              _MenuItem(
+                asset: 'assets/icons/language.svg',
+                label: 'Language Preference',
+                onTap: () => _comingSoon('Language preference'),
               ),
             ],
           ),
@@ -242,27 +287,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _MenuSection(
             items: [
               _MenuItem(
-                icon: Icons.contrast_rounded,
+                asset: 'assets/icons/theme.svg',
                 label: 'Theme',
                 onTap: () => context.push(AppRoutes.themeSettings),
               ),
               _MenuItem(
-                icon: Icons.notifications_outlined,
+                asset: 'assets/icons/customize-storefront.svg',
+                label: 'Customize your Storefront',
+                onTap: () => _comingSoon('Storefront customization'),
+              ),
+              _MenuItem(
+                asset: 'assets/icons/notifications.svg',
                 label: 'Notifications',
                 onTap: () => context.push(AppRoutes.notificationSettings),
               ),
               _MenuItem(
-                icon: Icons.help_outline_rounded,
+                asset: 'assets/icons/help-and-support.svg',
                 label: 'Help and Support',
                 onTap: () => context.push(AppRoutes.help),
               ),
               _MenuItem(
-                icon: Icons.article_outlined,
+                asset: 'assets/icons/terms-and-conditions.svg',
                 label: 'Terms & Conditions',
                 onTap: () => context.push(AppRoutes.termsAndConditions),
               ),
               _MenuItem(
-                icon: Icons.logout_rounded,
+                asset: 'assets/icons/leave-planovar.svg',
                 label: 'Leave Planovar',
                 onTap: () => context.push(AppRoutes.deleteAccount),
               ),
@@ -289,11 +339,11 @@ class _PillBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.transparent,
+        color: Colors.white.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white, width: 1),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.35), width: 1),
       ),
       child: child,
     );
@@ -314,7 +364,7 @@ class _SectionLabel extends StatelessWidget {
         label,
         style: GoogleFonts.urbanist(
           fontSize: 12,
-          color: Colors.grey,
+          color: context.c.textSecondary,
         ),
       ),
     );
@@ -332,7 +382,7 @@ class _MenuSection extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.c.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: const [
           BoxShadow(
@@ -355,10 +405,10 @@ class _MenuSection extends StatelessWidget {
             children: [
               _MenuTile(item: item),
               if (index < items.length - 1)
-                const Divider(
+                Divider(
                   height: 1,
                   indent: 56,
-                  color: AppColors.divider,
+                  color: context.c.divider,
                 ),
             ],
           );
@@ -370,12 +420,12 @@ class _MenuSection extends StatelessWidget {
 
 // ── Menu item data ─────────────────────────────────────────────────────────────
 class _MenuItem {
-  final IconData icon;
+  final String asset; // SVG path under assets/icons/
   final String label;
   final VoidCallback onTap;
 
   const _MenuItem({
-    required this.icon,
+    required this.asset,
     required this.label,
     required this.onTap,
   });
@@ -400,10 +450,17 @@ class _MenuTile extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: AppColors.primaryLight,
+                color: context.c.primaryLight,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(item.icon, color: AppColors.primary, size: 18),
+              alignment: Alignment.center,
+              child: SvgPicture.asset(
+                item.asset,
+                width: 18,
+                height: 18,
+                colorFilter: const ColorFilter.mode(
+                    AppColors.primary, BlendMode.srcIn),
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -412,13 +469,13 @@ class _MenuTile extends StatelessWidget {
                 style: GoogleFonts.urbanist(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: context.c.textPrimary,
                 ),
               ),
             ),
-            const Icon(
+            Icon(
               Icons.chevron_right,
-              color: AppColors.textHint,
+              color: context.c.textHint,
               size: 20,
             ),
           ],
@@ -434,9 +491,11 @@ class _SignOutButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () async {
+        // Proper sign-out: clears the bearer token + resets auth state.
+        context.read<AuthBloc>().add(const AuthSignOutRequested());
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool('vendor_isLoggedIn', false);
-        if (context.mounted) context.go(AppRoutes.onboarding);
+        if (context.mounted) context.go(AppRoutes.login);
       },
       child: Container(
         height: 52,
@@ -447,12 +506,14 @@ class _SignOutButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.logout_rounded,
-              color: Color(0xFFE53935),
-              size: 18,
+            SvgPicture.asset(
+              'assets/icons/sign-out.svg',
+              width: 18,
+              height: 18,
+              colorFilter: const ColorFilter.mode(
+                  Color(0xFFE53935), BlendMode.srcIn),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: 6),
             Text(
               'Sign out',
               style: GoogleFonts.urbanist(

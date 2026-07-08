@@ -6,11 +6,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/services/upload_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../shared/widgets/app_icon.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_input.dart';
 import '../../../shared/widgets/tag_input_field.dart';
 import '../bloc/listings_cubit.dart';
 import '../data/listings_repository.dart';
+import '../../vendor/data/vendor_repository.dart';
 
 class AddServiceScreen extends StatefulWidget {
   const AddServiceScreen({super.key});
@@ -62,6 +64,11 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         description: desc,
         pricingType: startPrice > 0 ? 'STARTING_FROM' : 'QUOTE',
         basePrice: startPrice > 0 ? startPrice : null,
+        durationValue: int.tryParse(_durationValueController.text.trim()),
+        durationUnit: _durationUnit,
+        cancellationPolicy: _selectedCancellationPolicy.isEmpty
+            ? null
+            : _selectedCancellationPolicy,
         tags: _tags,
         mediaUrls: _imageSlots.whereType<String>().toList(),
       );
@@ -124,11 +131,42 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   final List<String> _cancellationPolicies = ['Flexible', 'Moderate', 'Strict'];
   final List<String> _durationUnits = ['Days', 'Hours', 'Mins'];
 
+  // Brief explanation of each policy — shown in the picker and below the field.
+  static const _cancellationDescriptions = {
+    'Flexible':
+        'Full refund if the client cancels up to 24 hours before the event.',
+    'Moderate':
+        '50% refund if cancelled at least 7 days before the event; none after.',
+    'Strict': 'No refund once the booking is confirmed.',
+  };
+
+  // Categories this vendor registered (their profile tags). The picker is
+  // limited to these; they can add more from their profile.
+  List<String> _vendorTags = [];
+
+  List<CategoryOption> get _pickableCategories => _vendorTags.isEmpty
+      ? _apiCategories
+      : _apiCategories.where((c) => _vendorTags.contains(c.name)).toList();
+
+  void _onFieldChanged() => setState(() {});
+
+  /// Submit is enabled only once the mandatory fields are filled.
+  bool get _canPublish =>
+      _nameController.text.trim().isNotEmpty &&
+      _descController.text.trim().isNotEmpty;
+
   @override
   void initState() {
     super.initState();
+    _nameController.addListener(_onFieldChanged);
+    _descController.addListener(_onFieldChanged);
     ListingsRepository().categories().then((cats) {
       if (mounted) setState(() => _apiCategories = cats);
+    }).catchError((_) {});
+    VendorRepository().getMe().then((v) {
+      if (mounted && v != null) {
+        setState(() => _vendorTags = List<String>.from(v.tags));
+      }
     }).catchError((_) {});
   }
 
@@ -148,8 +186,65 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         style: GoogleFonts.urbanist(
           fontSize: 15,
           fontWeight: FontWeight.w700,
-          color: AppColors.textPrimary,
+          color: context.c.textPrimary,
         ),
+      ),
+    );
+  }
+
+  /// A field label with an ⓘ icon that explains the field in a dialog.
+  Widget _labelWithInfo(String label, String info) {
+    return Row(
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.urbanist(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: context.c.textSecondary,
+          ),
+        ),
+        const SizedBox(width: 6),
+        GestureDetector(
+          onTap: () => _showFieldInfo(label, info),
+          behavior: HitTestBehavior.opaque,
+          child: Icon(Icons.info_outline_rounded,
+              size: 15, color: context.c.textHint),
+        ),
+      ],
+    );
+  }
+
+  void _showFieldInfo(String title, String body) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: ctx.c.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          title,
+          style: GoogleFonts.urbanist(
+            fontSize: 17,
+            fontWeight: FontWeight.w700,
+            color: ctx.c.textPrimary,
+          ),
+        ),
+        content: Text(
+          body,
+          style: GoogleFonts.urbanist(
+            fontSize: 14,
+            color: ctx.c.textSecondary,
+            height: 1.5,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('Got it',
+                style: GoogleFonts.urbanist(
+                    fontWeight: FontWeight.w700, color: AppColors.primary)),
+          ),
+        ],
       ),
     );
   }
@@ -178,7 +273,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     style: GoogleFonts.urbanist(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                     ),
                   ),
                 ),
@@ -189,31 +284,66 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           padding: EdgeInsets.all(28),
                           child: Center(child: CircularProgressIndicator()),
                         )
-                      : ListView(
-                          shrinkWrap: true,
-                          padding: const EdgeInsets.only(bottom: 12),
-                          children: _apiCategories
-                              .map(
-                                (cat) => ListTile(
-                                  title: Text(
-                                    cat.name,
-                                    style: GoogleFonts.urbanist(
-                                      fontSize: 15,
-                                      color: AppColors.textPrimary,
-                                    ),
-                                  ),
-                                  trailing: _selectedCategory == cat.name
-                                      ? const Icon(Icons.check_rounded,
-                                          color: AppColors.primary)
-                                      : null,
-                                  onTap: () {
-                                    setState(() => _selectedCategory = cat.name);
-                                    Navigator.pop(ctx);
-                                  },
+                      : _pickableCategories.isEmpty
+                          ? Padding(
+                              padding: const EdgeInsets.all(24),
+                              child: Text(
+                                "You haven't added any categories to your profile yet. "
+                                'Add them under Profile → Business Details to list services here.',
+                                style: GoogleFonts.urbanist(
+                                  fontSize: 14,
+                                  color: context.c.textSecondary,
+                                  height: 1.5,
                                 ),
-                              )
-                              .toList(),
+                              ),
+                            )
+                          : ListView(
+                              shrinkWrap: true,
+                              padding: const EdgeInsets.only(bottom: 12),
+                              children: _pickableCategories
+                                  .map(
+                                    (cat) => ListTile(
+                                      title: Text(
+                                        cat.name,
+                                        style: GoogleFonts.urbanist(
+                                          fontSize: 15,
+                                          color: context.c.textPrimary,
+                                        ),
+                                      ),
+                                      trailing: _selectedCategory == cat.name
+                                          ? const Icon(Icons.check_rounded,
+                                              color: AppColors.primary)
+                                          : null,
+                                      onTap: () {
+                                        setState(
+                                            () => _selectedCategory = cat.name);
+                                        Navigator.pop(ctx);
+                                      },
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                ),
+                // Hint: the picker only shows the vendor's registered categories.
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+                  child: Row(
+                    children: [
+                      Icon(Icons.info_outline_rounded,
+                          size: 16, color: context.c.textSecondary),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Only your registered categories are shown. Add more in '
+                          'Profile → Business Details.',
+                          style: GoogleFonts.urbanist(
+                            fontSize: 12,
+                            color: context.c.textSecondary,
+                          ),
                         ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -243,7 +373,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                   style: GoogleFonts.urbanist(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                    color: context.c.textPrimary,
                   ),
                 ),
               ),
@@ -254,7 +384,16 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     policy,
                     style: GoogleFonts.urbanist(
                       fontSize: 15,
-                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.w600,
+                      color: context.c.textPrimary,
+                    ),
+                  ),
+                  subtitle: Text(
+                    _cancellationDescriptions[policy] ?? '',
+                    style: GoogleFonts.urbanist(
+                      fontSize: 13,
+                      color: context.c.textSecondary,
+                      height: 1.4,
                     ),
                   ),
                   trailing: _selectedCancellationPolicy == policy
@@ -283,20 +422,14 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Category',
-            style: GoogleFonts.urbanist(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
-            ),
-          ),
+          _labelWithInfo('Category',
+              'The service category clients browse by. Only the categories you registered on your profile appear here.'),
           const SizedBox(height: 6),
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
             decoration: BoxDecoration(
-              color: const Color(0xFFF2F2F2),
+              color: context.c.surfaceElevated,
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
@@ -307,14 +440,14 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     style: GoogleFonts.urbanist(
                       fontSize: 15,
                       color: _selectedCategory != null
-                          ? AppColors.textPrimary
-                          : AppColors.textHint,
+                          ? context.c.textPrimary
+                          : context.c.textHint,
                     ),
                   ),
                 ),
-                const Icon(
+                Icon(
                   Icons.keyboard_arrow_down_rounded,
-                  color: AppColors.textSecondary,
+                  color: context.c.textSecondary,
                 ),
               ],
             ),
@@ -328,19 +461,13 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Price Range',
-          style: GoogleFonts.urbanist(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textSecondary,
-          ),
-        ),
+        _labelWithInfo('Price Range',
+            'The typical price band for this service. Clients see it as a guide; the final amount is agreed in your quote.'),
         const SizedBox(height: 8),
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
             activeTrackColor: AppColors.primary,
-            inactiveTrackColor: AppColors.primaryLight,
+            inactiveTrackColor: context.c.primaryLight,
             thumbColor: AppColors.primary,
             overlayColor: AppColors.primary.withValues(alpha: 0.12),
             rangeThumbShape: const RoundRangeSliderThumbShape(
@@ -382,7 +509,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           style: GoogleFonts.urbanist(
             fontSize: 11,
             fontWeight: FontWeight.w500,
-            color: AppColors.textHint,
+            color: context.c.textHint,
           ),
         ),
         const SizedBox(height: 4),
@@ -390,7 +517,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
           decoration: BoxDecoration(
-            color: const Color(0xFFF2F2F2),
+            color: context.c.surfaceElevated,
             borderRadius: BorderRadius.circular(14),
           ),
           child: Row(
@@ -398,7 +525,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryLight,
+                  color: context.c.primaryLight,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -417,7 +544,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                   style: GoogleFonts.urbanist(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: context.c.textPrimary,
                   ),
                 ),
               ),
@@ -452,7 +579,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           style: GoogleFonts.urbanist(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: AppColors.textSecondary,
+            color: context.c.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
@@ -471,10 +598,10 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    color: isSelected ? AppColors.primary : Colors.white,
+                    color: isSelected ? AppColors.primary : context.c.surface,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: isSelected ? AppColors.primary : AppColors.border,
+                      color: isSelected ? AppColors.primary : context.c.border,
                     ),
                   ),
                   child: Text(
@@ -484,7 +611,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       fontWeight: FontWeight.w600,
                       color: isSelected
                           ? Colors.white
-                          : AppColors.textSecondary,
+                          : context.c.textSecondary,
                     ),
                   ),
                 ),
@@ -510,20 +637,14 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Cancellation Policy',
-            style: GoogleFonts.urbanist(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
-            ),
-          ),
+          _labelWithInfo('Cancellation Policy',
+              'How refunds work if a client cancels. Choose the level that best fits your business.'),
           const SizedBox(height: 6),
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
             decoration: BoxDecoration(
-              color: const Color(0xFFF2F2F2),
+              color: context.c.surfaceElevated,
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
@@ -536,18 +657,29 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     style: GoogleFonts.urbanist(
                       fontSize: 15,
                       color: _selectedCancellationPolicy.isNotEmpty
-                          ? AppColors.textPrimary
-                          : AppColors.textHint,
+                          ? context.c.textPrimary
+                          : context.c.textHint,
                     ),
                   ),
                 ),
-                const Icon(
+                Icon(
                   Icons.keyboard_arrow_down_rounded,
-                  color: AppColors.textSecondary,
+                  color: context.c.textSecondary,
                 ),
               ],
             ),
           ),
+          if (_selectedCancellationPolicy.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              _cancellationDescriptions[_selectedCancellationPolicy] ?? '',
+              style: GoogleFonts.urbanist(
+                fontSize: 12,
+                color: context.c.textSecondary,
+                height: 1.4,
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -562,7 +694,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         height: 90,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: AppColors.primaryLight.withValues(alpha: 0.4),
+          color: context.c.primaryLight.withValues(alpha: 0.4),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: AppColors.primary.withValues(alpha: 0.4),
@@ -605,11 +737,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                 : Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        Icons.add_photo_alternate_outlined,
-                        color: AppColors.primary.withValues(alpha: 0.6),
-                        size: 26,
-                      ),
+                      AppIcon('gallery',
+                          size: 26,
+                          color: AppColors.primary.withValues(alpha: 0.6)),
                       const SizedBox(height: 4),
                       Text(
                         label,
@@ -629,7 +759,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(90),
         child: Container(
@@ -697,6 +827,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     label: 'Service Name',
                     hint: 'Enter service name...',
                     controller: _nameController,
+                    onInfoTap: () => _showFieldInfo('Service Name',
+                        'A short, clear name clients will see, e.g. "Wedding Photography — Full Day".'),
                   ),
                   const SizedBox(height: 16),
                   AppInput(
@@ -706,6 +838,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     maxLines: 4,
                     keyboardType: TextInputType.multiline,
                     textInputAction: TextInputAction.newline,
+                    onInfoTap: () => _showFieldInfo('Service Description',
+                        "What's included, your experience, and what clients can expect. The more detail, the more trust."),
                   ),
                   const SizedBox(height: 16),
                   _buildCategorySelector(),
@@ -745,14 +879,14 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           ),
           Container(
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(top: BorderSide(color: AppColors.border)),
+            decoration: BoxDecoration(
+              color: context.c.surface,
+              border: Border(top: BorderSide(color: context.c.border)),
             ),
             child: AppButton.primary(
               _publishing ? 'Publishing…' : 'Publish Service',
               loading: _publishing,
-              onTap: _publishing ? null : _publish,
+              onTap: (_publishing || !_canPublish) ? null : _publish,
             ),
           ),
         ],

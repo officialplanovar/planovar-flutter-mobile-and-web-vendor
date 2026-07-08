@@ -45,12 +45,12 @@ class _PaymentCheckoutScreenState extends State<PaymentCheckoutScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.c.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close_rounded, color: AppColors.textPrimary),
+          icon: Icon(Icons.close_rounded, color: context.c.textPrimary),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
@@ -58,7 +58,7 @@ class _PaymentCheckoutScreenState extends State<PaymentCheckoutScreen> {
           style: GoogleFonts.urbanist(
             fontSize: 17,
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: context.c.textPrimary,
           ),
         ),
         centerTitle: true,
@@ -72,7 +72,7 @@ class _PaymentCheckoutScreenState extends State<PaymentCheckoutScreen> {
               width: 84,
               height: 84,
               decoration: BoxDecoration(
-                color: AppColors.primaryLight,
+                color: context.c.primaryLight,
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.lock_outline_rounded,
@@ -84,7 +84,7 @@ class _PaymentCheckoutScreenState extends State<PaymentCheckoutScreen> {
               style: GoogleFonts.urbanist(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
             ),
             const SizedBox(height: 10),
@@ -95,7 +95,7 @@ class _PaymentCheckoutScreenState extends State<PaymentCheckoutScreen> {
               textAlign: TextAlign.center,
               style: GoogleFonts.urbanist(
                 fontSize: 14,
-                color: AppColors.textSecondary,
+                color: context.c.textSecondary,
                 height: 1.5,
               ),
             ),

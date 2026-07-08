@@ -24,11 +24,20 @@ class OrderModel extends Equatable {
   /// 'confirmed' | 'payment_pending' | 'completed' | 'cancelled'
   final String status;
 
+  /// 'PURCHASE' | 'RENTAL' | 'SERVICE' | null — drives accept via the direct
+  /// order flow (products/rentals) vs the quote flow (services).
+  final String? fulfilmentType;
+
   // Timeline step completion timestamps (null = not yet done)
   final DateTime? invoiceAcceptedAt;
   final DateTime? paymentConfirmedAt;
   final DateTime? serviceDeliveredAt;
   final DateTime? reviewedAt;
+
+  /// A direct product/rental order (accept generates an invoice), vs a service
+  /// inquiry (accept confirms; the vendor sends a quote separately).
+  bool get isDirectOrder =>
+      fulfilmentType == 'PURCHASE' || fulfilmentType == 'RENTAL';
 
   const OrderModel({
     required this.id,
@@ -51,6 +60,7 @@ class OrderModel extends Equatable {
     required this.bankName,
     required this.amount,
     required this.status,
+    this.fulfilmentType,
     this.invoiceAcceptedAt,
     this.paymentConfirmedAt,
     this.serviceDeliveredAt,
@@ -79,6 +89,7 @@ class OrderModel extends Equatable {
       bankName: json['bankName'] as String,
       amount: (json['amount'] as num).toDouble(),
       status: json['status'] as String,
+      fulfilmentType: json['fulfilmentType'] as String?,
       invoiceAcceptedAt: json['invoiceAcceptedAt'] != null
           ? DateTime.parse(json['invoiceAcceptedAt'] as String)
           : null,

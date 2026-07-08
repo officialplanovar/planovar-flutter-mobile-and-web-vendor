@@ -2,6 +2,10 @@ import 'package:equatable/equatable.dart';
 
 class ConversationModel extends Equatable {
   final String id;
+
+  /// The client's user id (the other party in a vendor DM) — needed to send
+  /// a quote via the chat-order flow.
+  final String? clientId;
   final String participantName;
   final String? participantImage;
   final String? lastMessage;
@@ -54,6 +58,7 @@ class ConversationModel extends Equatable {
 
   const ConversationModel({
     required this.id,
+    this.clientId,
     required this.participantName,
     this.participantImage,
     this.lastMessage,

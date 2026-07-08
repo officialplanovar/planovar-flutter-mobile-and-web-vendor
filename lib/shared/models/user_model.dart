@@ -7,6 +7,7 @@ class UserModel extends Equatable {
   final String? phone;
   final String role;
   final String? image;
+  final String? dateOfBirth; // ISO date string YYYY-MM-DD
 
   const UserModel({
     required this.id,
@@ -15,6 +16,7 @@ class UserModel extends Equatable {
     this.phone,
     required this.role,
     this.image,
+    this.dateOfBirth,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -25,6 +27,7 @@ class UserModel extends Equatable {
       phone: json['phone'] as String?,
       role: json['role'] as String? ?? 'vendor',
       image: json['image'] as String?,
+      dateOfBirth: json['dateOfBirth'] as String?,
     );
   }
 
@@ -35,6 +38,7 @@ class UserModel extends Equatable {
         'phone': phone,
         'role': role,
         'image': image,
+        'dateOfBirth': dateOfBirth,
       };
 
   UserModel copyWith({
@@ -44,6 +48,7 @@ class UserModel extends Equatable {
     String? phone,
     String? role,
     String? image,
+    String? dateOfBirth,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -52,9 +57,11 @@ class UserModel extends Equatable {
       phone: phone ?? this.phone,
       role: role ?? this.role,
       image: image ?? this.image,
+      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
     );
   }
 
   @override
-  List<Object?> get props => [id, name, email, phone, role, image];
+  List<Object?> get props =>
+      [id, name, email, phone, role, image, dateOfBirth];
 }

@@ -31,9 +31,9 @@ class StatCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: context.c.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: context.c.border),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,7 +45,7 @@ class StatCard extends StatelessWidget {
                 height: 36,
                 margin: const EdgeInsets.only(bottom: 10),
                 decoration: BoxDecoration(
-                  color: iconBgColor ?? AppColors.primaryLight,
+                  color: iconBgColor ?? context.c.primaryLight,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
@@ -59,7 +59,7 @@ class StatCard extends StatelessWidget {
               style: GoogleFonts.urbanist(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
-                color: AppColors.textSecondary,
+                color: context.c.textSecondary,
               ),
             ),
             const SizedBox(height: 4),
@@ -68,7 +68,7 @@ class StatCard extends StatelessWidget {
               style: GoogleFonts.urbanist(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
             ),
             if (subtitle != null) ...[
@@ -78,7 +78,7 @@ class StatCard extends StatelessWidget {
                 style: GoogleFonts.urbanist(
                   fontSize: 11,
                   fontWeight: FontWeight.w400,
-                  color: AppColors.textSecondary,
+                  color: context.c.textSecondary,
                 ),
               ),
             ],

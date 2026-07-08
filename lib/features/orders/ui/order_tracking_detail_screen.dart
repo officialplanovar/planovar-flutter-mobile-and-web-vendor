@@ -11,12 +11,12 @@ class OrderTrackingDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.c.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.c.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
+          icon: Icon(Icons.arrow_back_rounded, color: context.c.textPrimary),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
@@ -24,7 +24,7 @@ class OrderTrackingDetailScreen extends StatelessWidget {
           style: GoogleFonts.urbanist(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: context.c.textPrimary,
           ),
         ),
         centerTitle: true,
@@ -35,15 +35,15 @@ class OrderTrackingDetailScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.local_shipping_outlined,
-                  size: 56, color: AppColors.textHint),
+              Icon(Icons.local_shipping_outlined,
+                  size: 56, color: context.c.textHint),
               const SizedBox(height: 12),
               Text(
                 'Order tracking is coming soon',
                 style: GoogleFonts.urbanist(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: context.c.textPrimary,
                 ),
               ),
               const SizedBox(height: 4),
@@ -52,7 +52,7 @@ class OrderTrackingDetailScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: GoogleFonts.urbanist(
                   fontSize: 14,
-                  color: AppColors.textSecondary,
+                  color: context.c.textSecondary,
                 ),
               ),
             ],

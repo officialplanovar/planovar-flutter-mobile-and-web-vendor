@@ -157,7 +157,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
           style: GoogleFonts.urbanist(
             fontSize: 16,
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: context.c.textPrimary,
           ),
         ),
         if (rightLabel != null)
@@ -165,7 +165,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             rightLabel,
             style: GoogleFonts.urbanist(
               fontSize: 13,
-              color: AppColors.textSecondary,
+              color: context.c.textSecondary,
             ),
           ),
       ],
@@ -178,14 +178,14 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       alignment: Alignment.centerLeft,
       padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
-        color: const Color(0xFFF2F2F2),
+        color: context.c.surfaceElevated,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
         value,
         style: GoogleFonts.urbanist(
           fontSize: 14,
-          color: AppColors.textSecondary,
+          color: context.c.textSecondary,
         ),
       ),
     );
@@ -203,16 +203,16 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               controller: item.desc,
               style: GoogleFonts.urbanist(
                 fontSize: 14,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
               decoration: InputDecoration(
                 hintText: 'Description',
                 hintStyle: GoogleFonts.urbanist(
                   fontSize: 14,
-                  color: AppColors.textHint,
+                  color: context.c.textHint,
                 ),
                 filled: true,
-                fillColor: const Color(0xFFF2F2F2),
+                fillColor: context.c.surfaceElevated,
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                 border: OutlineInputBorder(
@@ -240,16 +240,16 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               style: GoogleFonts.urbanist(
                 fontSize: 14,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
               decoration: InputDecoration(
                 hintText: 'Amount',
                 hintStyle: GoogleFonts.urbanist(
                   fontSize: 14,
-                  color: AppColors.textHint,
+                  color: context.c.textHint,
                 ),
                 filled: true,
-                fillColor: const Color(0xFFF2F2F2),
+                fillColor: context.c.surfaceElevated,
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                 border: OutlineInputBorder(
@@ -314,8 +314,8 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: AppColors.border),
+        color: context.c.surface,
+        border: Border.all(color: context.c.border),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
@@ -326,7 +326,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             style: GoogleFonts.urbanist(
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: context.c.textPrimary,
             ),
           ),
           const SizedBox(height: 10),
@@ -337,7 +337,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 height: 36,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF2F2F2),
+                  color: context.c.surfaceElevated,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -345,7 +345,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                   style: GoogleFonts.urbanist(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: context.c.textPrimary,
                   ),
                 ),
               ),
@@ -380,7 +380,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                   dueLabel,
                   style: GoogleFonts.urbanist(
                     fontSize: 12,
-                    color: AppColors.textSecondary,
+                    color: context.c.textSecondary,
                   ),
                 ),
               ),
@@ -389,7 +389,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 style: GoogleFonts.urbanist(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: context.c.textPrimary,
                 ),
               ),
             ],
@@ -402,7 +402,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.background,
       appBar: _buildGradientAppBar() as PreferredSizeWidget,
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 24, 20, 140),
@@ -461,7 +461,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 style: GoogleFonts.urbanist(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: context.c.textPrimary,
                 ),
               ),
             ),
@@ -488,7 +488,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               style: GoogleFonts.urbanist(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
             ),
             const SizedBox(height: 16),
@@ -499,7 +499,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                   'Man power',
                   style: GoogleFonts.urbanist(
                     fontSize: 13,
-                    color: AppColors.textSecondary,
+                    color: context.c.textSecondary,
                   ),
                 ),
                 Text(
@@ -507,7 +507,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                   style: GoogleFonts.urbanist(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: context.c.textPrimary,
                   ),
                 ),
               ],
@@ -520,7 +520,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                   'Account',
                   style: GoogleFonts.urbanist(
                     fontSize: 13,
-                    color: AppColors.textSecondary,
+                    color: context.c.textSecondary,
                   ),
                 ),
                 Text(
@@ -528,14 +528,14 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                   style: GoogleFonts.urbanist(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: context.c.textPrimary,
                   ),
                 ),
               ],
             ),
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 14),
-              child: Divider(color: AppColors.border, height: 1),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              child: Divider(color: context.c.border, height: 1),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -544,7 +544,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                   'Your payout',
                   style: GoogleFonts.urbanist(
                     fontSize: 13,
-                    color: AppColors.textSecondary,
+                    color: context.c.textSecondary,
                   ),
                 ),
                 Text(
@@ -567,10 +567,10 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
           20,
           MediaQuery.of(context).padding.bottom + 16,
         ),
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          color: context.c.surface,
           border: Border(
-            top: BorderSide(color: AppColors.border),
+            top: BorderSide(color: context.c.border),
           ),
         ),
         child: Column(
@@ -593,7 +593,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               child: Container(
                 height: 52,
                 decoration: BoxDecoration(
-                  color: AppColors.primaryLight,
+                  color: context.c.primaryLight,
                   border: Border.all(color: AppColors.primary, width: 1.5),
                   borderRadius: BorderRadius.circular(14),
                 ),

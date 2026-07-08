@@ -19,18 +19,25 @@ class AuthSignInRequested extends AuthEvent {
 }
 
 class AuthSignUpRequested extends AuthEvent {
+  final String firstName;
+  final String lastName;
+  final String? dateOfBirth; // ISO date string YYYY-MM-DD
   final String businessName;
   final String email;
   final String password;
   final String? phone;
   const AuthSignUpRequested({
+    required this.firstName,
+    required this.lastName,
+    this.dateOfBirth,
     required this.businessName,
     required this.email,
     required this.password,
     this.phone,
   });
   @override
-  List<Object?> get props => [businessName, email, password, phone];
+  List<Object?> get props =>
+      [firstName, lastName, dateOfBirth, businessName, email, password, phone];
 }
 
 class AuthOtpVerifyRequested extends AuthEvent {

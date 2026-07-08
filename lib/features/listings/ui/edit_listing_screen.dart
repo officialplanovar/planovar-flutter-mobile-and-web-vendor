@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../shared/widgets/app_icon.dart';
 import '../bloc/listings_cubit.dart';
 import '../data/listings_repository.dart';
 import '../../../shared/models/listing_model.dart';
@@ -54,9 +55,12 @@ class _EditListingScreenState extends State<EditListingScreen> {
   String _selectedCancellationPolicy = 'Flexible';
   RangeValues _priceRange = const RangeValues(0, 500000);
 
-  // Category names from the backend (admin-managed).
-  List<String> _apiCategoryNames = [];
+  // Categories from the backend (admin-managed).
+  List<CategoryOption> _apiCategories = [];
+  List<String> get _apiCategoryNames =>
+      _apiCategories.map((c) => c.name).toList();
 
+  static const _durationUnits = ['Days', 'Hours', 'Mins'];
   final List<String> _cancellationPolicies = ['Flexible', 'Moderate', 'Strict'];
 
   bool get _isService =>
@@ -79,7 +83,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
     super.initState();
     ListingsRepository().categories().then((cats) {
       if (mounted) {
-        setState(() => _apiCategoryNames = cats.map((c) => c.name).toList());
+        setState(() => _apiCategories = cats);
       }
     }).catchError((_) {});
     final listings = context.read<ListingsCubit>().state.listings;
@@ -105,8 +109,10 @@ class _EditListingScreenState extends State<EditListingScreen> {
           : '',
     );
     _durationCtrl = TextEditingController();
-    _skuCtrl = TextEditingController();
-    _quantityCtrl = TextEditingController();
+    _skuCtrl = TextEditingController(text: listing.sku ?? '');
+    _quantityCtrl = TextEditingController(
+      text: listing.stockQuantity != null ? '${listing.stockQuantity}' : '',
+    );
     _isForRent = listing.isRentable;
 
     // Service fields
@@ -117,6 +123,25 @@ class _EditListingScreenState extends State<EditListingScreen> {
     _durationDaysCtrl = TextEditingController();
     _durationHoursCtrl = TextEditingController();
     _durationMinsCtrl = TextEditingController();
+    // Prefill the service-duration box matching the stored unit.
+    if (listing.durationValue != null) {
+      final v = '${listing.durationValue}';
+      switch (listing.durationUnit) {
+        case 'Days':
+          _durationDaysCtrl.text = v;
+          break;
+        case 'Mins':
+          _durationMinsCtrl.text = v;
+          break;
+        case 'Hours':
+        default:
+          _durationHoursCtrl.text = v;
+      }
+    }
+    if (listing.cancellationPolicy != null &&
+        listing.cancellationPolicy!.isNotEmpty) {
+      _selectedCancellationPolicy = listing.cancellationPolicy!;
+    }
     _selectedCategory = listing.categoryName;
 
     if (listing.basePrice != null) {
@@ -214,7 +239,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
         style: GoogleFonts.urbanist(
           fontSize: 15,
           fontWeight: FontWeight.w700,
-          color: AppColors.textPrimary,
+          color: context.c.textPrimary,
         ),
       ),
     );
@@ -239,7 +264,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
                 style: GoogleFonts.urbanist(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondary,
+                  color: context.c.textSecondary,
                 ),
               ),
               if (labelSuffix != null) ...[
@@ -253,7 +278,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
             decoration: BoxDecoration(
-              color: const Color(0xFFF2F2F2),
+              color: context.c.surfaceElevated,
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
@@ -264,14 +289,14 @@ class _EditListingScreenState extends State<EditListingScreen> {
                     style: GoogleFonts.urbanist(
                       fontSize: 15,
                       color: value != null
-                          ? AppColors.textPrimary
-                          : AppColors.textHint,
+                          ? context.c.textPrimary
+                          : context.c.textHint,
                     ),
                   ),
                 ),
-                const Icon(
+                Icon(
                   Icons.keyboard_arrow_down_rounded,
-                  color: AppColors.textSecondary,
+                  color: context.c.textSecondary,
                 ),
               ],
             ),
@@ -330,27 +355,23 @@ class _EditListingScreenState extends State<EditListingScreen> {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.divider,
+          color: context.c.divider,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: AppColors.border,
+            color: context.c.border,
             width: 1.5,
           ),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.add_photo_alternate_outlined,
-              color: AppColors.textHint,
-              size: 24,
-            ),
+            AppIcon('gallery', size: 24, color: context.c.textHint),
             const SizedBox(height: 4),
             Text(
               label,
               style: GoogleFonts.urbanist(
                 fontSize: 11,
-                color: AppColors.textSecondary,
+                color: context.c.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -411,7 +432,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
                     style: GoogleFonts.urbanist(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                     ),
                   ),
                 ),
@@ -432,7 +453,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
                                     opt,
                                     style: GoogleFonts.urbanist(
                                       fontSize: 15,
-                                      color: AppColors.textPrimary,
+                                      color: context.c.textPrimary,
                                     ),
                                   ),
                                   trailing: selected == opt
@@ -476,7 +497,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
                     style: GoogleFonts.urbanist(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -502,12 +523,12 @@ class _EditListingScreenState extends State<EditListingScreen> {
                           height: 44,
                           decoration: BoxDecoration(
                             color:
-                                isSelected ? AppColors.primary : Colors.white,
+                                isSelected ? AppColors.primary : context.c.surface,
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
                               color: isSelected
                                   ? AppColors.primary
-                                  : AppColors.border,
+                                  : context.c.border,
                             ),
                           ),
                           child: Center(
@@ -518,7 +539,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
                                 fontWeight: FontWeight.w600,
                                 color: isSelected
                                     ? Colors.white
-                                    : AppColors.textSecondary,
+                                    : context.c.textSecondary,
                               ),
                             ),
                           ),
@@ -572,7 +593,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
               style: GoogleFonts.urbanist(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textSecondary,
+                color: context.c.textSecondary,
               ),
             ),
             Text(
@@ -593,7 +614,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
             constraints: const BoxConstraints(minHeight: 52),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: const Color(0xFFF2F2F2),
+              color: context.c.surfaceElevated,
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
@@ -604,7 +625,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
                           'Select sizes',
                           style: GoogleFonts.urbanist(
                             fontSize: 15,
-                            color: AppColors.textHint,
+                            color: context.c.textHint,
                           ),
                         )
                       : Wrap(
@@ -615,7 +636,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 10, vertical: 5),
                               decoration: BoxDecoration(
-                                color: AppColors.primaryLight,
+                                color: context.c.primaryLight,
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
                                   color: AppColors.primary
@@ -653,9 +674,9 @@ class _EditListingScreenState extends State<EditListingScreen> {
                           }).toList(),
                         ),
                 ),
-                const Icon(
+                Icon(
                   Icons.keyboard_arrow_down_rounded,
-                  color: AppColors.textSecondary,
+                  color: context.c.textSecondary,
                 ),
               ],
             ),
@@ -684,6 +705,20 @@ class _EditListingScreenState extends State<EditListingScreen> {
           maxLines: 4,
           keyboardType: TextInputType.multiline,
           textInputAction: TextInputAction.newline,
+        ),
+        const SizedBox(height: 16),
+        _buildDropdownSelector(
+          label: 'Category',
+          value: _selectedCategory,
+          placeholder: 'Select a category',
+          onTap: () {
+            _showSimpleBottomSheet(
+              title: 'Select Category',
+              options: _apiCategoryNames,
+              selected: _selectedCategory,
+              onSelect: (cat) => setState(() => _selectedCategory = cat),
+            );
+          },
         ),
         const SizedBox(height: 16),
 
@@ -725,7 +760,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
                 style: GoogleFonts.urbanist(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondary,
+                  color: context.c.textSecondary,
                 ),
               ),
               const SizedBox(height: 6),
@@ -740,21 +775,21 @@ class _EditListingScreenState extends State<EditListingScreen> {
                       ],
                       style: GoogleFonts.urbanist(
                         fontSize: 15,
-                        color: AppColors.textPrimary,
+                        color: context.c.textPrimary,
                       ),
                       decoration: InputDecoration(
                         hintText: '0',
                         hintStyle: GoogleFonts.urbanist(
                           fontSize: 15,
-                          color: AppColors.textHint,
+                          color: context.c.textHint,
                         ),
-                        prefixIcon: const Icon(
+                        prefixIcon: Icon(
                           Icons.calendar_today_outlined,
                           size: 18,
-                          color: AppColors.textSecondary,
+                          color: context.c.textSecondary,
                         ),
                         filled: true,
-                        fillColor: const Color(0xFFF2F2F2),
+                        fillColor: context.c.surfaceElevated,
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 18, vertical: 16),
                         border: OutlineInputBorder(
@@ -778,7 +813,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 18, vertical: 16),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryLight,
+                      color: context.c.primaryLight,
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Text(
@@ -843,14 +878,14 @@ class _EditListingScreenState extends State<EditListingScreen> {
           style: GoogleFonts.urbanist(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: AppColors.textSecondary,
+            color: context.c.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
             activeTrackColor: AppColors.primary,
-            inactiveTrackColor: AppColors.primaryLight,
+            inactiveTrackColor: context.c.primaryLight,
             thumbColor: AppColors.primary,
             overlayColor: AppColors.primary.withValues(alpha: 0.12),
             rangeThumbShape:
@@ -887,7 +922,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
           style: GoogleFonts.urbanist(
             fontSize: 11,
             fontWeight: FontWeight.w500,
-            color: AppColors.textHint,
+            color: context.c.textHint,
           ),
         ),
         const SizedBox(height: 4),
@@ -895,7 +930,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
           decoration: BoxDecoration(
-            color: const Color(0xFFF2F2F2),
+            color: context.c.surfaceElevated,
             borderRadius: BorderRadius.circular(14),
           ),
           child: Row(
@@ -904,7 +939,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryLight,
+                  color: context.c.primaryLight,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -923,7 +958,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
                   style: GoogleFonts.urbanist(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: context.c.textPrimary,
                   ),
                 ),
               ),
@@ -962,7 +997,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
             style: GoogleFonts.urbanist(
               fontSize: 11,
               fontWeight: FontWeight.w500,
-              color: AppColors.textHint,
+              color: context.c.textHint,
             ),
           ),
           const SizedBox(height: 4),
@@ -972,21 +1007,21 @@ class _EditListingScreenState extends State<EditListingScreen> {
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             style: GoogleFonts.urbanist(
               fontSize: 14,
-              color: AppColors.textPrimary,
+              color: context.c.textPrimary,
             ),
             decoration: InputDecoration(
               hintText: '0',
               hintStyle: GoogleFonts.urbanist(
                 fontSize: 14,
-                color: AppColors.textHint,
+                color: context.c.textHint,
               ),
-              prefixIcon: const Icon(
+              prefixIcon: Icon(
                 Icons.access_time_rounded,
                 size: 18,
-                color: AppColors.textSecondary,
+                color: context.c.textSecondary,
               ),
               filled: true,
-              fillColor: const Color(0xFFF2F2F2),
+              fillColor: context.c.surfaceElevated,
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
               border: OutlineInputBorder(
@@ -1018,7 +1053,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
           style: GoogleFonts.urbanist(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: AppColors.textSecondary,
+            color: context.c.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
@@ -1114,7 +1149,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
   Widget build(BuildContext context) {
     final label = _isService ? 'Service' : 'Product';
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       appBar: _buildAppBar(),
       body: Column(
         children: [
@@ -1126,9 +1161,9 @@ class _EditListingScreenState extends State<EditListingScreen> {
           ),
           Container(
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(top: BorderSide(color: AppColors.border)),
+            decoration: BoxDecoration(
+              color: context.c.surface,
+              border: Border(top: BorderSide(color: context.c.border)),
             ),
             child: AppButton.primary(
               'Update $label',
@@ -1147,6 +1182,37 @@ class _EditListingScreenState extends State<EditListingScreen> {
                 final price =
                     num.tryParse(priceText.replaceAll(',', '').trim());
                 if (price != null) changes['basePrice'] = price;
+
+                // Resolve category name → id (only if it maps to a known one).
+                if (_selectedCategory != null) {
+                  final match = _apiCategories
+                      .where((c) => c.name == _selectedCategory)
+                      .toList();
+                  if (match.isNotEmpty) changes['categoryId'] = match.first.id;
+                }
+
+                if (_isService) {
+                  // Send the single filled duration box as value + unit.
+                  final durByUnit = <String, int?>{
+                    'Days': int.tryParse(_durationDaysCtrl.text.trim()),
+                    'Hours': int.tryParse(_durationHoursCtrl.text.trim()),
+                    'Mins': int.tryParse(_durationMinsCtrl.text.trim()),
+                  };
+                  final filled = _durationUnits.firstWhere(
+                    (u) => (durByUnit[u] ?? 0) > 0,
+                    orElse: () => '',
+                  );
+                  if (filled.isNotEmpty) {
+                    changes['durationValue'] = durByUnit[filled];
+                    changes['durationUnit'] = filled;
+                  }
+                  changes['cancellationPolicy'] = _selectedCancellationPolicy;
+                } else {
+                  final sku = _skuCtrl.text.trim();
+                  changes['sku'] = sku.isEmpty ? null : sku;
+                  changes['stockQuantity'] =
+                      int.tryParse(_quantityCtrl.text.trim());
+                }
                 try {
                   await ListingsRepository().update(listing.id, changes);
                   if (!mounted) return;
@@ -1187,10 +1253,10 @@ class _NairaPrefix extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
+          Icon(
             Icons.account_balance_wallet_outlined,
             size: 18,
-            color: AppColors.textSecondary,
+            color: context.c.textSecondary,
           ),
           const SizedBox(width: 4),
           Text(
@@ -1198,7 +1264,7 @@ class _NairaPrefix extends StatelessWidget {
             style: GoogleFonts.urbanist(
               fontSize: 15,
               fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
+              color: context.c.textPrimary,
             ),
           ),
         ],

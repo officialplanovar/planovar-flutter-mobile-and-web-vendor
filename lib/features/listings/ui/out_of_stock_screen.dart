@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/theme/app_colors.dart';
 import '../bloc/listings_cubit.dart';
-import '../../../core/router/app_routes.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../shared/models/listing_model.dart';
 import '../../../shared/widgets/network_image_widget.dart';
@@ -50,6 +49,29 @@ class _OutOfStockScreenState extends State<OutOfStockScreen> {
   }
 
   // ── Helpers ────────────────────────────────────────────────────────────────
+
+  Future<void> _reactivate(ListingModel listing) async {
+    final cubit = context.read<ListingsCubit>();
+    final messenger = ScaffoldMessenger.of(context);
+    final noun = listing.pricingType == 'FIXED' && !listing.isRentable
+        ? 'Product'
+        : listing.isRentable
+            ? 'Rental'
+            : 'Service';
+    try {
+      await cubit.toggleActive(listing.id, true);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('$noun reactivated'),
+          backgroundColor: AppColors.success,
+        ),
+      );
+    } catch (e) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+      );
+    }
+  }
 
   String _listingTypeBadge(ListingModel listing) {
     if (listing.isRentable) return 'Product (Rental)';
@@ -145,10 +167,10 @@ class _OutOfStockScreenState extends State<OutOfStockScreen> {
               duration: const Duration(milliseconds: 200),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: isActive ? AppColors.primary : Colors.white,
+                color: isActive ? AppColors.primary : context.c.surface,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: isActive ? AppColors.primary : AppColors.border,
+                  color: isActive ? AppColors.primary : context.c.border,
                 ),
               ),
               child: Text(
@@ -156,7 +178,7 @@ class _OutOfStockScreenState extends State<OutOfStockScreen> {
                 style: GoogleFonts.urbanist(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: isActive ? Colors.white : AppColors.textSecondary,
+                  color: isActive ? Colors.white : context.c.textSecondary,
                 ),
               ),
             ),
@@ -175,7 +197,7 @@ class _OutOfStockScreenState extends State<OutOfStockScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.c.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -230,7 +252,7 @@ class _OutOfStockScreenState extends State<OutOfStockScreen> {
                                   style: GoogleFonts.urbanist(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w700,
-                                    color: AppColors.textPrimary,
+                                    color: context.c.textPrimary,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -244,7 +266,7 @@ class _OutOfStockScreenState extends State<OutOfStockScreen> {
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 8, vertical: 2),
                                       decoration: BoxDecoration(
-                                        color: AppColors.primaryLight,
+                                        color: context.c.primaryLight,
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: Text(
@@ -263,7 +285,7 @@ class _OutOfStockScreenState extends State<OutOfStockScreen> {
                                           listing.categoryName!,
                                           style: GoogleFonts.urbanist(
                                             fontSize: 12,
-                                            color: AppColors.textSecondary,
+                                            color: context.c.textSecondary,
                                           ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
@@ -280,7 +302,7 @@ class _OutOfStockScreenState extends State<OutOfStockScreen> {
                                   style: GoogleFonts.urbanist(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w700,
-                                    color: AppColors.textPrimary,
+                                    color: context.c.textPrimary,
                                   ),
                                 ),
                               ],
@@ -313,17 +335,17 @@ class _OutOfStockScreenState extends State<OutOfStockScreen> {
                               // Eye + view count
                               Row(
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     Icons.remove_red_eye_outlined,
                                     size: 13,
-                                    color: AppColors.textHint,
+                                    color: context.c.textHint,
                                   ),
                                   const SizedBox(width: 3),
                                   Text(
                                     '${listing.viewCount}',
                                     style: GoogleFonts.urbanist(
                                       fontSize: 12,
-                                      color: AppColors.textSecondary,
+                                      color: context.c.textSecondary,
                                     ),
                                   ),
                                 ],
@@ -335,12 +357,11 @@ class _OutOfStockScreenState extends State<OutOfStockScreen> {
 
                       const SizedBox(height: 12),
 
-                      // Re stock button — full width
+                      // Re stock button — reactivates the listing
                       SizedBox(
                         width: double.infinity,
                         child: GestureDetector(
-                          onTap: () =>
-                              context.push(AppRoutes.editListingPath(listing.id)),
+                          onTap: () => _reactivate(listing),
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             decoration: BoxDecoration(
@@ -392,7 +413,7 @@ class _OutOfStockScreenState extends State<OutOfStockScreen> {
             style: GoogleFonts.urbanist(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
+              color: context.c.textSecondary,
             ),
           ),
           const SizedBox(height: 4),
@@ -400,7 +421,7 @@ class _OutOfStockScreenState extends State<OutOfStockScreen> {
             'No out-of-stock items in this category',
             style: GoogleFonts.urbanist(
               fontSize: 13,
-              color: AppColors.textHint,
+              color: context.c.textHint,
             ),
           ),
         ],
@@ -416,7 +437,7 @@ class _OutOfStockScreenState extends State<OutOfStockScreen> {
     final listings = _filteredListings;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.c.background,
       body: Column(
         children: [
           _buildAppBar(context),

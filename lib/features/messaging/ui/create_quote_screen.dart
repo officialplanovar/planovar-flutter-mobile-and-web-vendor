@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/services/messaging_service.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../shared/models/chat_card_models.dart';
 import '../../../shared/models/conversation_model.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../data/quotes_repository.dart';
@@ -11,15 +12,31 @@ import '../data/quotes_repository.dart';
 class CreateQuoteScreen extends StatefulWidget {
   final String conversationId;
 
-  /// When set, the quote is sent to the API against this booking inquiry
-  /// (opened from the order-detail "Send Quote" action). Without it the
-  /// screen is the chat-flow preview (messaging wiring lands in Phase 4).
+  /// Legacy: send against an existing booking inquiry (old quote flow).
   final String? bookingId;
+
+  /// New chat-order flow — when [clientId] + [listingId] are set, the quote is
+  /// sent as a chat card via /chat-orders/quotes (direct-pay model).
+  final String? clientId;
+  final String? listingId;
+  final String? eventId;
+
+  /// When set, this replaces (revises) an existing active quote instead of
+  /// sending a new one.
+  final String? reviseQuoteId;
+
+  /// The existing quote to prefill the form with (for revise).
+  final ChatQuote? initialQuote;
 
   const CreateQuoteScreen({
     super.key,
     required this.conversationId,
     this.bookingId,
+    this.clientId,
+    this.listingId,
+    this.eventId,
+    this.reviseQuoteId,
+    this.initialQuote,
   });
 
   @override
@@ -53,19 +70,41 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
     return match != null ? int.parse(match.group(0)!) : 7;
   }
 
-  Future<void> _submit() async {
-    final bookingId = widget.bookingId;
-    if (bookingId == null || bookingId.isEmpty) {
-      // Chat-flow preview — real in-chat quoting ships with messaging (Phase 4).
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('In-chat quotes arrive with messaging — '
-                'send quotes from a booking inquiry for now')),
-      );
-      return;
+  /// The payment terms selection → milestone inputs for the API. "Pay at once"
+  /// sends no terms (backend uses a single 100% milestone).
+  List<QuotePaymentTermInput> _buildPaymentTerms() {
+    switch (_paymentTerm) {
+      case '50/50':
+        return const [
+          QuotePaymentTermInput(
+              label: 'On Confirmation', percentage: 50, dueLabel: 'Due on confirmation'),
+          QuotePaymentTermInput(
+              label: 'After Event', percentage: 50, dueLabel: 'After the event'),
+        ];
+      case '30/70':
+        return const [
+          QuotePaymentTermInput(
+              label: 'On Confirmation', percentage: 30, dueLabel: 'Due on confirmation'),
+          QuotePaymentTermInput(
+              label: 'After Event', percentage: 70, dueLabel: 'After the event'),
+        ];
+      case 'Custom':
+        return [
+          QuotePaymentTermInput(
+              label: 'Milestone 1',
+              percentage: double.tryParse(_m1PercentCtrl.text) ?? 50,
+              dueLabel: 'Due on confirmation'),
+          QuotePaymentTermInput(
+              label: 'Milestone 2',
+              percentage: double.tryParse(_m2PercentCtrl.text) ?? 50,
+              dueLabel: 'After the event'),
+        ];
+      default:
+        return const [];
     }
+  }
 
+  Future<void> _submit() async {
     final lineItems = _items
         .map((i) => QuoteLineItemInput(
               label: i.desc.text.trim(),
@@ -82,10 +121,77 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
       );
       return;
     }
+    final note = _noteController.text.trim();
+
+    // ── Revise an existing active quote ──
+    if (widget.reviseQuoteId != null) {
+      setState(() => _sending = true);
+      try {
+        await QuotesRepository().reviseQuote(
+          quoteId: widget.reviseQuoteId!,
+          lineItems: lineItems,
+          paymentTerms: _buildPaymentTerms(),
+          validUntil: DateTime.now().add(Duration(days: _validDays)),
+          notes: note.isEmpty ? null : note,
+        );
+        if (!mounted) return;
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Revised quote sent 🎉')),
+        );
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+        );
+      } finally {
+        if (mounted) setState(() => _sending = false);
+      }
+      return;
+    }
+
+    // ── New chat-order flow (client + listing context) ──
+    if (widget.clientId != null && widget.listingId != null) {
+      setState(() => _sending = true);
+      try {
+        await QuotesRepository().sendQuote(
+          clientId: widget.clientId!,
+          listingId: widget.listingId!,
+          eventId: widget.eventId,
+          lineItems: lineItems,
+          paymentTerms: _buildPaymentTerms(),
+          validForDays: _validDays,
+          notes: note.isEmpty ? null : note,
+        );
+        if (!mounted) return;
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Quote sent to the client 🎉')),
+        );
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+        );
+      } finally {
+        if (mounted) setState(() => _sending = false);
+      }
+      return;
+    }
+
+    // ── Legacy booking-inquiry flow ──
+    final bookingId = widget.bookingId;
+    if (bookingId == null || bookingId.isEmpty) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Open this from a client chat or inquiry to send a quote')),
+      );
+      return;
+    }
 
     setState(() => _sending = true);
     try {
-      final note = _noteController.text.trim();
       await QuotesRepository().create(
         bookingId: bookingId,
         lineItems: lineItems,
@@ -126,15 +232,59 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
         if (match.isNotEmpty) setState(() => _conv = match.first);
       }).catchError((_) {});
     }
-    _items = [
-      _LineItem(descText: '', amountText: ''),
-    ];
-    // Rebuild on item amount changes
+
+    final q = widget.initialQuote;
+    // Prefill line items from the existing quote (revise), else one empty row.
+    _items = (q != null && q.lineItems.isNotEmpty)
+        ? q.lineItems
+            .map((li) => _LineItem(
+                  descText: li.label,
+                  amountText: li.amount.toInt().toString(),
+                ))
+            .toList()
+        : [_LineItem(descText: '', amountText: '')];
     for (final item in _items) {
       item.amount.addListener(() => setState(() {}));
     }
+
+    if (q != null) {
+      _noteController.text = q.notes ?? '';
+      _validFor = _closestValidFor(q.validUntil.difference(DateTime.now()).inDays);
+      final terms = q.paymentTerms;
+      if (terms.length == 2) {
+        final p1 = terms[0].percentage.round();
+        final p2 = terms[1].percentage.round();
+        if (p1 == 50 && p2 == 50) {
+          _paymentTerm = '50/50';
+        } else if (p1 == 30 && p2 == 70) {
+          _paymentTerm = '30/70';
+        } else {
+          _paymentTerm = 'Custom';
+          _m1PercentCtrl.text = '$p1';
+          _m2PercentCtrl.text = '$p2';
+        }
+      } else {
+        _paymentTerm = 'Pay at once';
+      }
+    }
+
     _m1PercentCtrl.addListener(() => setState(() {}));
     _m2PercentCtrl.addListener(() => setState(() {}));
+  }
+
+  String _closestValidFor(int days) {
+    const opts = {1: '1 Day', 3: '3 Days', 7: '7 Days', 14: '14 Days', 30: '30 Days'};
+    if (days <= 0) return '7 Days';
+    var best = 7;
+    var bestDiff = 1 << 30;
+    for (final k in opts.keys) {
+      final d = (k - days).abs();
+      if (d < bestDiff) {
+        bestDiff = d;
+        best = k;
+      }
+    }
+    return opts[best]!;
   }
 
   @override
@@ -172,6 +322,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
     final options = ['1 Day', '3 Days', '7 Days', '14 Days', '30 Days'];
     await showModalBottomSheet(
       context: context,
+      backgroundColor: context.c.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -183,7 +334,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.border,
+              color: ctx.c.border,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -193,7 +344,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
             style: GoogleFonts.urbanist(
               fontSize: 16,
               fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
+              color: ctx.c.textPrimary,
             ),
           ),
           const SizedBox(height: 8),
@@ -204,7 +355,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
                 style: GoogleFonts.urbanist(
                   fontSize: 15,
                   fontWeight: _validFor == opt ? FontWeight.w700 : FontWeight.w500,
-                  color: _validFor == opt ? AppColors.primary : AppColors.textPrimary,
+                  color: _validFor == opt ? AppColors.primary : ctx.c.textPrimary,
                 ),
               ),
               trailing: _validFor == opt
@@ -249,7 +400,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Create quote',
+                widget.reviseQuoteId != null ? 'Revise quote' : 'Create quote',
                 style: GoogleFonts.urbanist(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
@@ -276,7 +427,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
       style: GoogleFonts.urbanist(
         fontSize: 16,
         fontWeight: FontWeight.w700,
-        color: AppColors.textPrimary,
+        color: context.c.textPrimary,
       ),
     );
   }
@@ -293,16 +444,16 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
               controller: item.desc,
               style: GoogleFonts.urbanist(
                 fontSize: 14,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
               decoration: InputDecoration(
                 hintText: 'Description',
                 hintStyle: GoogleFonts.urbanist(
                   fontSize: 14,
-                  color: AppColors.textHint,
+                  color: context.c.textHint,
                 ),
                 filled: true,
-                fillColor: const Color(0xFFF2F2F2),
+                fillColor: context.c.surfaceElevated,
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                 border: OutlineInputBorder(
@@ -330,16 +481,16 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               style: GoogleFonts.urbanist(
                 fontSize: 14,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
               decoration: InputDecoration(
                 hintText: 'Amount',
                 hintStyle: GoogleFonts.urbanist(
                   fontSize: 14,
-                  color: AppColors.textHint,
+                  color: context.c.textHint,
                 ),
                 filled: true,
-                fillColor: const Color(0xFFF2F2F2),
+                fillColor: context.c.surfaceElevated,
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                 border: OutlineInputBorder(
@@ -403,7 +554,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
         style: GoogleFonts.urbanist(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: AppColors.textPrimary,
+          color: context.c.textPrimary,
         ),
       ),
     );
@@ -424,8 +575,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
                 border: Border.all(
-                  color:
-                      isActive ? AppColors.primary : const Color(0xFFCCCCCC),
+                  color: isActive ? AppColors.primary : context.c.border,
                   width: 1.5,
                 ),
                 borderRadius: BorderRadius.circular(24),
@@ -436,7 +586,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color:
-                      isActive ? AppColors.primary : AppColors.textSecondary,
+                      isActive ? AppColors.primary : context.c.textSecondary,
                 ),
               ),
             ),
@@ -459,8 +609,8 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: AppColors.border),
+        color: context.c.surface,
+        border: Border.all(color: context.c.border),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
@@ -471,7 +621,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
             style: GoogleFonts.urbanist(
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: context.c.textPrimary,
             ),
           ),
           const SizedBox(height: 10),
@@ -488,11 +638,11 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
                     style: GoogleFonts.urbanist(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                     ),
                     decoration: InputDecoration(
                       filled: true,
-                      fillColor: const Color(0xFFF2F2F2),
+                      fillColor: context.c.surfaceElevated,
                       contentPadding:
                           const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                       border: OutlineInputBorder(
@@ -517,7 +667,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
                   height: 36,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF2F2F2),
+                    color: context.c.surfaceElevated,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -525,7 +675,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
                     style: GoogleFonts.urbanist(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                     ),
                   ),
                 ),
@@ -568,7 +718,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
                   dueLabel,
                   style: GoogleFonts.urbanist(
                     fontSize: 12,
-                    color: AppColors.textSecondary,
+                    color: context.c.textSecondary,
                   ),
                 ),
               ),
@@ -584,7 +734,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
                 style: GoogleFonts.urbanist(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: context.c.textPrimary,
                 ),
               ),
             ],
@@ -654,7 +804,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.background,
       appBar: _buildGradientAppBar() as PreferredSizeWidget,
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 24, 20, 120),
@@ -688,16 +838,16 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
               keyboardType: TextInputType.multiline,
               style: GoogleFonts.urbanist(
                 fontSize: 15,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
               decoration: InputDecoration(
                 hintText: 'Short description of the product',
                 hintStyle: GoogleFonts.urbanist(
                   fontSize: 15,
-                  color: AppColors.textHint,
+                  color: context.c.textHint,
                 ),
                 filled: true,
-                fillColor: const Color(0xFFF2F2F2),
+                fillColor: context.c.surfaceElevated,
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
                 border: OutlineInputBorder(
@@ -725,7 +875,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF2F2F2),
+                  color: context.c.surfaceElevated,
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Row(
@@ -736,11 +886,11 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
                       style: GoogleFonts.urbanist(
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
-                        color: AppColors.textPrimary,
+                        color: context.c.textPrimary,
                       ),
                     ),
-                    const Icon(Icons.keyboard_arrow_down_rounded,
-                        color: AppColors.textSecondary),
+                    Icon(Icons.keyboard_arrow_down_rounded,
+                        color: context.c.textSecondary),
                   ],
                 ),
               ),
@@ -755,14 +905,16 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
           20,
           MediaQuery.of(context).padding.bottom + 16,
         ),
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          color: context.c.surface,
           border: Border(
-            top: BorderSide(color: AppColors.border),
+            top: BorderSide(color: context.c.border),
           ),
         ),
         child: AppButton.primary(
-          _sending ? 'Sending…' : 'Create Quote',
+          _sending
+              ? 'Sending…'
+              : (widget.reviseQuoteId != null ? 'Send revised quote' : 'Create Quote'),
           loading: _sending,
           onTap: _sending ? null : _submit,
         ),

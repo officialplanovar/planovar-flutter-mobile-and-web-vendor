@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../shared/widgets/app_icon.dart';
 import '../../../shared/models/order_model.dart';
 import '../bloc/orders_cubit.dart';
 
@@ -51,18 +52,18 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
     final bottomInset = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.c.surface,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1, color: AppColors.divider),
+          child: Container(height: 1, color: context.c.divider),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded,
-              color: AppColors.textPrimary),
+          icon: Icon(Icons.arrow_back_rounded,
+              color: context.c.textPrimary),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Column(
@@ -73,7 +74,7 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
               style: GoogleFonts.urbanist(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
             ),
             if (order != null)
@@ -81,7 +82,7 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
                 '${order.orderNumber} · ${order.clientName}',
                 style: GoogleFonts.urbanist(
                   fontSize: 12,
-                  color: AppColors.textSecondary,
+                  color: context.c.textSecondary,
                 ),
               ),
           ],
@@ -96,7 +97,7 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFFEEEEF8),
+                color: context.c.primaryLight,
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                   color: AppColors.primary.withValues(alpha: 0.5),
@@ -118,7 +119,7 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
                       'Try messaging the client first — most issues are resolved quickly.',
                       style: GoogleFonts.urbanist(
                         fontSize: 13,
-                        color: AppColors.textSecondary,
+                        color: context.c.textSecondary,
                         height: 1.5,
                       ),
                     ),
@@ -134,7 +135,7 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
               style: GoogleFonts.urbanist(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
             ),
             const SizedBox(height: 14),
@@ -148,12 +149,12 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 16, vertical: 14),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: context.c.surface,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: selected
                           ? AppColors.primary
-                          : const Color(0xFFE0E0E0),
+                          : context.c.border,
                       width: 1.5,
                     ),
                   ),
@@ -165,7 +166,7 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
                           selected ? FontWeight.w700 : FontWeight.w400,
                       color: selected
                           ? AppColors.primary
-                          : AppColors.textPrimary,
+                          : context.c.textPrimary,
                     ),
                   ),
                 ),
@@ -179,7 +180,7 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
               style: GoogleFonts.urbanist(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
             ),
             const SizedBox(height: 12),
@@ -189,16 +190,16 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
               maxLines: 10,
               style: GoogleFonts.urbanist(
                 fontSize: 14,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
               decoration: InputDecoration(
                 filled: true,
-                fillColor: AppColors.backgroundLight,
+                fillColor: context.c.surfaceElevated,
                 hintText:
                     'Describe what happened in detail, include dates, amounts, and any relevant context',
                 hintStyle: GoogleFonts.urbanist(
                   fontSize: 13,
-                  color: AppColors.textHint,
+                  color: context.c.textHint,
                   height: 1.5,
                 ),
                 contentPadding: const EdgeInsets.all(16),
@@ -225,7 +226,7 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
               style: GoogleFonts.urbanist(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
             ),
             const SizedBox(height: 12),
@@ -247,11 +248,8 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
-                          Icons.photo_library_outlined,
-                          color: AppColors.primary,
-                          size: 28,
-                        ),
+                        const AppIcon('photo',
+                            size: 28, color: AppColors.primary),
                         const SizedBox(height: 8),
                         Text(
                           'Upload Image',
@@ -273,9 +271,9 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
 
       // ── Bottom Bar ─────────────────────────────────────────────────────
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: AppColors.divider)),
+        decoration: BoxDecoration(
+          color: context.c.surface,
+          border: Border(top: BorderSide(color: context.c.divider)),
         ),
         padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + bottomInset),
         child: Column(
@@ -342,7 +340,7 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
               child: Container(
                 height: 52,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: context.c.surface,
                   borderRadius: BorderRadius.circular(28),
                   border: Border.all(
                       color: AppColors.primary, width: 1.5),

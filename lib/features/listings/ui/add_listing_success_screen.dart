@@ -4,8 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/app_button.dart';
+import '../../vendor/data/vendor_repository.dart';
 
-class AddListingSuccessScreen extends StatelessWidget {
+class AddListingSuccessScreen extends StatefulWidget {
   final String productId;
   final String sku;
   final bool isService;
@@ -17,6 +18,22 @@ class AddListingSuccessScreen extends StatelessWidget {
     this.isService = false,
   });
 
+  @override
+  State<AddListingSuccessScreen> createState() =>
+      _AddListingSuccessScreenState();
+}
+
+class _AddListingSuccessScreenState extends State<AddListingSuccessScreen> {
+  bool? _verified; // null = still loading
+
+  @override
+  void initState() {
+    super.initState();
+    VendorRepository().getMe().then((v) {
+      if (mounted && v != null) setState(() => _verified = v.isVerified);
+    }).catchError((_) {});
+  }
+
   String _formattedDate() {
     final now = DateTime.now();
     return DateFormat('MMM d, yyyy').format(now);
@@ -24,13 +41,17 @@ class AddListingSuccessScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final label = isService ? 'Service' : 'Product';
-    final subtitle = isService
-        ? 'Your service has been added successfully and is currently Live'
-        : 'Your product has been added successfully and is currently Live';
+    final label = widget.isService ? 'Service' : 'Product';
+    final pending = _verified == false;
+    final subtitle = pending
+        ? 'Your $label has been saved. It will become visible to clients once '
+            'your account is verified.'
+        : (widget.isService
+            ? 'Your service has been added successfully and is currently Live'
+            : 'Your product has been added successfully and is currently Live');
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.c.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -76,7 +97,7 @@ class AddListingSuccessScreen extends StatelessWidget {
                               style: GoogleFonts.urbanist(
                                 fontSize: 26,
                                 fontWeight: FontWeight.w800,
-                                color: AppColors.textPrimary,
+                                color: context.c.textPrimary,
                               ),
                             ),
                             TextSpan(
@@ -99,10 +120,43 @@ class AddListingSuccessScreen extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: GoogleFonts.urbanist(
                           fontSize: 14,
-                          color: AppColors.textSecondary,
+                          color: context.c.textSecondary,
                           height: 1.5,
                         ),
                       ),
+
+                      if (pending) ...[
+                        const SizedBox(height: 20),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFF7ED),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: const Color(0xFFFDBA74)),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Icon(Icons.hourglass_bottom_rounded,
+                                  size: 20, color: Color(0xFFEA580C)),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  "Pending verification — clients can't see your "
+                                  'listings until an admin verifies your account. '
+                                  "We'll let you know once you're approved.",
+                                  style: GoogleFonts.urbanist(
+                                    fontSize: 13,
+                                    color: const Color(0xFF9A3412),
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
 
                       const SizedBox(height: 36),
 
@@ -110,24 +164,27 @@ class AddListingSuccessScreen extends StatelessWidget {
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.c.surface,
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: AppColors.border),
+                          border: Border.all(color: context.c.border),
                         ),
                         child: Column(
                           children: [
                             _buildInfoRow(
+                              context,
                               label: '$label ID',
-                              value: productId,
+                              value: widget.productId,
                               isFirst: true,
                             ),
-                            const Divider(height: 1, color: AppColors.border),
+                            Divider(height: 1, color: context.c.border),
                             _buildInfoRow(
+                              context,
                               label: 'SKU',
-                              value: sku,
+                              value: widget.sku,
                             ),
-                            const Divider(height: 1, color: AppColors.border),
+                            Divider(height: 1, color: context.c.border),
                             _buildInfoRow(
+                              context,
                               label: 'Date Created',
                               value: _formattedDate(),
                               isLast: true,
@@ -157,7 +214,8 @@ class AddListingSuccessScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow({
+  Widget _buildInfoRow(
+    BuildContext context, {
     required String label,
     required String value,
     bool isFirst = false,
@@ -172,7 +230,7 @@ class AddListingSuccessScreen extends StatelessWidget {
             label,
             style: GoogleFonts.urbanist(
               fontSize: 13,
-              color: AppColors.textSecondary,
+              color: context.c.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -180,7 +238,7 @@ class AddListingSuccessScreen extends StatelessWidget {
             value,
             style: GoogleFonts.urbanist(
               fontSize: 14,
-              color: AppColors.textPrimary,
+              color: context.c.textPrimary,
               fontWeight: FontWeight.w700,
             ),
           ),

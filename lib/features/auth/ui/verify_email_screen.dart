@@ -54,14 +54,14 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
     final canProceed = _otp.length == 6;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.c.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_rounded,
-            color: AppColors.textPrimary,
+            color: context.c.textPrimary,
           ),
           onPressed: () => context.pop(),
         ),
@@ -75,8 +75,8 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
             Container(
               width: 90,
               height: 90,
-              decoration: const BoxDecoration(
-                color: AppColors.primaryLight,
+              decoration: BoxDecoration(
+                color: context.c.primaryLight,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -92,7 +92,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               style: GoogleFonts.urbanist(
                 fontSize: 26,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -101,7 +101,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               "We've sent a 6-digit OTP to your email",
               style: GoogleFonts.urbanist(
                 fontSize: 15,
-                color: AppColors.textSecondary,
+                color: context.c.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -112,7 +112,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
               decoration: BoxDecoration(
-                color: AppColors.primaryLight,
+                color: context.c.primaryLight,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
@@ -152,11 +152,11 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                       fieldHeight: 56,
                       fieldWidth: 48,
                       borderWidth: 1.5,
-                      activeFillColor: Colors.white,
-                      selectedFillColor: Colors.white,
-                      inactiveFillColor: Colors.white,
+                      activeFillColor: context.c.surface,
+                      selectedFillColor: context.c.surface,
+                      inactiveFillColor: context.c.surface,
                       // visible outline on empty boxes (divider #F3F4F6 is too faint)
-                      inactiveColor: AppColors.border,
+                      inactiveColor: context.c.border,
                       selectedColor: AppColors.primary,
                       activeColor: AppColors.primary,
                     ),
@@ -165,7 +165,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                     textStyle: GoogleFonts.urbanist(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                     ),
                   ),
                 ),
@@ -208,7 +208,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                 'Resend code in ${_countdown}s',
                 style: GoogleFonts.urbanist(
                   fontSize: 14,
-                  color: AppColors.textSecondary,
+                  color: context.c.textSecondary,
                 ),
               )
             else

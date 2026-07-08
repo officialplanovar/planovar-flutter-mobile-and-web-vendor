@@ -51,7 +51,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -112,7 +112,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
     final topPadding = MediaQuery.of(context).padding.top;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.c.background,
       body: Column(
         children: [
           // Gradient AppBar
@@ -169,7 +169,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                         Text('Could not load reviews',
                             style: GoogleFonts.urbanist(
                                 fontSize: 14,
-                                color: AppColors.textSecondary)),
+                                color: context.c.textSecondary)),
                         const SizedBox(height: 12),
                         AppButton.secondary('Retry', onTap: _reload),
                       ],
@@ -182,20 +182,20 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.reviews_outlined,
-                            size: 44, color: AppColors.textHint),
+                        Icon(Icons.reviews_outlined,
+                            size: 44, color: context.c.textHint),
                         const SizedBox(height: 12),
                         Text('No reviews yet',
                             style: GoogleFonts.urbanist(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary)),
+                                color: context.c.textPrimary)),
                         const SizedBox(height: 4),
                         Text(
                             'Complete bookings and your client reviews will appear here.',
                             style: GoogleFonts.urbanist(
                                 fontSize: 13,
-                                color: AppColors.textSecondary)),
+                                color: context.c.textSecondary)),
                       ],
                     ),
                   );
@@ -225,7 +225,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.c.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -248,7 +248,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                       Text('$star',
                           style: GoogleFonts.urbanist(
                               fontSize: 12,
-                              color: AppColors.textSecondary)),
+                              color: context.c.textSecondary)),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Stack(
@@ -256,7 +256,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                             Container(
                               height: 6,
                               decoration: BoxDecoration(
-                                color: AppColors.divider,
+                                color: context.c.divider,
                                 borderRadius: BorderRadius.circular(3),
                               ),
                             ),
@@ -286,7 +286,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                   style: GoogleFonts.urbanist(
                       fontSize: 40,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary)),
+                      color: context.c.textPrimary)),
               Row(
                 children: List.generate(
                   5,
@@ -294,13 +294,13 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                       size: 16,
                       color: i < page.averageRating.floor()
                           ? AppColors.starColor
-                          : AppColors.divider),
+                          : context.c.divider),
                 ),
               ),
               const SizedBox(height: 4),
               Text('(${page.total} Reviews)',
                   style: GoogleFonts.urbanist(
-                      fontSize: 12, color: AppColors.textSecondary)),
+                      fontSize: 12, color: context.c.textSecondary)),
             ],
           ),
         ],
@@ -318,7 +318,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
             children: [
               CircleAvatar(
                 radius: 22,
-                backgroundColor: AppColors.primaryLight,
+                backgroundColor: context.c.primaryLight,
                 child: review.reviewerImage != null
                     ? ClipOval(
                         child: AppNetworkImage(
@@ -347,7 +347,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                         style: GoogleFonts.urbanist(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary)),
+                            color: context.c.textPrimary)),
                     Row(
                       children: [
                         ...List.generate(
@@ -356,13 +356,13 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                               size: 14,
                               color: i < review.rating
                                   ? AppColors.starColor
-                                  : AppColors.divider),
+                                  : context.c.divider),
                         ),
                         const SizedBox(width: 4),
                         Text('${review.rating}.0 · ${_timeAgo(review.createdAt)}',
                             style: GoogleFonts.urbanist(
                                 fontSize: 12,
-                                color: AppColors.textSecondary)),
+                                color: context.c.textSecondary)),
                       ],
                     ),
                   ],
@@ -383,9 +383,9 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.c.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.divider),
+              border: Border.all(color: context.c.divider),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -395,19 +395,19 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                       style: GoogleFonts.urbanist(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary)),
+                          color: context.c.textPrimary)),
                   const SizedBox(height: 4),
                 ],
                 Text(review.body,
                     style: GoogleFonts.urbanist(
-                        fontSize: 14, color: AppColors.textPrimary)),
+                        fontSize: 14, color: context.c.textPrimary)),
                 if (review.responseBody != null) ...[
                   const SizedBox(height: 10),
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryLight,
+                      color: context.c.primaryLight,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Column(
@@ -422,7 +422,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                         Text(review.responseBody!,
                             style: GoogleFonts.urbanist(
                                 fontSize: 13,
-                                color: AppColors.textPrimary)),
+                                color: context.c.textPrimary)),
                       ],
                     ),
                   ),

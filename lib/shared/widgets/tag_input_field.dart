@@ -85,7 +85,7 @@ class _TagInputFieldState extends State<TagInputField> {
 
   @override
   Widget build(BuildContext context) {
-    final borderColor = _isFocused ? AppColors.primary : AppColors.border;
+    final borderColor = _isFocused ? AppColors.primary : context.c.border;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,7 +96,7 @@ class _TagInputFieldState extends State<TagInputField> {
           style: GoogleFonts.urbanist(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: AppColors.textSecondary,
+            color: context.c.textSecondary,
           ),
         ),
         const SizedBox(height: 6),
@@ -110,7 +110,7 @@ class _TagInputFieldState extends State<TagInputField> {
             constraints: const BoxConstraints(minHeight: 52),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: const Color(0xFFF2F2F2),
+              color: context.c.surfaceElevated,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
                 color: borderColor,
@@ -149,7 +149,7 @@ class _TagInputFieldState extends State<TagInputField> {
           'Press comma or Enter to add a tag  ·  ${widget.tags.length}/${widget.maxTags}',
           style: GoogleFonts.urbanist(
             fontSize: 11,
-            color: AppColors.textHint,
+            color: context.c.textHint,
           ),
         ),
       ],
@@ -170,7 +170,7 @@ class _TagChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: AppColors.primaryLight,
+        color: context.c.primaryLight,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
       ),
@@ -237,7 +237,7 @@ class _InlineInput extends StatelessWidget {
             hintText: hint,
             hintStyle: GoogleFonts.urbanist(
               fontSize: 14,
-              color: AppColors.textHint,
+              color: context.c.textHint,
             ),
             border: InputBorder.none,
             isDense: true,
@@ -245,7 +245,7 @@ class _InlineInput extends StatelessWidget {
           ),
           style: GoogleFonts.urbanist(
             fontSize: 14,
-            color: AppColors.textPrimary,
+            color: context.c.textPrimary,
           ),
           textInputAction: TextInputAction.done,
           onChanged: (value) {

@@ -43,7 +43,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     final reviewCount = _vendor?.reviewCount ?? 0;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.c.background,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70),
         child: Container(
@@ -119,21 +119,21 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.c.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: context.c.border),
             ),
             child: Column(
               children: [
-                const Icon(Icons.insights_outlined,
-                    size: 40, color: AppColors.textHint),
+                Icon(Icons.insights_outlined,
+                    size: 40, color: context.c.textHint),
                 const SizedBox(height: 12),
                 Text(
                   'Detailed performance analytics',
                   style: GoogleFonts.urbanist(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                    color: context.c.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -142,7 +142,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   textAlign: TextAlign.center,
                   style: GoogleFonts.urbanist(
                     fontSize: 13,
-                    color: AppColors.textSecondary,
+                    color: context.c.textSecondary,
                   ),
                 ),
               ],
@@ -175,9 +175,9 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.c.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.c.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -192,7 +192,7 @@ class _StatCard extends StatelessWidget {
                 style: GoogleFonts.urbanist(
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
+                  color: context.c.textPrimary,
                 ),
               ),
               Text(
@@ -200,14 +200,14 @@ class _StatCard extends StatelessWidget {
                 style: GoogleFonts.urbanist(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: context.c.textPrimary,
                 ),
               ),
               Text(
                 sub,
                 style: GoogleFonts.urbanist(
                   fontSize: 11,
-                  color: AppColors.textSecondary,
+                  color: context.c.textSecondary,
                 ),
               ),
             ],

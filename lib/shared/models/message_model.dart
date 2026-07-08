@@ -1,14 +1,24 @@
 import 'package:equatable/equatable.dart';
+import 'chat_card_models.dart';
 
 class MessageModel extends Equatable {
   final String id;
   final String conversationId;
   final String senderId;
   final String? content;
-  /// 'TEXT' | 'IMAGE' | 'VOICE'
+  /// Raw type (e.g. 'QUOTE'); use [typeLower] for switching on cards.
   final String type;
   final DateTime createdAt;
   final bool isMe;
+  final Map<String, dynamic> metadata;
+
+  // Structured-card payloads (only the one matching the type is set)
+  final ChatQuote? quote;
+  final ChatInvoice? invoice;
+  final ChatBookingRef? booking;
+  final ChatTodo? todo;
+
+  String get typeLower => type.toLowerCase();
 
   const MessageModel({
     required this.id,
@@ -18,7 +28,40 @@ class MessageModel extends Equatable {
     required this.type,
     required this.createdAt,
     required this.isMe,
+    this.metadata = const {},
+    this.quote,
+    this.invoice,
+    this.booking,
+    this.todo,
   });
+
+  /// Parses an API/socket message payload, including structured cards.
+  factory MessageModel.fromApi(Map<String, dynamic> m, String currentUserId) {
+    return MessageModel(
+      id: m['id'] as String,
+      conversationId: m['conversationId'] as String,
+      senderId: m['senderId'] as String,
+      content: m['content'] as String?,
+      type: m['type'] as String? ?? 'TEXT',
+      createdAt: DateTime.parse(m['createdAt'] as String),
+      isMe: m['senderId'] == currentUserId,
+      metadata: m['metadata'] is Map
+          ? Map<String, dynamic>.from(m['metadata'] as Map)
+          : const {},
+      quote: m['quote'] != null
+          ? ChatQuote.fromJson(Map<String, dynamic>.from(m['quote'] as Map))
+          : null,
+      invoice: m['invoice'] != null
+          ? ChatInvoice.fromJson(Map<String, dynamic>.from(m['invoice'] as Map))
+          : null,
+      booking: m['booking'] != null
+          ? ChatBookingRef.fromJson(Map<String, dynamic>.from(m['booking'] as Map))
+          : null,
+      todo: m['todo'] != null
+          ? ChatTodo.fromJson(Map<String, dynamic>.from(m['todo'] as Map))
+          : null,
+    );
+  }
 
   factory MessageModel.fromJson(Map<String, dynamic> json) {
     return MessageModel(

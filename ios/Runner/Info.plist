@@ -18,6 +18,8 @@
 	<string>6.0</string>
 	<key>CFBundleName</key>
 	<string>planovar_vendor</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Planovar uses your location to auto-fill your city when setting up your vendor profile.</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

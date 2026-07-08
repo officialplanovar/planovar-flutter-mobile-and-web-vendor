@@ -106,17 +106,17 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     final orderedGroups = groupOrder.where((g) => grouped.containsKey(g)).toList();
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.c.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.c.surface,
         elevation: 0,
-        leading: BackButton(color: AppColors.textPrimary),
+        leading: BackButton(color: context.c.textPrimary),
         title: Text(
           'Notifications',
           style: GoogleFonts.urbanist(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: context.c.textPrimary,
           ),
         ),
         actions: [
@@ -137,7 +137,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         children: [
           // Filter chips
           Container(
-            color: Colors.white,
+            color: context.c.surface,
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -150,7 +150,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       margin: const EdgeInsets.only(right: 10),
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
                       decoration: BoxDecoration(
-                        color: isSelected ? AppColors.primary : const Color(0xFFE9E9E9),
+                        color: isSelected ? AppColors.primary : context.c.surfaceElevated,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -158,7 +158,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         style: GoogleFonts.urbanist(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: isSelected ? Colors.white : AppColors.textSecondary,
+                          color: isSelected ? Colors.white : context.c.textSecondary,
                         ),
                       ),
                     ),
@@ -175,14 +175,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.notifications_off_outlined,
-                            size: 56, color: AppColors.textHint),
+                        Icon(Icons.notifications_off_outlined,
+                            size: 56, color: context.c.textHint),
                         const SizedBox(height: 12),
                         Text(
                           'No notifications',
                           style: GoogleFonts.urbanist(
                             fontSize: 16,
-                            color: AppColors.textSecondary,
+                            color: context.c.textSecondary,
                           ),
                         ),
                       ],
@@ -205,7 +205,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               style: GoogleFonts.urbanist(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.textSecondary,
+                                color: context.c.textSecondary,
                               ),
                             ),
                           ),
@@ -258,19 +258,19 @@ class _NotifTile extends StatelessWidget {
       child: Container(
         color: notif.isRead
             ? Colors.transparent
-            : AppColors.primaryLight.withValues(alpha: 0.5),
+            : context.c.primaryLight.withValues(alpha: 0.5),
         child: ListTile(
           contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           leading: Container(
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: notif.isRead ? AppColors.divider : AppColors.primaryLight,
+              color: notif.isRead ? context.c.divider : context.c.primaryLight,
               shape: BoxShape.circle,
             ),
             child: Icon(
               iconForType(notif.type),
-              color: notif.isRead ? AppColors.textHint : AppColors.primary,
+              color: notif.isRead ? context.c.textHint : AppColors.primary,
               size: 20,
             ),
           ),
@@ -279,7 +279,7 @@ class _NotifTile extends StatelessWidget {
             style: GoogleFonts.urbanist(
               fontSize: 14,
               fontWeight: notif.isRead ? FontWeight.w500 : FontWeight.w700,
-              color: AppColors.textPrimary,
+              color: context.c.textPrimary,
             ),
           ),
           subtitle: Padding(
@@ -288,7 +288,7 @@ class _NotifTile extends StatelessWidget {
               notif.body,
               style: GoogleFonts.urbanist(
                 fontSize: 12,
-                color: AppColors.textSecondary,
+                color: context.c.textSecondary,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -302,7 +302,7 @@ class _NotifTile extends StatelessWidget {
                 Formatters.timeAgo(notif.createdAt),
                 style: GoogleFonts.urbanist(
                   fontSize: 11,
-                  color: AppColors.textSecondary,
+                  color: context.c.textSecondary,
                 ),
               ),
               if (!notif.isRead) ...[

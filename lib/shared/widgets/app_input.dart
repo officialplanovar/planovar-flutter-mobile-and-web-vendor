@@ -25,6 +25,7 @@ class AppInput extends StatelessWidget {
   final ValueChanged<String>? onSubmitted;
   final List<TextInputFormatter>? inputFormatters;
   final EdgeInsets? contentPadding;
+  final VoidCallback? onInfoTap; // shows an ⓘ next to the label when set
 
   const AppInput({
     super.key,
@@ -49,6 +50,7 @@ class AppInput extends StatelessWidget {
     this.onSubmitted,
     this.inputFormatters,
     this.contentPadding,
+    this.onInfoTap,
   });
 
   @override
@@ -56,7 +58,7 @@ class AppInput extends StatelessWidget {
     final baseStyle = GoogleFonts.urbanist(
       fontSize: 15,
       fontWeight: FontWeight.w400,
-      color: AppColors.textPrimary,
+      color: context.c.textPrimary,
     );
 
     return Column(
@@ -64,13 +66,26 @@ class AppInput extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (label != null) ...[
-          Text(
-            label!,
-            style: GoogleFonts.urbanist(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
-            ),
+          Row(
+            children: [
+              Text(
+                label!,
+                style: GoogleFonts.urbanist(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: context.c.textSecondary,
+                ),
+              ),
+              if (onInfoTap != null) ...[
+                const SizedBox(width: 6),
+                GestureDetector(
+                  onTap: onInfoTap,
+                  behavior: HitTestBehavior.opaque,
+                  child: Icon(Icons.info_outline_rounded,
+                      size: 15, color: context.c.textHint),
+                ),
+              ],
+            ],
           ),
           const SizedBox(height: 6),
         ],
@@ -94,13 +109,13 @@ class AppInput extends StatelessWidget {
             hintStyle: GoogleFonts.urbanist(
               fontSize: 15,
               fontWeight: FontWeight.w400,
-              color: AppColors.textHint,
+              color: context.c.textHint,
             ),
             errorText: errorText,
             helperText: helperText,
             helperStyle: GoogleFonts.urbanist(
               fontSize: 12,
-              color: AppColors.textSecondary,
+              color: context.c.textSecondary,
             ),
             errorStyle: GoogleFonts.urbanist(
               fontSize: 12,
@@ -112,7 +127,7 @@ class AppInput extends StatelessWidget {
             prefixStyle: baseStyle,
             filled: true,
             fillColor:
-                enabled ? const Color(0xFFF2F2F2) : const Color(0xFFE8E8E8),
+                enabled ? context.c.surfaceElevated : context.c.border,
             contentPadding: contentPadding ??
                 const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
             counterText: '',

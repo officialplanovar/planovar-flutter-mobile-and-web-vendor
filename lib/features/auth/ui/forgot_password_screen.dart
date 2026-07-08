@@ -29,12 +29,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: context.c.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
+          icon: Icon(Icons.arrow_back_rounded, color: context.c.textPrimary),
           onPressed: () => context.pop(),
         ),
         title: Text(
@@ -42,7 +42,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           style: GoogleFonts.urbanist(
             fontSize: 17,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+            color: context.c.textPrimary,
           ),
         ),
       ),
@@ -54,8 +54,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             Container(
               width: 72,
               height: 72,
-              decoration: const BoxDecoration(
-                color: AppColors.primaryLight,
+              decoration: BoxDecoration(
+                color: context.c.primaryLight,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -70,7 +70,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               style: GoogleFonts.urbanist(
                 fontSize: 24,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
@@ -78,7 +78,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               "Enter your email address and we'll send you a link to reset your password.",
               style: GoogleFonts.urbanist(
                 fontSize: 15,
-                color: AppColors.textSecondary,
+                color: context.c.textSecondary,
                 height: 1.5,
               ),
             ),

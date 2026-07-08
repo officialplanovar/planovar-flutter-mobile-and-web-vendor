@@ -15,6 +15,9 @@ class AuthRemoteDataSource {
     required String password,
     String role = 'VENDOR',
     String? phone,
+    String? firstName,
+    String? lastName,
+    String? dateOfBirth,
   }) async {
     final res = await _dio.post('/api/auth/sign-up/email', data: {
       'name': name,
@@ -22,6 +25,10 @@ class AuthRemoteDataSource {
       'password': password,
       'role': role,
       if (phone != null && phone.isNotEmpty) 'phone': phone,
+      if (firstName != null && firstName.isNotEmpty) 'firstName': firstName,
+      if (lastName != null && lastName.isNotEmpty) 'lastName': lastName,
+      if (dateOfBirth != null && dateOfBirth.isNotEmpty)
+        'dateOfBirth': dateOfBirth,
     });
     _ensureOk(res);
     await _captureToken(res);
@@ -79,6 +86,13 @@ class AuthRemoteDataSource {
       // ignore — clear the local token regardless
     }
     await _api.tokenStore.clear();
+  }
+
+  /// Update the account/user record (phone, dateOfBirth, name, …) via PATCH /users/me.
+  Future<Map<String, dynamic>> updateUser(Map<String, dynamic> data) async {
+    final res = await _dio.patch('/users/me', data: data);
+    _ensureOk(res);
+    return _asMap(res.data);
   }
 
   // ── helpers ──────────────────────────────────────────────────────────────

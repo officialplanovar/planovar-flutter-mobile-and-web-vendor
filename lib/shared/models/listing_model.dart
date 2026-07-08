@@ -14,6 +14,11 @@ class ListingModel extends Equatable {
   final bool isRentable;
   final double? perDayRate;
   final double? depositAmount;
+  final String? sku;
+  final int? stockQuantity;
+  final int? durationValue;
+  final String? durationUnit;
+  final String? cancellationPolicy;
   final List<String> tags;
   final double ratingAvg;
   final int reviewCount;
@@ -36,6 +41,11 @@ class ListingModel extends Equatable {
     this.isRentable = false,
     this.perDayRate,
     this.depositAmount,
+    this.sku,
+    this.stockQuantity,
+    this.durationValue,
+    this.durationUnit,
+    this.cancellationPolicy,
     this.tags = const [],
     this.ratingAvg = 0.0,
     this.reviewCount = 0,
@@ -66,6 +76,11 @@ class ListingModel extends Equatable {
       isRentable: json['isRentable'] as bool? ?? false,
       perDayRate: _toDouble(json['perDayRate']),
       depositAmount: _toDouble(json['depositAmount']),
+      sku: json['sku'] as String?,
+      stockQuantity: _toInt(json['stockQuantity']),
+      durationValue: _toInt(json['durationValue']),
+      durationUnit: json['durationUnit'] as String?,
+      cancellationPolicy: json['cancellationPolicy'] as String?,
       tags: List<String>.from(json['tags'] as List? ?? []),
       ratingAvg: _toDouble(json['ratingAvg']) ?? 0.0,
       reviewCount: json['reviewCount'] as int? ?? 0,
@@ -92,6 +107,13 @@ class ListingModel extends Equatable {
     return double.tryParse(v.toString());
   }
 
+  static int? _toInt(dynamic v) {
+    if (v == null) return null;
+    if (v is int) return v;
+    if (v is num) return v.toInt();
+    return int.tryParse(v.toString());
+  }
+
   Map<String, dynamic> toJson() => {
         'id': id,
         'vendorId': vendorId,
@@ -105,6 +127,11 @@ class ListingModel extends Equatable {
         'isRentable': isRentable,
         'perDayRate': perDayRate,
         'depositAmount': depositAmount,
+        'sku': sku,
+        'stockQuantity': stockQuantity,
+        'durationValue': durationValue,
+        'durationUnit': durationUnit,
+        'cancellationPolicy': cancellationPolicy,
         'tags': tags,
         'ratingAvg': ratingAvg,
         'reviewCount': reviewCount,
@@ -128,6 +155,11 @@ class ListingModel extends Equatable {
     bool? isRentable,
     double? perDayRate,
     double? depositAmount,
+    String? sku,
+    int? stockQuantity,
+    int? durationValue,
+    String? durationUnit,
+    String? cancellationPolicy,
     List<String>? tags,
     double? ratingAvg,
     int? reviewCount,
@@ -150,6 +182,11 @@ class ListingModel extends Equatable {
       isRentable: isRentable ?? this.isRentable,
       perDayRate: perDayRate ?? this.perDayRate,
       depositAmount: depositAmount ?? this.depositAmount,
+      sku: sku ?? this.sku,
+      stockQuantity: stockQuantity ?? this.stockQuantity,
+      durationValue: durationValue ?? this.durationValue,
+      durationUnit: durationUnit ?? this.durationUnit,
+      cancellationPolicy: cancellationPolicy ?? this.cancellationPolicy,
       tags: tags ?? this.tags,
       ratingAvg: ratingAvg ?? this.ratingAvg,
       reviewCount: reviewCount ?? this.reviewCount,

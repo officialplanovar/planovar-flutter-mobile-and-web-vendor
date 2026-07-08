@@ -143,7 +143,7 @@ class TwoFAIntroScreen extends StatelessWidget {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       body: SafeArea(
         child: Stack(
           children: [
@@ -153,9 +153,9 @@ class TwoFAIntroScreen extends StatelessWidget {
               left: 16,
               child: GestureDetector(
                 onTap: () => context.pop(),
-                child: const Icon(
+                child: Icon(
                   Icons.arrow_back_rounded,
-                  color: AppColors.textPrimary,
+                  color: context.c.textPrimary,
                   size: 24,
                 ),
               ),
@@ -245,7 +245,7 @@ class TwoFAIntroScreen extends StatelessWidget {
                             style: GoogleFonts.urbanist(
                               fontSize: 20,
                               fontWeight: FontWeight.w800,
-                              color: AppColors.textPrimary,
+                              color: context.c.textPrimary,
                             ),
                           ),
                         ),
@@ -283,7 +283,7 @@ class TwoFASetupScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.c.background,
       body: Column(
         children: [
           _buildGradientAppBar(
@@ -299,7 +299,7 @@ class TwoFASetupScreen extends StatelessWidget {
                   style: GoogleFonts.urbanist(
                     fontSize: 24,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
+                    color: context.c.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -307,7 +307,7 @@ class TwoFASetupScreen extends StatelessWidget {
                   'Using the authenticator app such as (Google Authenticator, Authy, 1Password, Last pass etc',
                   style: GoogleFonts.urbanist(
                     fontSize: 14,
-                    color: AppColors.textSecondary,
+                    color: context.c.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -336,7 +336,7 @@ class TwoFASetupScreen extends StatelessWidget {
                   "If you can't scan the QR code above, enter this text instead",
                   style: GoogleFonts.urbanist(
                     fontSize: 13,
-                    color: AppColors.textSecondary,
+                    color: context.c.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -347,14 +347,14 @@ class TwoFASetupScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 14),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF2F2F2),
+                          color: context.c.surfaceElevated,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
                           '48hd8b 94u83b c88b3 f9vb',
                           style: GoogleFonts.urbanist(
                             fontSize: 13,
-                            color: AppColors.textPrimary,
+                            color: context.c.textPrimary,
                           ),
                         ),
                       ),
@@ -364,7 +364,7 @@ class TwoFASetupScreen extends StatelessWidget {
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: AppColors.primaryLight,
+                        color: context.c.primaryLight,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(
@@ -415,7 +415,7 @@ class _TwoFAConfirmScreenState extends State<TwoFAConfirmScreen> {
     final code = _controller.text;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       body: Column(
         children: [
           _buildGradientAppBar(context, title: 'Confirm Code'),
@@ -433,7 +433,7 @@ class _TwoFAConfirmScreenState extends State<TwoFAConfirmScreen> {
                       style: GoogleFonts.urbanist(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
+                        color: context.c.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -442,7 +442,7 @@ class _TwoFAConfirmScreenState extends State<TwoFAConfirmScreen> {
                       textAlign: TextAlign.center,
                       style: GoogleFonts.urbanist(
                         fontSize: 14,
-                        color: AppColors.textSecondary,
+                        color: context.c.textSecondary,
                       ),
                     ),
                     const SizedBox(height: 32),
@@ -481,11 +481,11 @@ class _TwoFAConfirmScreenState extends State<TwoFAConfirmScreen> {
                                   border: Border.all(
                                     color: isFilled || isActive
                                         ? AppColors.primary
-                                        : AppColors.border,
+                                        : context.c.border,
                                     width: isFilled || isActive ? 2 : 1,
                                   ),
                                   borderRadius: BorderRadius.circular(12),
-                                  color: Colors.white,
+                                  color: context.c.surface,
                                 ),
                                 child: Center(
                                   child: Text(
@@ -493,7 +493,7 @@ class _TwoFAConfirmScreenState extends State<TwoFAConfirmScreen> {
                                     style: GoogleFonts.urbanist(
                                       fontSize: 22,
                                       fontWeight: FontWeight.w700,
-                                      color: AppColors.textPrimary,
+                                      color: context.c.textPrimary,
                                     ),
                                   ),
                                 ),
@@ -530,7 +530,7 @@ class TwoFASuccessScreen extends StatelessWidget {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.c.surface,
       body: SafeArea(
         child: Column(
           children: [
@@ -549,7 +549,7 @@ class TwoFASuccessScreen extends StatelessWidget {
                       style: GoogleFonts.urbanist(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
+                        color: context.c.textPrimary,
                       ),
                       children: [
                         const TextSpan(text: 'All '),
@@ -572,7 +572,7 @@ class TwoFASuccessScreen extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: GoogleFonts.urbanist(
                         fontSize: 14,
-                        color: AppColors.textSecondary,
+                        color: context.c.textSecondary,
                       ),
                     ),
                   ),

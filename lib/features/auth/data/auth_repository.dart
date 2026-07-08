@@ -16,13 +16,24 @@ class AuthRepository {
   }
 
   Future<UserModel> signUp({
+    required String firstName,
+    required String lastName,
+    String? dateOfBirth,
     required String businessName,
     required String email,
     required String password,
     String? phone,
   }) async {
+    final fullName = [firstName.trim(), lastName.trim()]
+        .where((s) => s.isNotEmpty)
+        .join(' ');
     final data = await _remote.signUpEmail(
-      name: businessName,
+      // The account's display name is the contact person; the business name is
+      // stored separately on the vendor profile at onboarding.
+      name: fullName.isNotEmpty ? fullName : businessName,
+      firstName: firstName.trim().isEmpty ? null : firstName.trim(),
+      lastName: lastName.trim().isEmpty ? null : lastName.trim(),
+      dateOfBirth: dateOfBirth,
       email: email,
       password: password,
       phone: phone,
@@ -60,6 +71,12 @@ class AuthRepository {
   }
 
   Future<void> signOut() => _remote.signOut();
+
+  /// PATCH /users/me — update account fields (phone, dateOfBirth, name, …).
+  Future<UserModel> updateMe(Map<String, dynamic> data) async {
+    final res = await _remote.updateUser(data);
+    return UserModel.fromJson(_extractUser(res));
+  }
 
   /// Better Auth returns `{ user: {...}, session: {...} }` (or a bare user).
   Map<String, dynamic> _extractUser(Map<String, dynamic> data) {

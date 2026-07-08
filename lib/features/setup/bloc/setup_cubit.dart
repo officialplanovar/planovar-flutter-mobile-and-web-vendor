@@ -52,6 +52,7 @@ class SetupCubit extends Cubit<SetupState> {
         super(const SetupState());
 
   // ── collected draft ──
+  String businessName = ''; // captured at registration, used at onboard
   String? businessType; // LICENSED | FREELANCER
   String vendorType = 'BOTH';
   String? description;
@@ -63,6 +64,8 @@ class SetupCubit extends Cubit<SetupState> {
   String billingCycle = 'MONTHLY';
   String? ninUrl;
   String? cacUrl;
+
+  void setBusinessName(String name) => businessName = name.trim();
 
   void setBusinessType(String uiValue) =>
       businessType = uiValue == 'licensed' ? 'LICENSED' : 'FREELANCER';
@@ -96,6 +99,8 @@ class SetupCubit extends Cubit<SetupState> {
   }
 
   void setPlan(String? planId) => this.planId = planId;
+
+  void setBillingCycle(String cycle) => billingCycle = cycle;
 
   void setKyc({String? ninUrl, String? cacUrl}) {
     this.ninUrl = ninUrl;

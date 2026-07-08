@@ -31,6 +31,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
   /// Live inquiries from the API (set from cubit state in build).
   List<OrderModel> _orders = const [];
+  List<TrackingOrderModel> _tracking = const [];
 
   @override
   void initState() {
@@ -62,8 +63,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
       _orders.where((o) => o.status == 'PENDING').length;
 
   List<TrackingOrderModel> get _filteredTracking {
-    // Rental/purchase delivery tracking has no backend yet — show empty state.
-    const List<TrackingOrderModel> all = [];
+    // Live product/rental orders from the API (mapped from the vendor's bookings).
+    final List<TrackingOrderModel> all = _tracking;
     switch (_trackingFilter) {
       case 0: // Purchase
         return all
@@ -99,9 +100,10 @@ class _OrdersScreenState extends State<OrdersScreen> {
     final topPadding = MediaQuery.of(context).padding.top;
     // Live inquiries from the API.
     _orders = context.watch<OrdersCubit>().state.orders;
+    _tracking = context.watch<OrdersCubit>().state.tracking;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: context.c.background,
       body: Column(
         children: [
           // ── Gradient Header ────────────────────────────────────────────
@@ -183,7 +185,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                       decoration: BoxDecoration(
                         color: selected
                             ? AppColors.primaryDark
-                            : const Color(0xFFEEEEF8),
+                            : context.c.surfaceElevated,
                         borderRadius: BorderRadius.circular(24),
                       ),
                       child: Text(
@@ -193,7 +195,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                           fontWeight: FontWeight.w600,
                           color: selected
                               ? Colors.white
-                              : AppColors.textSecondary,
+                              : context.c.textSecondary,
                         ),
                       ),
                     ),
@@ -210,7 +212,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                         'No orders here yet.',
                         style: GoogleFonts.urbanist(
                           fontSize: 14,
-                          color: AppColors.textSecondary,
+                          color: context.c.textSecondary,
                         ),
                       ),
                     )
@@ -242,7 +244,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                       decoration: BoxDecoration(
                         color: selected
                             ? AppColors.primaryDark
-                            : const Color(0xFFEEEEF8),
+                            : context.c.surfaceElevated,
                         borderRadius: BorderRadius.circular(24),
                       ),
                       child: Text(
@@ -252,7 +254,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                           fontWeight: FontWeight.w600,
                           color: selected
                               ? Colors.white
-                              : AppColors.textSecondary,
+                              : context.c.textSecondary,
                         ),
                       ),
                     ),
@@ -269,7 +271,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                         'No orders here yet.',
                         style: GoogleFonts.urbanist(
                           fontSize: 14,
-                          color: AppColors.textSecondary,
+                          color: context.c.textSecondary,
                         ),
                       ),
                     )
@@ -304,7 +306,7 @@ class _TrackingCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.c.surface,
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
@@ -358,7 +360,7 @@ class _TrackingCard extends StatelessWidget {
                                 style: GoogleFonts.urbanist(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
-                                  color: AppColors.textPrimary,
+                                  color: context.c.textPrimary,
                                 ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -368,7 +370,7 @@ class _TrackingCard extends StatelessWidget {
                                 Formatters.shortDate(order.orderDate),
                                 style: GoogleFonts.urbanist(
                                   fontSize: 12,
-                                  color: AppColors.textSecondary,
+                                  color: context.c.textSecondary,
                                 ),
                               ),
                               const SizedBox(height: 6),
@@ -380,7 +382,7 @@ class _TrackingCard extends StatelessWidget {
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: AppColors.primaryLight,
+                                      color: context.c.primaryLight,
                                       borderRadius:
                                           BorderRadius.circular(20),
                                     ),
@@ -408,7 +410,7 @@ class _TrackingCard extends StatelessWidget {
                       child: Container(
                         height: 40,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.c.surface,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: AppColors.primary,
@@ -490,8 +492,8 @@ class _TrackingStatusChip extends StatelessWidget {
         fg = const Color(0xFFC62828);
         label = 'Cancelled';
       default:
-        bg = AppColors.divider;
-        fg = AppColors.textSecondary;
+        bg = context.c.divider;
+        fg = context.c.textSecondary;
         label = status;
     }
 
@@ -568,7 +570,7 @@ class _OrderCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.c.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -608,7 +610,7 @@ class _OrderCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 6, vertical: 3),
                         decoration: BoxDecoration(
-                          color: AppColors.primaryLight,
+                          color: context.c.primaryLight,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
@@ -637,7 +639,7 @@ class _OrderCard extends StatelessWidget {
                         style: GoogleFonts.urbanist(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
+                          color: context.c.textPrimary,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -647,7 +649,7 @@ class _OrderCard extends StatelessWidget {
                         '${Formatters.shortDate(order.eventDate)} · ${order.eventVenue}',
                         style: GoogleFonts.urbanist(
                           fontSize: 12,
-                          color: AppColors.textSecondary,
+                          color: context.c.textSecondary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -682,7 +684,7 @@ class _OrderCard extends StatelessWidget {
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: AppColors.primaryLight,
+                        color: context.c.primaryLight,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(
@@ -742,8 +744,8 @@ class _StatusChip extends StatelessWidget {
         textColor = const Color(0xFFC62828);
         label = 'Cancelled';
       default:
-        bgColor = AppColors.divider;
-        textColor = AppColors.textSecondary;
+        bgColor = context.c.divider;
+        textColor = context.c.textSecondary;
         label = status;
     }
 
