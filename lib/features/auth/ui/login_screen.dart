@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
+import '../data/auth_repository.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_input.dart';
@@ -49,8 +51,10 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildGoogleButton(BuildContext context) {
-    return GestureDetector(
-      onTap: () {},
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+      onTap: () => _googleSignIn(context),
       child: Container(
         height: 52,
         decoration: BoxDecoration(
@@ -61,20 +65,10 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 22,
-              height: 22,
-              decoration: const BoxDecoration(shape: BoxShape.circle),
-              child: Center(
-                child: Text(
-                  'G',
-                  style: GoogleFonts.urbanist(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF4285F4),
-                  ),
-                ),
-              ),
+            SvgPicture.asset(
+              'assets/icons/google_logo.svg',
+              width: 20,
+              height: 20,
             ),
             const SizedBox(width: 10),
             Text(
@@ -88,7 +82,18 @@ class _LoginScreenState extends State<LoginScreen> {
           ],
         ),
       ),
-    );
+    ));
+  }
+
+  Future<void> _googleSignIn(BuildContext context) async {
+    try {
+      await AuthRepository().signInWithGoogle();
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+      );
+    }
   }
 
   @override

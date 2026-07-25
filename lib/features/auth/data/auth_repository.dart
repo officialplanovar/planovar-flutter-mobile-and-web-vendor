@@ -15,6 +15,9 @@ class AuthRepository {
     return UserModel.fromJson(_extractUser(data));
   }
 
+  /// Launches the Google OAuth flow (redirects the browser to Google).
+  Future<void> signInWithGoogle() => _remote.signInWithGoogle();
+
   Future<UserModel> signUp({
     required String firstName,
     required String lastName,

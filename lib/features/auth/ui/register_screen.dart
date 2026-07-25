@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/router/app_routes.dart';
+import '../data/auth_repository.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_input.dart';
 import '../bloc/auth_bloc.dart';
@@ -83,46 +85,50 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Widget _buildGoogleButton(BuildContext context) {
-    return GestureDetector(
-      onTap: () {},
-      child: Container(
-        height: 52,
-        decoration: BoxDecoration(
-          color: context.c.surface,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: context.c.border, width: 1.5),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 22,
-              height: 22,
-              decoration: const BoxDecoration(shape: BoxShape.circle),
-              child: Center(
-                child: Text(
-                  'G',
-                  style: GoogleFonts.urbanist(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF4285F4),
-                  ),
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => _googleSignIn(context),
+        child: Container(
+          height: 52,
+          decoration: BoxDecoration(
+            color: context.c.surface,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: context.c.border, width: 1.5),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                'assets/icons/google_logo.svg',
+                width: 20,
+                height: 20,
+              ),
+              const SizedBox(width: 10),
+              Text(
+                'Continue with Google',
+                style: GoogleFonts.urbanist(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: context.c.textPrimary,
                 ),
               ),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              'Continue with Google',
-              style: GoogleFonts.urbanist(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: context.c.textPrimary,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  Future<void> _googleSignIn(BuildContext context) async {
+    try {
+      await AuthRepository().signInWithGoogle();
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+      );
+    }
   }
 
   @override
