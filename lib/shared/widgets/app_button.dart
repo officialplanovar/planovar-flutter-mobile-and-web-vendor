@@ -159,7 +159,9 @@ class AppButton extends StatelessWidget {
     final bool isPrimary = variant == ButtonVariant.primary;
     const double radius = 14;
 
-    return GestureDetector(
+    return MouseRegion(
+      cursor: disabled ? SystemMouseCursors.basic : SystemMouseCursors.click,
+      child: GestureDetector(
       onTap: disabled ? null : onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
@@ -245,7 +247,7 @@ class AppButton extends StatelessWidget {
               )
             : Center(child: content),
       ),
-    );
+    ));
   }
 }
 
@@ -269,7 +271,11 @@ class AppIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return MouseRegion(
+      cursor: onTap == null
+          ? SystemMouseCursors.basic
+          : SystemMouseCursors.click,
+      child: GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -292,6 +298,6 @@ class AppIconButton extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ));
   }
 }

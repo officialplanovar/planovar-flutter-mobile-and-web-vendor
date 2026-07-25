@@ -5,7 +5,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 const _kThemeKey = 'vendor_theme_mode';
 
 class ThemeCubit extends Cubit<ThemeMode> {
-  ThemeCubit() : super(ThemeMode.system);
+  // Default to light so a tester on a dark-mode OS doesn't see every screen
+  // dark; users can still choose Dark or System from theme settings.
+  ThemeCubit() : super(ThemeMode.light);
 
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -26,7 +28,8 @@ class ThemeCubit extends Cubit<ThemeMode> {
   static ThemeMode _fromString(String? value) => switch (value) {
         'light' => ThemeMode.light,
         'dark' => ThemeMode.dark,
-        _ => ThemeMode.system,
+        'system' => ThemeMode.system,
+        _ => ThemeMode.light, // no stored preference → default to light
       };
 
   static String _toString(ThemeMode mode) => switch (mode) {
