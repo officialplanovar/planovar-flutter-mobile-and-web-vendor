@@ -57,7 +57,7 @@ class AuthRemoteDataSource {
   Future<void> signInWithGoogle() async {
     final appTarget = kIsWeb ? Uri.base.origin : 'planovarvendor://auth';
     final startUrl =
-        '${AppConstants.apiBaseUrl}/oauth/start?redirect=${Uri.encodeComponent(appTarget)}';
+        '${AppConstants.apiBaseUrl}/oauth/start?intent=vendor&redirect=${Uri.encodeComponent(appTarget)}';
     await launchUrl(
       Uri.parse(startUrl),
       mode: LaunchMode.platformDefault,
@@ -69,6 +69,15 @@ class AuthRemoteDataSource {
     final res = await _dio.get('/api/auth/get-session');
     // Bearer plugin returns a fresh token on any authenticated response —
     // capture it so an OAuth/cookie session upgrades to a stored bearer token.
+    await _captureToken(res);
+    if (res.statusCode == 200 && res.data is Map) return _asMap(res.data);
+    return null;
+  }
+
+  /// Full profile (role + vendorProfile + clientProfile) for role-separation
+  /// gating. Also refreshes the bearer token via the plugin's response header.
+  Future<Map<String, dynamic>?> me() async {
+    final res = await _dio.get('/users/me');
     await _captureToken(res);
     if (res.statusCode == 200 && res.data is Map) return _asMap(res.data);
     return null;

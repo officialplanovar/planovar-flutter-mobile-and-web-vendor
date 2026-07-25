@@ -12,6 +12,7 @@ import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
 import '../../setup/bloc/setup_cubit.dart';
+import '../../vendor/data/vendor_repository.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -387,6 +388,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             BlocConsumer<AuthBloc, AuthState>(
               listener: (context, state) {
                 if (state is AuthOtpSent) {
+                  // Type this brand-new account as a vendor (vendor-app sign-up)
+                  // so the role gate admits it. Fire-and-forget.
+                  VendorRepository().claimIntent().catchError((_) {});
                   context.push(
                     AppRoutes.verifyEmail,
                     extra: {'email': _emailCtrl.text.trim()},

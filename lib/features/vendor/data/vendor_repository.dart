@@ -41,6 +41,13 @@ class VendorRepository {
     return null;
   }
 
+  /// Types the freshly-created account as a vendor (called right after a
+  /// vendor-app sign-up) so the app's role gate admits them. The backend
+  /// refuses established client accounts.
+  Future<void> claimIntent() async {
+    await _api.dio.post('/vendors/intent');
+  }
+
   /// Updates the current vendor profile (PATCH /vendors/me).
   Future<VendorModel> updateProfile(Map<String, dynamic> changes) async {
     final res = await _api.dio.patch('/vendors/me', data: changes);

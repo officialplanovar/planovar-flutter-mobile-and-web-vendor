@@ -68,9 +68,11 @@ class AuthRepository {
   }
 
   Future<UserModel> getMe() async {
-    final session = await _remote.getSession();
-    if (session == null) throw Exception('No active session');
-    return UserModel.fromJson(_extractUser(session));
+    // /users/me carries role + vendorProfile + clientProfile for role gating;
+    // fall back to the session endpoint if it's unavailable.
+    final me = await _remote.me() ?? await _remote.getSession();
+    if (me == null) throw Exception('No active session');
+    return UserModel.fromJson(_extractUser(me));
   }
 
   Future<void> signOut() => _remote.signOut();
