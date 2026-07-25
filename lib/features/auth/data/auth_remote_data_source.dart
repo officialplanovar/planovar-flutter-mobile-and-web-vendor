@@ -49,22 +49,17 @@ class AuthRemoteDataSource {
     return _asMap(res.data);
   }
 
-  /// Starts the Google OAuth flow. Asks Better Auth for the provider consent
-  /// URL, then hands off to the browser (same-tab redirect on web). Better Auth
-  /// returns to [callbackURL] after the Google round-trip.
+  /// Starts the Google OAuth flow via a top-level navigation to the API's
+  /// /oauth/start (NOT an XHR) so Better Auth's OAuth state cookie is set
+  /// first-party — otherwise the callback fails with state_mismatch. After
+  /// consent, the token relay returns to `redirect` with a bearer token: the
+  /// web app origin, or the vendor app's deep link on native.
   Future<void> signInWithGoogle() async {
-    final callbackURL = kIsWeb ? Uri.base.origin : AppConstants.apiBaseUrl;
-    final res = await _dio.post('/api/auth/sign-in/social', data: {
-      'provider': 'google',
-      'callbackURL': callbackURL,
-    });
-    _ensureOk(res);
-    final url = _asMap(res.data)['url'] as String?;
-    if (url == null || url.isEmpty) {
-      throw Exception('Could not start Google sign-in. Please try again.');
-    }
+    final appTarget = kIsWeb ? Uri.base.origin : 'planovarvendor://auth';
+    final startUrl =
+        '${AppConstants.apiBaseUrl}/oauth/start?redirect=${Uri.encodeComponent(appTarget)}';
     await launchUrl(
-      Uri.parse(url),
+      Uri.parse(startUrl),
       mode: LaunchMode.platformDefault,
       webOnlyWindowName: '_self',
     );
