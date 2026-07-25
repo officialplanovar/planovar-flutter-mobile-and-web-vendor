@@ -1,11 +1,11 @@
 {
-    "name": "planovar_vendor",
-    "short_name": "planovar_vendor",
+    "name": "Planovar Vendor",
+    "short_name": "Planovar Vendor",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#FFFFFF",
+    "theme_color": "#4544F4",
+    "description": "Manage listings, quotes, orders and payments in one place.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
