@@ -7,6 +7,7 @@ import '../../features/auth/ui/onboarding_screen.dart';
 import '../../features/auth/ui/login_screen.dart';
 import '../../features/auth/ui/register_screen.dart';
 import '../../features/auth/ui/verify_email_screen.dart';
+import '../../features/auth/ui/reset_password_screen.dart';
 import '../../features/auth/ui/forgot_password_screen.dart';
 import '../../features/setup/ui/setup_screens.dart';
 import '../../features/home/ui/home_screen.dart';
@@ -108,6 +109,13 @@ GoRouter createRouter() {
       GoRoute(
         path: AppRoutes.forgotPassword,
         builder: (ctx, route) =>const ForgotPasswordScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.resetPassword,
+        builder: (_, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          return ResetPasswordScreen(email: extra['email'] as String? ?? '');
+        },
       ),
 
       // ─── Setup Flow ────────────────────────────────────────────────────────

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/router/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_input.dart';
@@ -75,7 +76,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              "Enter your email address and we'll send you a link to reset your password.",
+              "Enter your email address and we'll send you a 6-digit code to reset your password.",
               style: GoogleFonts.urbanist(
                 fontSize: 15,
                 color: context.c.textSecondary,
@@ -113,7 +114,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'A reset link has been sent to ${_emailCtrl.text.trim()}. Check your inbox.',
+                        'A reset code has been sent to ${_emailCtrl.text.trim()}. Check your inbox.',
                         style: GoogleFonts.urbanist(
                           fontSize: 13,
                           color: AppColors.activeText,
@@ -134,6 +135,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               listener: (context, state) {
                 if (state is AuthPasswordResetSent) {
                   setState(() => _sent = true);
+                  context.push(AppRoutes.resetPassword,
+                      extra: {'email': _emailCtrl.text.trim()});
                 } else if (state is AuthError) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(state.message)),
