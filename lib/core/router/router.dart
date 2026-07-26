@@ -39,6 +39,7 @@ import '../../features/profile/ui/terms_screen.dart';
 import '../../features/analytics/ui/analytics_screen.dart';
 import '../../features/payouts/ui/payouts_screen.dart';
 import '../../features/notifications/ui/notifications_screen.dart';
+import '../responsive/responsive.dart';
 import '../theme/app_colors.dart';
 import 'app_routes.dart';
 
@@ -576,8 +577,85 @@ class _AppShell extends StatelessWidget {
     );
   }
 
+  static const _railItems = [
+    ('assets/icons/nav-home.svg', 'assets/icons/nav-home-active.svg', 'Home', 0),
+    ('assets/icons/nav-listings.svg', 'assets/icons/nav-listings-active.svg', 'Listings', 1),
+    ('assets/icons/nav-orders.svg', 'assets/icons/nav-orders-active.svg', 'Orders', 2),
+    (null, null, 'Messages', 3),
+    ('assets/icons/nav-profile.svg', 'assets/icons/nav-profile-active.svg', 'Profile', 4),
+  ];
+
+  Widget _railItem(BuildContext context, String? icon, String? activeIcon,
+      String label, int branch) {
+    final active = shell.currentIndex == branch;
+    final color = active ? AppColors.primary : context.c.textSecondary;
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => shell.goBranch(branch,
+            initialLocation: branch == shell.currentIndex),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: active
+                ? AppColors.primary.withValues(alpha: context.isDark ? 0.22 : 0.12)
+                : null,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Column(
+            children: [
+              icon != null
+                  ? SvgPicture.asset(active ? activeIcon! : icon,
+                      width: 24, height: 24)
+                  : Icon(Icons.chat_bubble_outline_rounded,
+                      size: 24, color: color),
+              const SizedBox(height: 4),
+              Text(label,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: active ? FontWeight.w600 : FontWeight.w400,
+                    color: color,
+                  )),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSideRail(BuildContext context) {
+    return Container(
+      width: 104,
+      color: context.c.surface,
+      child: SafeArea(
+        right: false,
+        child: Column(
+          children: [
+            const SizedBox(height: 22),
+            for (final it in _railItems)
+              _railItem(context, it.$1, it.$2, it.$3, it.$4),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Wide/desktop: a side rail beside the content instead of a bottom bar.
+    if (context.useSideNav) {
+      return Scaffold(
+        body: Row(
+          children: [
+            _buildSideRail(context),
+            VerticalDivider(width: 1, thickness: 1, color: context.c.border),
+            Expanded(child: shell),
+          ],
+        ),
+      );
+    }
     return Scaffold(
       body: Stack(
         alignment: Alignment.bottomCenter,

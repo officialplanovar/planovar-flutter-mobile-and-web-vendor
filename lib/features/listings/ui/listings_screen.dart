@@ -580,12 +580,19 @@ class _ListingsScreenState extends State<ListingsScreen> {
                         : RefreshIndicator(
                             onRefresh: () =>
                                 context.read<ListingsCubit>().load(),
-                            child: ListView.builder(
-                              padding:
-                                  const EdgeInsets.fromLTRB(20, 0, 20, 120),
-                              itemCount: listings.length,
-                              itemBuilder: (context, index) =>
-                                  _buildListingCard(context, listings[index]),
+                            child: Center(
+                              child: ConstrainedBox(
+                                constraints:
+                                    const BoxConstraints(maxWidth: 820),
+                                child: ListView.builder(
+                                  padding: const EdgeInsets.fromLTRB(
+                                      20, 0, 20, 120),
+                                  itemCount: listings.length,
+                                  itemBuilder: (context, index) =>
+                                      _buildListingCard(
+                                          context, listings[index]),
+                                ),
+                              ),
                             ),
                           ),
           ),

@@ -216,12 +216,17 @@ class _OrdersScreenState extends State<OrdersScreen> {
                         ),
                       ),
                     )
-                  : ListView.builder(
-                      padding: const EdgeInsets.only(top: 8, bottom: 24),
-                      itemCount: _filteredOrders.length,
-                      itemBuilder: (context, index) {
-                        return _OrderCard(order: _filteredOrders[index]);
-                      },
+                  : Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 820),
+                        child: ListView.builder(
+                          padding: const EdgeInsets.only(top: 8, bottom: 24),
+                          itemCount: _filteredOrders.length,
+                          itemBuilder: (context, index) {
+                            return _OrderCard(order: _filteredOrders[index]);
+                          },
+                        ),
+                      ),
                     ),
             ),
           ] else ...[
@@ -275,14 +280,19 @@ class _OrdersScreenState extends State<OrdersScreen> {
                         ),
                       ),
                     )
-                  : ListView.builder(
-                      padding:
-                          const EdgeInsets.only(top: 8, bottom: 24),
-                      itemCount: _filteredTracking.length,
-                      itemBuilder: (context, index) {
-                        return _TrackingCard(
-                            order: _filteredTracking[index]);
-                      },
+                  : Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 820),
+                        child: ListView.builder(
+                          padding:
+                              const EdgeInsets.only(top: 8, bottom: 24),
+                          itemCount: _filteredTracking.length,
+                          itemBuilder: (context, index) {
+                            return _TrackingCard(
+                                order: _filteredTracking[index]);
+                          },
+                        ),
+                      ),
                     ),
             ),
           ],
