@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/responsive/responsive.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../core/mock/mock_data.dart';
@@ -66,7 +67,12 @@ class _HomeScreenState extends State<HomeScreen> {
           // ── Scrollable body ─────────────────────────────────────────────
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: 100),
+              padding: EdgeInsets.fromLTRB(
+                ((context.screenWidth - 1000) / 2).clamp(0.0, 1000.0),
+                0,
+                ((context.screenWidth - 1000) / 2).clamp(0.0, 1000.0),
+                100,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
