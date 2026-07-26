@@ -188,14 +188,19 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     painter: _TriangleTilePainter(),
                   ),
                 ),
-                // Messages list
-                ListView.builder(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 16),
-                  itemCount: _messages.length,
-                  itemBuilder: (context, index) =>
-                      _buildMessage(_messages[index]),
+                // Messages list (centered + width-capped on wide screens)
+                Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 760),
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 16),
+                      itemCount: _messages.length,
+                      itemBuilder: (context, index) =>
+                          _buildMessage(_messages[index]),
+                    ),
+                  ),
                 ),
               ],
             ),

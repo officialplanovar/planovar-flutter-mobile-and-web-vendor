@@ -146,16 +146,21 @@ class _MessagesScreenState extends State<MessagesScreen> {
                       ],
                     ),
                   )
-                : ListView.builder(
-                    padding: const EdgeInsets.only(bottom: 80),
-                    itemCount: conversations.length,
-                    itemBuilder: (context, index) {
-                      final conv = conversations[index];
-                      return _ConversationTile(
-                        conv: conv,
-                        onOpen: () => _markReadLocal(conv.id),
-                      );
-                    },
+                : Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 780),
+                      child: ListView.builder(
+                        padding: const EdgeInsets.only(bottom: 80),
+                        itemCount: conversations.length,
+                        itemBuilder: (context, index) {
+                          final conv = conversations[index];
+                          return _ConversationTile(
+                            conv: conv,
+                            onOpen: () => _markReadLocal(conv.id),
+                          );
+                        },
+                      ),
+                    ),
                   ),
           ),
         ],

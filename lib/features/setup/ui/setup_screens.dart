@@ -8,6 +8,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/responsive/responsive.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../core/services/upload_service.dart';
 import '../../../shared/widgets/app_button.dart';
@@ -194,7 +195,7 @@ class _SetupBusinessTypeScreenState extends State<SetupBusinessTypeScreen> {
       appBar: _buildSetupAppBar(context, step: 1, total: 6),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+          padding: pagePadding(context, base: 24).add(const EdgeInsets.only(top: 28, bottom: 24)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -366,7 +367,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+                padding: pagePadding(context, base: 24).add(const EdgeInsets.only(top: 28, bottom: 24)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -658,7 +659,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+              padding: pagePadding(context, base: 24).add(const EdgeInsets.only(top: 12, bottom: 32)),
               child: AppButton.primary(
                 'Proceed',
                 onTap: () {
@@ -820,7 +821,7 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
                 borderRadius: BorderRadius.circular(4)),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
+            padding: pagePadding(context, base: 24).add(const EdgeInsets.only(top: 20, bottom: 8)),
             child: Text(
               'Select City',
               style: GoogleFonts.urbanist(
@@ -951,7 +952,7 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+                padding: pagePadding(context, base: 24).add(const EdgeInsets.only(top: 28, bottom: 24)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1054,7 +1055,7 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+              padding: pagePadding(context, base: 24).add(const EdgeInsets.only(top: 12, bottom: 32)),
               child: AppButton.primary(
                 'Proceed',
                 onTap: () {
@@ -1117,7 +1118,7 @@ class _SetupPlanScreenState extends State<SetupPlanScreen> {
       appBar: _buildSetupAppBar(context, step: 4, total: 6),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+          padding: pagePadding(context, base: 24).add(const EdgeInsets.only(top: 28, bottom: 24)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -1385,7 +1386,7 @@ class _SetupKycScreenState extends State<SetupKycScreen> {
               children: [
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+                    padding: pagePadding(context, base: 24).add(const EdgeInsets.only(top: 28, bottom: 24)),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -1414,7 +1415,7 @@ class _SetupKycScreenState extends State<SetupKycScreen> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+                  padding: pagePadding(context, base: 24).add(const EdgeInsets.only(top: 12, bottom: 32)),
                   child: Column(
                     children: [
                       AppButton.primary(
@@ -1504,7 +1505,7 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
                 borderRadius: BorderRadius.circular(4)),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
+            padding: pagePadding(context, base: 24).add(const EdgeInsets.only(top: 20, bottom: 8)),
             child: Text(
               'Select Bank',
               style: GoogleFonts.urbanist(
@@ -1570,7 +1571,7 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+                padding: pagePadding(context, base: 24).add(const EdgeInsets.only(top: 28, bottom: 24)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1705,7 +1706,7 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+              padding: pagePadding(context, base: 24).add(const EdgeInsets.only(top: 12, bottom: 32)),
               child: AppButton.primary(
                 'Save Payout Details',
                 loading: _loading,
@@ -1750,7 +1751,7 @@ class SetupSuccessScreen extends StatelessWidget {
       backgroundColor: context.c.surface,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 48, 24, 40),
+          padding: pagePadding(context, base: 24).add(const EdgeInsets.only(top: 48, bottom: 40)),
           child: Column(
             children: [
               // Success icon

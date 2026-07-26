@@ -23,6 +23,15 @@ extension ResponsiveContext on BuildContext {
   bool get useSideNav => screenWidth >= Breakpoints.sideNav;
 }
 
+/// Horizontal page padding that centers a form/content column on wide screens
+/// (adds symmetric insets so content never exceeds [maxWidth]), while keeping
+/// [base] padding on phones. For full-screen setup/onboarding pages.
+EdgeInsets pagePadding(BuildContext context,
+    {double base = 20, double maxWidth = 560}) {
+  final inset = ((context.screenWidth - maxWidth) / 2).clamp(0.0, 1000.0);
+  return EdgeInsets.symmetric(horizontal: base + inset);
+}
+
 /// Column count for a card grid given the available width, targeting cards no
 /// narrower than [minItemWidth]. Keeps a phone at 1 column and lets a wide
 /// desktop fan out to several.
