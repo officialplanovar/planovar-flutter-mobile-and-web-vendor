@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/responsive/responsive.dart';
 import '../../../core/services/messaging_service.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../shared/models/chat_card_models.dart';
@@ -807,7 +808,8 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
       backgroundColor: context.c.background,
       appBar: _buildGradientAppBar() as PreferredSizeWidget,
       body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 24, 20, 120),
+        padding: pagePadding(context, base: 20)
+            .add(const EdgeInsets.only(top: 24, bottom: 120)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -899,12 +901,10 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
         ),
       ),
       bottomNavigationBar: Container(
-        padding: EdgeInsets.fromLTRB(
-          20,
-          16,
-          20,
-          MediaQuery.of(context).padding.bottom + 16,
-        ),
+        padding: pagePadding(context, base: 20).add(EdgeInsets.only(
+          top: 16,
+          bottom: MediaQuery.of(context).padding.bottom + 16,
+        )),
         decoration: BoxDecoration(
           color: context.c.surface,
           border: Border(

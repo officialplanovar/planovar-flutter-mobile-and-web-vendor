@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/responsive/responsive.dart';
 import '../../../shared/widgets/app_icon.dart';
 import '../bloc/listings_cubit.dart';
 import '../data/listings_repository.dart';
@@ -1155,12 +1156,14 @@ class _EditListingScreenState extends State<EditListingScreen> {
         children: [
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+              padding: pagePadding(context, base: 20)
+                  .add(const EdgeInsets.symmetric(vertical: 20)),
               child: _isService ? _buildServiceForm() : _buildProductForm(),
             ),
           ),
           Container(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+            padding: pagePadding(context, base: 20)
+                .add(const EdgeInsets.only(top: 12, bottom: 28)),
             decoration: BoxDecoration(
               color: context.c.surface,
               border: Border(top: BorderSide(color: context.c.border)),

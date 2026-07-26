@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/services/upload_service.dart';
+import '../../../core/responsive/responsive.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/app_icon.dart';
 import '../../../shared/widgets/app_button.dart';
@@ -585,7 +586,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
         children: [
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+              padding: pagePadding(context, base: 20)
+                  .add(const EdgeInsets.symmetric(vertical: 20)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -706,7 +708,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
             ),
           ),
           Container(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+            padding: pagePadding(context, base: 20)
+                .add(const EdgeInsets.only(top: 12, bottom: 28)),
             decoration: BoxDecoration(
               color: context.c.surface,
               border: Border(
