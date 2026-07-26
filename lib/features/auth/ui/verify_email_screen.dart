@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/responsive/responsive.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../bloc/auth_bloc.dart';
@@ -67,7 +68,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 40),
+        padding: pagePadding(context, base: 24).add(const EdgeInsets.only(top: 16, bottom: 40)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
