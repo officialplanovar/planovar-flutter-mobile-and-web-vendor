@@ -4,10 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import '../../../core/api/api_client.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/responsive/responsive.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../shared/widgets/app_button.dart';
+import '../data/auth_remote_data_source.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -42,6 +44,26 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
         setState(() => _countdown--);
       }
     });
+  }
+
+  /// Actually re-send the verification code, then restart the cooldown.
+  Future<void> _resend() async {
+    _startCountdown();
+    try {
+      await AuthRemoteDataSource(ApiClient())
+          .sendOtp(email: widget.email, type: 'email-verification');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('A new code has been sent')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not resend code: $e')),
+        );
+      }
+    }
   }
 
   @override
@@ -214,7 +236,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               )
             else
               GestureDetector(
-                onTap: _startCountdown,
+                onTap: _resend,
                 child: Text(
                   'Resend code',
                   style: GoogleFonts.urbanist(
