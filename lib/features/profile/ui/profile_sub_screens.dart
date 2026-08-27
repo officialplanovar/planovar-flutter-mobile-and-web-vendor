@@ -2251,13 +2251,19 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
       final checkoutUrl = res['checkoutUrl'] as String?;
       final paymentRef = res['reference'] as String?;
 
-      // Free plan (Basic) switches immediately; paid plans need payment.
+      // No checkout needed: Basic (free), a started free trial, or an upgrade
+      // fully covered by a proration credit — all switch immediately.
       if (checkoutUrl == null || checkoutUrl.isEmpty || paymentRef == null) {
         if (!mounted) return;
         await _load();
         if (mounted) {
+          final trialing = res['status'] == 'trialing';
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('You are now on the ${plan.name} plan')),
+            SnackBar(
+              content: Text(trialing
+                  ? 'Your ${plan.name} free trial has started 🎉'
+                  : 'You are now on the ${plan.name} plan'),
+            ),
           );
         }
         return;
