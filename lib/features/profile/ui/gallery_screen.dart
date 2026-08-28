@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../../core/services/upload_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../features/vendor/data/vendor_repository.dart';
 import '../../../shared/widgets/network_image_widget.dart';
 
 // ─── Dashed border painter ────────────────────────────────────────────────────
@@ -48,6 +51,8 @@ class GalleryScreen extends StatefulWidget {
 
 class _GalleryScreenState extends State<GalleryScreen> {
   final List<String?> _images = List.filled(4, null);
+  int? _uploadingIndex;
+  bool _saving = false;
 
   static const _labels = [
     'Front Photo',
@@ -55,6 +60,70 @@ class _GalleryScreenState extends State<GalleryScreen> {
     'Third Photo',
     'Fourth Photo',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final vendor = await VendorRepository().getMe();
+      final urls = vendor?.portfolioUrls ?? const <String>[];
+      if (!mounted) return;
+      setState(() {
+        for (var i = 0; i < _images.length && i < urls.length; i++) {
+          _images[i] = urls[i];
+        }
+      });
+    } catch (_) {/* keep empty slots */}
+  }
+
+  Future<void> _pickAndUpload(int index) async {
+    try {
+      final picked = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1600,
+        imageQuality: 85,
+      );
+      if (picked == null) return;
+      setState(() => _uploadingIndex = index);
+      final bytes = await picked.readAsBytes();
+      final url = await UploadService().uploadListingImage(bytes, picked.name);
+      if (mounted) setState(() => _images[index] = url);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not upload photo: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _uploadingIndex = null);
+    }
+  }
+
+  Future<void> _save() async {
+    setState(() => _saving = true);
+    try {
+      await VendorRepository().updateProfile({
+        'portfolioUrls': _images.whereType<String>().toList(),
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Gallery saved')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not save gallery: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -130,9 +199,19 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 itemCount: 4,
                 itemBuilder: (context, i) {
                   final hasImage = _images[i] != null;
+                  final uploading = _uploadingIndex == i;
                   return GestureDetector(
-                    onTap: () {},
-                    child: hasImage
+                    onTap: uploading ? null : () => _pickAndUpload(i),
+                    child: uploading
+                        ? Container(
+                            decoration: BoxDecoration(
+                              color: context.c.surface,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Center(
+                                child: CircularProgressIndicator()),
+                          )
+                        : hasImage
                         ? ClipRRect(
                             borderRadius: BorderRadius.circular(12),
                             child: AppNetworkImage(
@@ -179,18 +258,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
           Padding(
             padding: EdgeInsets.fromLTRB(16, 0, 16, bottomPadding + 16),
             child: GestureDetector(
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Gallery saved!',
-                      style: GoogleFonts.urbanist(fontSize: 14),
-                    ),
-                    behavior: SnackBarBehavior.floating,
-                    backgroundColor: AppColors.activeText,
-                  ),
-                );
-              },
+              onTap: _saving ? null : _save,
               child: Container(
                 height: 52,
                 width: double.infinity,
