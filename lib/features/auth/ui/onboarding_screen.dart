@@ -88,8 +88,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Logo
-                    const PlanovarLogo(height: 40),
+                    // Logo — larger on desktop.
+                    PlanovarLogo(
+                        height: MediaQuery.sizeOf(context).width >= 900
+                            ? 56
+                            : 40),
                     if (!isLastPage)
                       TextButton(
                         onPressed: () => context.go(AppRoutes.register),
@@ -189,27 +192,32 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
 
-            // CTA area
+            // CTA area (width-capped so buttons don't stretch on desktop)
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
-              child: isLastPage
-                  ? Column(
-                      children: [
-                        AppButton.primary(
-                          'List my business',
-                          onTap: () => context.go(AppRoutes.register),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 420),
+                  child: isLastPage
+                      ? Column(
+                          children: [
+                            AppButton.primary(
+                              'List my business',
+                              onTap: () => context.go(AppRoutes.register),
+                            ),
+                            const SizedBox(height: 12),
+                            AppButton.secondary(
+                              'I already have an account',
+                              onTap: () => context.go(AppRoutes.login),
+                            ),
+                          ],
+                        )
+                      : AppButton.primary(
+                          'Next',
+                          onTap: _nextPage,
                         ),
-                        const SizedBox(height: 12),
-                        AppButton.secondary(
-                          'I already have an account',
-                          onTap: () => context.go(AppRoutes.login),
-                        ),
-                      ],
-                    )
-                  : AppButton.primary(
-                      'Next',
-                      onTap: _nextPage,
-                    ),
+                ),
+              ),
             ),
           ],
         ),

@@ -257,28 +257,8 @@ class _GradientHeader extends StatelessWidget {
                           size: 22,
                         ),
                       ),
-                      Positioned(
-                        top: -2,
-                        right: -2,
-                        child: Container(
-                          width: 14,
-                          height: 14,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFFF3B3B),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Center(
-                            child: Text(
-                              '2',
-                              style: GoogleFonts.urbanist(
-                                fontSize: 8,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                      // Unread badge intentionally omitted until a real unread
+                      // notification count is wired up (was a hardcoded "2").
                     ],
                   ),
                 ),
