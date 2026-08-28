@@ -33,6 +33,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _obscurePassword = true;
   bool _agreed = false;
 
+  @override
+  void initState() {
+    super.initState();
+    // Re-evaluate the submit button as the user types.
+    for (final c in [
+      _firstNameCtrl,
+      _lastNameCtrl,
+      _businessNameCtrl,
+      _emailCtrl,
+      _passwordCtrl,
+    ]) {
+      c.addListener(() => setState(() {}));
+    }
+  }
+
+  bool get _emailValid =>
+      RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(_emailCtrl.text.trim());
+
+  /// All required fields present + valid, and terms accepted.
+  bool get _formValid =>
+      _firstNameCtrl.text.trim().isNotEmpty &&
+      _lastNameCtrl.text.trim().isNotEmpty &&
+      _businessNameCtrl.text.trim().isNotEmpty &&
+      _emailValid &&
+      _passwordCtrl.text.length >= 8 &&
+      _agreed;
+
   static const _months = [
     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
@@ -407,7 +434,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 return AppButton.primary(
                   'Next',
                   loading: loading,
-                  onTap: (_agreed && !loading)
+                  onTap: (_formValid && !loading)
                       ? () {
                           // Strip a leading national-trunk 0 so 08012345678 and
                           // 8012345678 both become +2348012345678.

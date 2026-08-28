@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/api/api_client.dart';
+import '../../../core/api/api_utils.dart';
 import '../../../core/constants/app_constants.dart';
 
 /// Thin wrapper over the Better Auth endpoints (/api/auth/*).
@@ -169,6 +170,6 @@ class AuthRemoteDataSource {
     final msg = (data is Map && data['message'] != null)
         ? data['message'].toString()
         : 'Request failed ($code)';
-    throw Exception(msg);
+    throw Exception(friendlyApiMessage(msg, code));
   }
 }

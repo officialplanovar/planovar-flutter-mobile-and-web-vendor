@@ -217,7 +217,7 @@ class _GradientHeader extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Good morning,',
+                        _timeGreeting(),
                         style: GoogleFonts.urbanist(
                           fontSize: 14,
                           color: Colors.white70,
@@ -1014,4 +1014,12 @@ class _TypeCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Time-of-day greeting ("Good morning/afternoon/evening,").
+String _timeGreeting() {
+  final h = DateTime.now().hour;
+  if (h < 12) return 'Good morning,';
+  if (h < 17) return 'Good afternoon,';
+  return 'Good evening,';
 }
