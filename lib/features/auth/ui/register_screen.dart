@@ -8,6 +8,7 @@ import '../../../core/responsive/responsive.dart';
 import '../../../core/router/app_routes.dart';
 import '../data/auth_repository.dart';
 import '../../../shared/widgets/app_button.dart';
+import '../../../shared/data/dial_codes.dart';
 import '../../../shared/widgets/app_input.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
@@ -32,6 +33,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
   DateTime? _dob;
   bool _obscurePassword = true;
   bool _agreed = false;
+  String _dialCode = '+234';
+  String _flag = '🇳🇬';
+
+  void _showDialCodeSheet() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => ListView(
+        shrinkWrap: true,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        children: kDialCodes.map((d) {
+          return ListTile(
+            leading: Text(d.flag, style: const TextStyle(fontSize: 24)),
+            title: Text('${d.label} (${d.code})',
+                style: GoogleFonts.urbanist(fontWeight: FontWeight.w500)),
+            onTap: () {
+              setState(() {
+                _dialCode = d.code;
+                _flag = d.flag;
+              });
+              Navigator.pop(context);
+            },
+          );
+        }).toList(),
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -299,29 +329,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    Container(
-                      height: 52,
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      decoration: BoxDecoration(
-                        color: context.c.surfaceElevated,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Row(
-                        children: [
-                          const Text(
-                            '🇳🇬',
-                            style: TextStyle(fontSize: 18),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            '+234',
-                            style: GoogleFonts.urbanist(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                              color: context.c.textPrimary,
+                    GestureDetector(
+                      onTap: _showDialCodeSheet,
+                      child: Container(
+                        height: 52,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: context.c.surfaceElevated,
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Row(
+                          children: [
+                            Text(_flag, style: const TextStyle(fontSize: 18)),
+                            const SizedBox(width: 6),
+                            Text(
+                              _dialCode,
+                              style: GoogleFonts.urbanist(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                                color: context.c.textPrimary,
+                              ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 4),
+                            Icon(Icons.keyboard_arrow_down_rounded,
+                                size: 18, color: context.c.textSecondary),
+                          ],
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -455,7 +488,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   businessName: _businessNameCtrl.text.trim(),
                                   email: _emailCtrl.text.trim(),
                                   password: _passwordCtrl.text,
-                                  phone: phone.isEmpty ? null : '+234$phone',
+                                  phone:
+                                      phone.isEmpty ? null : '$_dialCode$phone',
                                 ),
                               );
                         }
