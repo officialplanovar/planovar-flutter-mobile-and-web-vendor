@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../core/responsive/responsive.dart';
 import '../data/auth_repository.dart';
 import '../../../core/router/app_routes.dart';
@@ -33,13 +34,14 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildDivider(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Row(
       children: [
         Expanded(child: Divider(color: context.c.border)),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            'or',
+            t.orLabel,
             style: GoogleFonts.urbanist(
               fontSize: 13,
               color: context.c.textHint,
@@ -52,6 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildGoogleButton(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
@@ -73,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(width: 10),
             Text(
-              'Continue with Google',
+              t.signInWithGoogle,
               style: GoogleFonts.urbanist(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
@@ -99,6 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: context.c.surface,
       appBar: AppBar(
@@ -115,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Welcome back',
+              t.welcomeBack,
               style: GoogleFonts.urbanist(
                 fontSize: 28,
                 fontWeight: FontWeight.w700,
@@ -134,7 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
             // Email
             AppInput(
-              label: 'Email Address',
+              label: t.emailAddress,
               hint: 'yourname@business.com',
               controller: _emailCtrl,
               keyboardType: TextInputType.emailAddress,
@@ -143,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
             // Password
             AppInput(
-              label: 'Password',
+              label: t.password,
               hint: 'Enter your password',
               controller: _passwordCtrl,
               obscureText: _obscure,
@@ -165,7 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: GestureDetector(
                 onTap: () => context.push(AppRoutes.forgotPassword),
                 child: Text(
-                  'Forgot Password?',
+                  t.forgotPassword,
                   style: GoogleFonts.urbanist(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -190,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
               builder: (context, state) {
                 final loading = state is AuthLoading;
                 return AppButton.primary(
-                  'Sign In',
+                  t.signIn,
                   loading: loading,
                   onTap: loading
                       ? null
@@ -216,7 +220,7 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "Don't have an account? ",
+                  t.noAccountQuestion,
                   style: GoogleFonts.urbanist(
                     fontSize: 14,
                     color: context.c.textSecondary,
@@ -225,7 +229,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 GestureDetector(
                   onTap: () => context.go(AppRoutes.register),
                   child: Text(
-                    'Register',
+                    t.signUp,
                     style: GoogleFonts.urbanist(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,

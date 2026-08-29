@@ -28,14 +28,65 @@ class AppLocalizationsEn extends AppLocalizations {
   String get retry => 'Retry';
 
   @override
-  String get settings => 'Settings';
+  String get next => 'Next';
 
   @override
-  String get home => 'Home';
+  String get skip => 'Skip';
 
   @override
-  String get profile => 'Profile';
+  String get search => 'Search';
 
   @override
-  String get logout => 'Log out';
+  String get seeAll => 'See All';
+
+  @override
+  String get navHome => 'Home';
+
+  @override
+  String get navExplore => 'Explore';
+
+  @override
+  String get navEvents => 'Events';
+
+  @override
+  String get navMessages => 'Messages';
+
+  @override
+  String get navProfile => 'Profile';
+
+  @override
+  String get welcomeBack => 'Welcome Back';
+
+  @override
+  String get signInToContinue => 'Sign in to continue your Journey on Planovar';
+
+  @override
+  String get emailAddress => 'Email Address';
+
+  @override
+  String get emailHint => 'Enter your Email address';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get passwordHint => 'Enter Password';
+
+  @override
+  String get forgotPassword => 'Forgot Password';
+
+  @override
+  String get signIn => 'Sign In';
+
+  @override
+  String get signInWithGoogle => 'Sign In with Google';
+
+  @override
+  String get orLabel => 'or';
+
+  @override
+  String get noAccountQuestion => 'Don\'t Have an account?';
+
+  @override
+  String get signUp => 'Sign up';
 }
