@@ -294,7 +294,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _MenuItem(
                 asset: 'assets/icons/customize-storefront.svg',
                 label: 'Customize your Storefront',
-                onTap: () => _comingSoon('Storefront customization'),
+                onTap: () => context.push(AppRoutes.editProfile),
               ),
               _MenuItem(
                 asset: 'assets/icons/notifications.svg',

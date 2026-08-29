@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
@@ -11,6 +12,7 @@ import '../../../shared/models/subscription_plan_model.dart';
 import '../../../shared/widgets/add_bank_account_sheet.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/network_image_widget.dart';
+import '../../../core/services/upload_service.dart';
 import '../../../shared/widgets/plan_card.dart';
 import '../../auth/bloc/auth_bloc.dart';
 import '../../auth/bloc/auth_state.dart';
@@ -144,6 +146,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   int _tabIndex = 0;
 
   String? _logoUrl;
+  String? _coverUrl;
+  bool _uploadingLogo = false;
+  bool _uploadingCover = false;
 
   // Personal
   final _emailCtrl = TextEditingController();
@@ -189,6 +194,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _descCtrl.text = v.description ?? '';
         _selectedTags = List<String>.from(v.tags);
         _logoUrl = v.logoUrl;
+        _coverUrl = v.coverUrl;
       });
     }).catchError((_) {});
     // Category tags — the real list from the backend.
@@ -247,6 +253,44 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _businessNameCtrl.dispose();
     _descCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickLogo() async {
+    final picked = await ImagePicker()
+        .pickImage(source: ImageSource.gallery, maxWidth: 800, imageQuality: 85);
+    if (picked == null) return;
+    setState(() => _uploadingLogo = true);
+    try {
+      final url =
+          await UploadService().uploadVendorLogo(await picked.readAsBytes(), picked.name);
+      if (mounted) setState(() => _logoUrl = url);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Could not upload logo: $e')));
+      }
+    } finally {
+      if (mounted) setState(() => _uploadingLogo = false);
+    }
+  }
+
+  Future<void> _pickCover() async {
+    final picked = await ImagePicker().pickImage(
+        source: ImageSource.gallery, maxWidth: 1600, imageQuality: 85);
+    if (picked == null) return;
+    setState(() => _uploadingCover = true);
+    try {
+      final url =
+          await UploadService().uploadVendorCover(await picked.readAsBytes(), picked.name);
+      if (mounted) setState(() => _coverUrl = url);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Could not upload cover: $e')));
+      }
+    } finally {
+      if (mounted) setState(() => _uploadingCover = false);
+    }
   }
 
   /// Personal details (phone + date of birth) live on the account/user record.
@@ -458,12 +502,125 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
+  Widget _editBadge() => Container(
+        width: 24,
+        height: 24,
+        decoration:
+            const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
+        child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 13),
+      );
+
+  Widget _storefrontImages(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Cover banner
+        GestureDetector(
+          onTap: _uploadingCover ? null : _pickCover,
+          child: Container(
+            height: 130,
+            width: double.infinity,
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              color: context.c.surfaceElevated,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                if ((_coverUrl ?? '').isNotEmpty)
+                  AppNetworkImage(url: _coverUrl, fit: BoxFit.cover)
+                else
+                  Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.add_photo_alternate_outlined,
+                            color: AppColors.primary, size: 28),
+                        const SizedBox(height: 6),
+                        Text('Add cover photo',
+                            style: GoogleFonts.urbanist(
+                                fontSize: 13, color: AppColors.primary)),
+                      ],
+                    ),
+                  ),
+                if (_uploadingCover)
+                  const ColoredBox(
+                    color: Color(0x66000000),
+                    child:
+                        Center(child: CircularProgressIndicator(color: Colors.white)),
+                  ),
+                Positioned(right: 8, bottom: 8, child: _editBadge()),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        // Logo + hint
+        Row(
+          children: [
+            GestureDetector(
+              onTap: _uploadingLogo ? null : _pickLogo,
+              child: Stack(
+                children: [
+                  Container(
+                    width: 68,
+                    height: 68,
+                    clipBehavior: Clip.antiAlias,
+                    decoration: BoxDecoration(
+                      color: context.c.surfaceElevated,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: AppColors.primary, width: 2),
+                    ),
+                    child: (_logoUrl ?? '').isNotEmpty
+                        ? AppNetworkImage(url: _logoUrl, fit: BoxFit.cover)
+                        : const Icon(Icons.storefront_rounded,
+                            color: AppColors.primary, size: 28),
+                  ),
+                  if (_uploadingLogo)
+                    Positioned.fill(
+                      child: ClipOval(
+                        child: ColoredBox(
+                          color: const Color(0x66000000),
+                          child: const Center(
+                            child: SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  Positioned(right: 0, bottom: 0, child: _editBadge()),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Your logo and cover are what clients see on your storefront.',
+                style: GoogleFonts.urbanist(
+                    fontSize: 12.5, color: context.c.textSecondary),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   Widget _buildBusinessTab() {
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          _fieldLabel(context, 'Storefront images'),
+          const SizedBox(height: 8),
+          _storefrontImages(context),
+          const SizedBox(height: 24),
           _fieldLabel(context, 'Business Name'),
           TextField(
             controller: _businessNameCtrl,
@@ -576,6 +733,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 if (name.length >= 2) 'businessName': name,
                 'description': _descCtrl.text.trim(),
                 'tags': _selectedTags,
+                if (_logoUrl != null) 'logoUrl': _logoUrl,
+                if (_coverUrl != null) 'coverUrl': _coverUrl,
               });
             },
           ),

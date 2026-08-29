@@ -30,6 +30,10 @@ class UploadService {
   Future<String> uploadVendorLogo(List<int> bytes, String filename) =>
       _post('/upload/vendor/logo', bytes: bytes, filename: filename);
 
+  /// Storefront cover/banner image.
+  Future<String> uploadVendorCover(List<int> bytes, String filename) =>
+      _post('/upload/vendor/cover', bytes: bytes, filename: filename);
+
   /// Listing photo (image only).
   Future<String> uploadListingImage(List<int> bytes, String filename) =>
       _post('/upload/listing/image', bytes: bytes, filename: filename);
