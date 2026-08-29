@@ -77,5 +77,6 @@ abstract class AppRoutes {
   static const bankDetails = '/profile/bank-details';
   static const reviews = '/profile/reviews';
   static const gallery = '/profile/gallery';
+  static const language = '/profile/language';
   static const termsAndConditions = '/profile/terms';
 }

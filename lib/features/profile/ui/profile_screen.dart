@@ -31,11 +31,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }).catchError((_) {});
   }
 
-  void _comingSoon(String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$feature is coming soon')),
-    );
-  }
 
   String _locationLabel(VendorModel? v) {
     final loc = (v?.location as Map?) ?? const {};
@@ -277,7 +272,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _MenuItem(
                 asset: 'assets/icons/language.svg',
                 label: 'Language Preference',
-                onTap: () => _comingSoon('Language preference'),
+                onTap: () => context.push(AppRoutes.language),
               ),
             ],
           ),

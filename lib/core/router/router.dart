@@ -34,6 +34,7 @@ import '../../features/profile/ui/profile_sub_screens.dart';
 import '../../features/profile/ui/twofa_screens.dart';
 import '../../features/profile/ui/reviews_screen.dart';
 import '../../features/profile/ui/gallery_screen.dart';
+import '../../features/profile/ui/language_screen.dart';
 import '../../features/profile/ui/support_screen.dart';
 import '../../features/profile/ui/terms_screen.dart';
 import '../../features/analytics/ui/analytics_screen.dart';
@@ -363,6 +364,10 @@ GoRouter createRouter() {
       GoRoute(
         path: AppRoutes.gallery,
         builder: (_, __) => const GalleryScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.language,
+        builder: (_, __) => const LanguageScreen(),
       ),
 
       // ─── Profile — Terms ──────────────────────────────────────────────────
