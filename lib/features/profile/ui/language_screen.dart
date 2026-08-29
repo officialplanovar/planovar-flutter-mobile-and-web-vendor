@@ -1,56 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/locale/locale_cubit.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 
-/// Language preference. English is fully available today; other languages are
-/// listed so vendors can register interest, and the choice is persisted for
-/// when full translations ship (app-wide i18n is a separate, phased effort).
-class LanguageScreen extends StatefulWidget {
+/// Language preference. English + French are translated and switch the app
+/// live via LocaleCubit; the Nigerian languages are listed for when their
+/// translations ship (app-wide string coverage is still being built out).
+class LanguageScreen extends StatelessWidget {
   const LanguageScreen({super.key});
 
-  @override
-  State<LanguageScreen> createState() => _LanguageScreenState();
-}
-
-class _LanguageScreenState extends State<LanguageScreen> {
-  static const _prefsKey = 'preferred_language';
-
-  // (code, label, available-now)
+  // (code, label)
   static const _languages = [
-    ('en', 'English', true),
-    ('pcm', 'Nigerian Pidgin', false),
-    ('ha', 'Hausa', false),
-    ('yo', 'Yoruba', false),
-    ('ig', 'Igbo', false),
-    ('fr', 'Français', false),
+    ('en', 'English'),
+    ('fr', 'Français'),
+    ('pcm', 'Nigerian Pidgin'),
+    ('ha', 'Hausa'),
+    ('yo', 'Yoruba'),
+    ('ig', 'Igbo'),
   ];
-
-  String _selected = 'en';
-
-  @override
-  void initState() {
-    super.initState();
-    SharedPreferences.getInstance().then((p) {
-      if (mounted) setState(() => _selected = p.getString(_prefsKey) ?? 'en');
-    });
-  }
-
-  Future<void> _select(String code, bool available) async {
-    if (!available) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('That language is coming soon.')),
-      );
-      return;
-    }
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_prefsKey, code);
-    if (mounted) setState(() => _selected = code);
-  }
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final current = context.watch<LocaleCubit>().state.languageCode;
     return Scaffold(
       backgroundColor: context.c.background,
       appBar: AppBar(
@@ -62,7 +37,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
               color: context.c.textPrimary, size: 20),
           onPressed: () => context.pop(),
         ),
-        title: Text('Language',
+        title: Text(t.language,
             style: GoogleFonts.urbanist(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -72,25 +47,32 @@ class _LanguageScreenState extends State<LanguageScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
         children: [
-          Text(
-            'Planovar is currently available in English. More languages are on '
-            'the way — pick one to register your interest.',
-            style: GoogleFonts.urbanist(
-                fontSize: 13, color: context.c.textSecondary, height: 1.5),
-          ),
+          Text(t.languageIntro,
+              style: GoogleFonts.urbanist(
+                  fontSize: 13, color: context.c.textSecondary, height: 1.5)),
           const SizedBox(height: 16),
-          for (final (code, label, available) in _languages)
-            _row(context, code, label, available),
+          for (final (code, label) in _languages)
+            _row(context, t, code, label, current),
         ],
       ),
     );
   }
 
-  Widget _row(BuildContext context, String code, String label, bool available) {
-    final selected = _selected == code;
+  Widget _row(BuildContext context, AppLocalizations t, String code,
+      String label, String current) {
+    final available = LocaleCubit.supported.contains(code);
+    final selected = current == code;
     return GestureDetector(
-      onTap: () => _select(code, available),
       behavior: HitTestBehavior.opaque,
+      onTap: () {
+        if (available) {
+          context.read<LocaleCubit>().setLocale(code);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('$label — ${t.comingSoon}')),
+          );
+        }
+      },
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -113,7 +95,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
                           : context.c.textHint)),
             ),
             if (!available)
-              Text('Soon',
+              Text(t.comingSoon,
                   style: GoogleFonts.urbanist(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,

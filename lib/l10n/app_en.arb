@@ -1,0 +1,16 @@
+{
+  "@@locale": "en",
+  "language": "Language",
+  "@language": { "description": "Language screen title" },
+  "languageIntro": "Choose your preferred language. English is available now — more are on the way.",
+  "@languageIntro": { "description": "Intro text on the language screen" },
+  "comingSoon": "Soon",
+  "@comingSoon": { "description": "Badge for a not-yet-available language" },
+  "save": "Save",
+  "cancel": "Cancel",
+  "retry": "Retry",
+  "settings": "Settings",
+  "home": "Home",
+  "profile": "Profile",
+  "logout": "Log out"
+}

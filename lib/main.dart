@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/api/token_store.dart';
+import 'core/locale/locale_cubit.dart';
+import 'l10n/app_localizations.dart';
 import 'core/router/app_routes.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_cubit.dart';
@@ -31,13 +33,17 @@ void main() async {
   }
   final themeCubit = ThemeCubit();
   await themeCubit.load();
-  runApp(PlanovarVendorApp(themeCubit: themeCubit));
+  final localeCubit = LocaleCubit();
+  await localeCubit.load();
+  runApp(PlanovarVendorApp(themeCubit: themeCubit, localeCubit: localeCubit));
 }
 
 class PlanovarVendorApp extends StatefulWidget {
   final ThemeCubit themeCubit;
+  final LocaleCubit localeCubit;
 
-  const PlanovarVendorApp({super.key, required this.themeCubit});
+  const PlanovarVendorApp(
+      {super.key, required this.themeCubit, required this.localeCubit});
 
   @override
   State<PlanovarVendorApp> createState() => _PlanovarVendorAppState();
@@ -64,6 +70,7 @@ class _PlanovarVendorAppState extends State<PlanovarVendorApp> {
     return MultiBlocProvider(
       providers: [
         BlocProvider<ThemeCubit>.value(value: widget.themeCubit),
+        BlocProvider<LocaleCubit>.value(value: widget.localeCubit),
         BlocProvider<AuthBloc>(create: (_) => AuthBloc()),
         BlocProvider<SetupCubit>(create: (_) => SetupCubit()),
         BlocProvider<ListingsCubit>(create: (_) => ListingsCubit()),
@@ -72,13 +79,21 @@ class _PlanovarVendorAppState extends State<PlanovarVendorApp> {
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         bloc: widget.themeCubit,
         builder: (context, themeMode) {
-          return MaterialApp.router(
-            title: 'Planovar Vendor',
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.light(),
-            darkTheme: AppTheme.dark(),
-            themeMode: themeMode,
-            routerConfig: _router,
+          return BlocBuilder<LocaleCubit, Locale>(
+            bloc: widget.localeCubit,
+            builder: (context, locale) {
+              return MaterialApp.router(
+                title: 'Planovar Vendor',
+                debugShowCheckedModeBanner: false,
+                theme: AppTheme.light(),
+                darkTheme: AppTheme.dark(),
+                themeMode: themeMode,
+                locale: locale,
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                supportedLocales: AppLocalizations.supportedLocales,
+                routerConfig: _router,
+              );
+            },
           );
         },
       ),

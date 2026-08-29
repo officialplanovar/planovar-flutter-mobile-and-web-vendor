@@ -1,0 +1,13 @@
+{
+  "@@locale": "fr",
+  "language": "Langue",
+  "languageIntro": "Choisissez votre langue préférée. L'anglais est disponible maintenant — d'autres arrivent bientôt.",
+  "comingSoon": "Bientôt",
+  "save": "Enregistrer",
+  "cancel": "Annuler",
+  "retry": "Réessayer",
+  "settings": "Paramètres",
+  "home": "Accueil",
+  "profile": "Profil",
+  "logout": "Se déconnecter"
+}
