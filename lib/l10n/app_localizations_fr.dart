@@ -55,6 +55,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get navProfile => 'Profil';
 
   @override
+  String get navListings => 'Annonces';
+
+  @override
+  String get navOrders => 'Commandes';
+
+  @override
   String get welcomeBack => 'Bon retour';
 
   @override

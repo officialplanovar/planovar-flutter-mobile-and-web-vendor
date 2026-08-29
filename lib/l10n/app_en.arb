@@ -18,6 +18,8 @@
   "navEvents": "Events",
   "navMessages": "Messages",
   "navProfile": "Profile",
+  "navListings": "Listings",
+  "navOrders": "Orders",
   "welcomeBack": "Welcome Back",
   "signInToContinue": "Sign in to continue your Journey on Planovar",
   "emailAddress": "Email Address",

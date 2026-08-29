@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import '../../l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/auth/ui/onboarding_screen.dart';
@@ -454,6 +455,23 @@ class _AppShell extends StatelessWidget {
   // Messages branch index in the StatefulShellRoute.
   static const _messagesBranch = 3;
 
+  /// Localized nav label for a StatefulShellBranch index.
+  static String _navLabel(BuildContext context, int branch) {
+    final t = AppLocalizations.of(context);
+    switch (branch) {
+      case 0:
+        return t.navHome;
+      case 1:
+        return t.navListings;
+      case 2:
+        return t.navOrders;
+      case 4:
+        return t.navProfile;
+      default:
+        return '';
+    }
+  }
+
   static const _fabGradient = LinearGradient(
     colors: [Color(0xFF6B6AF7), Color(0xFF3332D4)],
     begin: Alignment.topLeft,
@@ -525,15 +543,15 @@ class _AppShell extends StatelessWidget {
               child: Row(
                 children: [
                   // Home
-                  _buildTab(context, _tabs[0].branch, _tabs[0].icon, _tabs[0].activeIcon, _tabs[0].label),
+                  _buildTab(context, _tabs[0].branch, _tabs[0].icon, _tabs[0].activeIcon, _navLabel(context, _tabs[0].branch)),
                   // Listings
-                  _buildTab(context, _tabs[1].branch, _tabs[1].icon, _tabs[1].activeIcon, _tabs[1].label),
+                  _buildTab(context, _tabs[1].branch, _tabs[1].icon, _tabs[1].activeIcon, _navLabel(context, _tabs[1].branch)),
                   // Centre FAB placeholder (takes up Expanded space)
                   const Expanded(child: SizedBox()),
                   // Orders
-                  _buildTab(context, _tabs[2].branch, _tabs[2].icon, _tabs[2].activeIcon, _tabs[2].label),
+                  _buildTab(context, _tabs[2].branch, _tabs[2].icon, _tabs[2].activeIcon, _navLabel(context, _tabs[2].branch)),
                   // Profile
-                  _buildTab(context, _tabs[3].branch, _tabs[3].icon, _tabs[3].activeIcon, _tabs[3].label),
+                  _buildTab(context, _tabs[3].branch, _tabs[3].icon, _tabs[3].activeIcon, _navLabel(context, _tabs[3].branch)),
                 ],
               ),
             ),

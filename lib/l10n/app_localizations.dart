@@ -188,6 +188,18 @@ abstract class AppLocalizations {
   /// **'Profile'**
   String get navProfile;
 
+  /// No description provided for @navListings.
+  ///
+  /// In en, this message translates to:
+  /// **'Listings'**
+  String get navListings;
+
+  /// No description provided for @navOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Orders'**
+  String get navOrders;
+
   /// No description provided for @welcomeBack.
   ///
   /// In en, this message translates to:
