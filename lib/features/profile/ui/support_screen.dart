@@ -1,7 +1,10 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/network_image_widget.dart';
 import '../../auth/bloc/auth_bloc.dart';
@@ -707,7 +710,17 @@ class CallSupportScreen extends StatelessWidget {
   }
 }
 
-// ─── LiveChatScreen ───────────────────────────────────────────────────────────
+
+// ─── LiveChatScreen (Crisp) ─────────────────────────────────────────────────
+// Live support via Crisp. The website ID is supplied at build time:
+//   --dart-define=CRISP_WEBSITE_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+// Mobile shows the Crisp chatbox in an in-app WebView; web opens it in a new
+// tab (webview_flutter has no web implementation). Until the ID is configured,
+// a friendly placeholder with an email fallback is shown.
+
+const String _kCrispWebsiteId =
+    String.fromEnvironment('CRISP_WEBSITE_ID', defaultValue: '');
+const String _kSupportEmail = 'support@planovar.ng';
 
 class LiveChatScreen extends StatefulWidget {
   const LiveChatScreen({super.key});
@@ -717,266 +730,116 @@ class LiveChatScreen extends StatefulWidget {
 }
 
 class _LiveChatScreenState extends State<LiveChatScreen> {
-  final _messageCtrl = TextEditingController();
+  WebViewController? _controller;
 
-  static const _mockMessages = [
-    _MockMessage(
-      isMe: false,
-      text:
-          'Hello there, i would like to confirm my Maintenance schedule',
-      time: 'Today, 10:00 AM',
-    ),
-    _MockMessage(
-      isMe: true,
-      text:
-          'Hello there, i have a transaction issue i would like to resolve ASAP',
-      time: 'Today, 10:02 AM',
-    ),
-  ];
+  String get _chatUrl =>
+      'https://go.crisp.chat/chat/embed/?website_id=$_kCrispWebsiteId';
 
   @override
-  void dispose() {
-    _messageCtrl.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    if (_kCrispWebsiteId.isNotEmpty && !kIsWeb) {
+      _controller = WebViewController()
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..loadRequest(Uri.parse(_chatUrl));
+    }
+  }
+
+  Future<void> _openInBrowser() async {
+    await launchUrl(Uri.parse(_chatUrl),
+        mode: LaunchMode.externalApplication, webOnlyWindowName: '_blank');
+  }
+
+  Future<void> _emailSupport() async {
+    await launchUrl(Uri.parse('mailto:$_kSupportEmail'));
   }
 
   @override
   Widget build(BuildContext context) {
-    final topPadding = MediaQuery.of(context).padding.top;
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
-
     return Scaffold(
       backgroundColor: context.c.background,
       body: Column(
         children: [
-          // Gradient AppBar with agent info
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF5756F5), Color(0xFF3332D4)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            padding: EdgeInsets.only(
-              top: topPadding + 12,
-              left: 16,
-              right: 16,
-              bottom: 16,
-            ),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () => context.pop(),
-                  child: const Icon(Icons.arrow_back_rounded,
-                      color: Colors.white, size: 24),
-                ),
-                const SizedBox(width: 12),
-                Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 20,
-                      child: ClipOval(
-                        child: AppNetworkImage(
-                          url:
-                              'https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=100',
-                          width: 40,
-                          height: 40,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Live',
-                          style: GoogleFonts.urbanist(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Text(
-                          'Available 24/7',
-                          style: GoogleFonts.urbanist(
-                            fontSize: 12,
-                            color: Colors.white70,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          // Messages
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 16, vertical: 16),
-              itemCount: _mockMessages.length,
-              itemBuilder: (context, i) {
-                final msg = _mockMessages[i];
-                return Column(
-                  children: [
-                    // Time header
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Text(
-                        msg.time,
-                        style: GoogleFonts.urbanist(
-                          fontSize: 12,
-                          color: context.c.textSecondary,
-                        ),
-                      ),
-                    ),
-                    // Message bubble
-                    Align(
-                      alignment: msg.isMe
-                          ? Alignment.centerRight
-                          : Alignment.centerLeft,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          if (!msg.isMe) ...[
-                            CircleAvatar(
-                              radius: 10,
-                              backgroundColor: context.c.primaryLight,
-                              child: const Icon(
-                                Icons.support_agent_rounded,
-                                size: 12,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                          ],
-                          Flexible(
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 14, vertical: 10),
-                              margin: const EdgeInsets.only(bottom: 16),
-                              decoration: BoxDecoration(
-                                color: msg.isMe
-                                    ? AppColors.primary
-                                    : const Color(0xFF1A1A2E),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Text(
-                                msg.text,
-                                style: GoogleFonts.urbanist(
-                                  fontSize: 14,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                          if (msg.isMe) ...[
-                            const SizedBox(width: 6),
-                            CircleAvatar(
-                              radius: 10,
-                              backgroundColor: context.c.primaryLight,
-                              child: const Icon(
-                                Icons.person,
-                                size: 12,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-
-          // Bottom input bar
-          Container(
-            color: context.c.surface,
-            padding: EdgeInsets.fromLTRB(16, 12, 16, bottomPadding + 12),
-            child: Row(
-              children: [
-                // Attach button
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: context.c.primaryLight,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.attach_file_rounded,
-                      color: AppColors.primary, size: 20),
-                ),
-                const SizedBox(width: 8),
-                // Text field
-                Expanded(
-                  child: Container(
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: context.c.background,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: TextField(
-                      controller: _messageCtrl,
-                      style: GoogleFonts.urbanist(
-                          fontSize: 14,
-                          color: context.c.textPrimary),
-                      decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 10),
-                        hintText: 'Type a message',
-                        hintStyle: GoogleFonts.urbanist(
-                          fontSize: 14,
-                          color: context.c.textHint,
-                        ),
-                        border: InputBorder.none,
-                        suffixIcon: Icon(
-                          Icons.mic_outlined,
-                          color: context.c.textHint,
-                          size: 20,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                // Send button
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [Color(0xFF5756F5), Color(0xFF3332D4)],
-                    ),
-                  ),
-                  child: const Icon(Icons.send_rounded,
-                      color: Colors.white, size: 20),
-                ),
-              ],
-            ),
-          ),
+          _buildGradientAppBar(context,
+              title: 'Live Support',
+              subtitle: 'We usually reply in a few minutes'),
+          Expanded(child: _body(context)),
         ],
       ),
     );
   }
-}
 
-class _MockMessage {
-  final bool isMe;
-  final String text;
-  final String time;
+  Widget _body(BuildContext context) {
+    if (_kCrispWebsiteId.isEmpty) {
+      return _placeholder(
+        context,
+        icon: Icons.support_agent_rounded,
+        title: 'Live chat is being set up',
+        message:
+            "Our live chat isn't connected yet. In the meantime, email us and "
+            "we'll get right back to you.",
+        actionLabel: 'Email support',
+        onAction: _emailSupport,
+      );
+    }
+    if (kIsWeb) {
+      return _placeholder(
+        context,
+        icon: Icons.chat_bubble_outline_rounded,
+        title: 'Chat with our team',
+        message: 'Open our live chat to talk to a support agent.',
+        actionLabel: 'Open live chat',
+        onAction: _openInBrowser,
+      );
+    }
+    return WebViewWidget(controller: _controller!);
+  }
 
-  const _MockMessage({
-    required this.isMe,
-    required this.text,
-    required this.time,
-  });
+  Widget _placeholder(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String message,
+    required String actionLabel,
+    required VoidCallback onAction,
+  }) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 56, color: AppColors.primary),
+            const SizedBox(height: 16),
+            Text(title,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.urbanist(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    color: context.c.textPrimary)),
+            const SizedBox(height: 8),
+            Text(message,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.urbanist(
+                    fontSize: 14, color: context.c.textSecondary, height: 1.5)),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: onAction,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14)),
+              ),
+              child: Text(actionLabel,
+                  style: GoogleFonts.urbanist(
+                      fontSize: 15, fontWeight: FontWeight.w700)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
