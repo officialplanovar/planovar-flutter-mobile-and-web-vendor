@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../core/services/upload_service.dart';
 import '../../../core/responsive/responsive.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/app_icon.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_input.dart';
@@ -111,9 +112,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
             content:
-                Text('Enter the product name first, then generate an SKU.')),
+                Text(AppLocalizations.of(context).apGenerateSkuHint)),
       );
       return;
     }
@@ -137,13 +138,13 @@ class _AddProductScreenState extends State<AddProductScreen> {
     final desc = _descController.text.trim();
     if (name.isEmpty || desc.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Product name and description are required')),
+        SnackBar(content: Text(AppLocalizations.of(context).apNameDescRequired)),
       );
       return;
     }
     if (_selectedCategory == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a category')),
+        SnackBar(content: Text(AppLocalizations.of(context).apSelectCategory)),
       );
       return;
     }
@@ -222,13 +223,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   Widget _buildCategorySelector() {
+    final t = AppLocalizations.of(context);
     return GestureDetector(
       onTap: _showCategoryBottomSheet,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Category',
+            t.category,
             style: GoogleFonts.urbanist(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -247,7 +249,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               children: [
                 Expanded(
                   child: Text(
-                    _selectedCategory ?? 'Select a category',
+                    _selectedCategory ?? t.apSelectACategory,
                     style: GoogleFonts.urbanist(
                       fontSize: 15,
                       color: _selectedCategory != null
@@ -269,6 +271,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   void _showCategoryBottomSheet() {
+    final t = AppLocalizations.of(context);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -288,7 +291,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
                   child: Text(
-                    'Select Category',
+                    t.selectCategory,
                     style: GoogleFonts.urbanist(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
@@ -307,8 +310,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                           ? Padding(
                               padding: const EdgeInsets.all(24),
                               child: Text(
-                                "You haven't added any categories to your profile yet. "
-                                'Add them under Profile → Business Details to list products here.',
+                                t.apNoCategoriesProfile,
                                 style: GoogleFonts.urbanist(
                                   fontSize: 14,
                                   color: context.c.textSecondary,
@@ -352,8 +354,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Only your registered categories are shown. Add more in '
-                          'Profile → Business Details.',
+                          t.apOnlyRegisteredCategories,
                           style: GoogleFonts.urbanist(
                             fontSize: 12,
                             color: context.c.textSecondary,
@@ -380,10 +381,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
       ),
       child: Row(
         children: [
-          _buildToggleTab('For Sale', !_isForRent, () {
+          _buildToggleTab(AppLocalizations.of(context).apForSale, !_isForRent, () {
             setState(() => _isForRent = false);
           }),
-          _buildToggleTab('For Rent', _isForRent, () {
+          _buildToggleTab(AppLocalizations.of(context).apForRent, _isForRent, () {
             setState(() => _isForRent = true);
           }),
         ],
@@ -540,6 +541,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: context.c.surface,
       appBar: AppBar(
@@ -565,7 +567,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Add a Product',
+              t.apTitle,
               style: GoogleFonts.urbanist(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
@@ -573,7 +575,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               ),
             ),
             Text(
-              'Add a product to your catalogue',
+              t.apSubtitle,
               style: GoogleFonts.urbanist(
                 fontSize: 12,
                 color: context.c.textSecondary,
@@ -594,14 +596,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   _buildToggleTabs(),
                   const SizedBox(height: 24),
                   AppInput(
-                    label: 'Product Name',
-                    hint: 'Enter product name...',
+                    label: t.apProductName,
+                    hint: t.apProductNameHint,
                     controller: _nameController,
                   ),
                   const SizedBox(height: 16),
                   AppInput(
-                    label: 'Product Description',
-                    hint: 'Describe your product...',
+                    label: t.apProductDescription,
+                    hint: t.apProductDescriptionHint,
                     controller: _descController,
                     maxLines: 4,
                     keyboardType: TextInputType.multiline,
@@ -611,7 +613,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   _buildCategorySelector(),
                   const SizedBox(height: 16),
                   AppInput(
-                    label: 'Product Price',
+                    label: t.apProductPrice,
                     hint: '0',
                     controller: _priceController,
                     keyboardType: TextInputType.number,
@@ -621,7 +623,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   if (_isForRent) ...[
                     const SizedBox(height: 16),
                     AppInput(
-                      label: 'Price Per Day',
+                      label: t.apPricePerDay,
                       hint: '0',
                       controller: _perDayController,
                       keyboardType: TextInputType.number,
@@ -630,7 +632,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     ),
                     const SizedBox(height: 16),
                     AppInput(
-                      label: 'Refundable Deposit',
+                      label: t.apRefundableDeposit,
                       hint: '0',
                       controller: _depositController,
                       keyboardType: TextInputType.number,
@@ -639,8 +641,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     ),
                     const SizedBox(height: 16),
                     AppInput(
-                      label: 'Rental Duration (days)',
-                      hint: 'e.g. 3',
+                      label: t.apRentalDuration,
+                      hint: t.apRentalDurationHint,
                       controller: _durationController,
                       keyboardType: TextInputType.number,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -648,8 +650,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   ],
                   const SizedBox(height: 16),
                   AppInput(
-                    label: 'SKU',
-                    hint: 'Enter product SKU...',
+                    label: t.addSuccessSku,
+                    hint: t.apSkuHint,
                     controller: _skuController,
                   ),
                   Align(
@@ -657,7 +659,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     child: TextButton.icon(
                       onPressed: _generateSku,
                       icon: const Icon(Icons.auto_awesome_rounded, size: 16),
-                      label: const Text('Generate for me'),
+                      label: Text(t.apGenerateForMe),
                       style: TextButton.styleFrom(
                         foregroundColor: AppColors.primary,
                         textStyle: GoogleFonts.urbanist(
@@ -670,24 +672,24 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   ),
                   const SizedBox(height: 8),
                   AppInput(
-                    label: 'Quantity in Stock',
-                    hint: 'How many do you have in stock',
+                    label: t.apQuantityInStock,
+                    hint: t.apQuantityHint,
                     controller: _quantityController,
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   ),
                   const SizedBox(height: 20),
-                  _buildSectionTitle('Available Sizes (Optional)'),
+                  _buildSectionTitle(t.apAvailableSizes),
                   _buildSizesRow(),
                   const SizedBox(height: 20),
                   TagInputField(
                     tags: _tags,
-                    label: 'Tags',
-                    hint: 'e.g. Wedding, Cake, Luxury',
+                    label: t.apTags,
+                    hint: t.apTagsHint,
                     onChanged: (updated) => setState(() => _tags = updated),
                   ),
                   const SizedBox(height: 20),
-                  _buildSectionTitle('Product Photos'),
+                  _buildSectionTitle(t.apProductPhotos),
                   GridView.count(
                     crossAxisCount: 2,
                     shrinkWrap: true,
@@ -696,10 +698,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     mainAxisSpacing: 12,
                     childAspectRatio: 2.0,
                     children: [
-                      _buildPhotoBox(0, 'Front Photo'),
-                      _buildPhotoBox(1, 'Back Photo'),
-                      _buildPhotoBox(2, 'Side Photo'),
-                      _buildPhotoBox(3, 'Detail Photo'),
+                      _buildPhotoBox(0, t.apFrontPhoto),
+                      _buildPhotoBox(1, t.apBackPhoto),
+                      _buildPhotoBox(2, t.apSidePhoto),
+                      _buildPhotoBox(3, t.apDetailPhoto),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -717,7 +719,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               ),
             ),
             child: AppButton.primary(
-              _publishing ? 'Publishing…' : 'Publish Product',
+              _publishing ? t.apPublishing : t.apPublishProduct,
               loading: _publishing,
               onTap: (_publishing || !_canPublish) ? null : _publish,
             ),

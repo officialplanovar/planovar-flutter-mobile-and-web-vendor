@@ -28,5 +28,581 @@
   "signInWithGoogle": "Se connecter avec Google",
   "orLabel": "ou",
   "noAccountQuestion": "Vous n'avez pas de compte ?",
-  "signUp": "S'inscrire"
+  "signUp": "S'inscrire",
+  "onboardingTitle1": "Accédez à des milliers de clients événementiels",
+  "onboardingSubtitle1": "Connectez-vous avec des couples, des entreprises et des organisateurs d'événements de votre région, tous à la recherche active de prestataires comme vous",
+  "onboardingTitle2": "Gérez tout depuis un seul tableau de bord",
+  "onboardingSubtitle2": "Suivez vos demandes, réservations et conversations depuis un espace de travail unique",
+  "onboardingTitle3": "Présentez votre travail, faites-vous découvrir",
+  "onboardingSubtitle3": "Répertoriez vos produits, services et locations, puis abonnez-vous pour grimper dans les classements de recherche et atteindre les organisateurs d'événements en premier.",
+  "onboardingListBusiness": "Répertorier mon entreprise",
+  "onboardingHaveAccount": "J'ai déjà un compte",
+  "loginSubtitle": "Connectez-vous à votre compte prestataire",
+  "emailPlaceholder": "votrenom@entreprise.com",
+  "loginPasswordHint": "Saisissez votre mot de passe",
+  "registerTitle": "Créez votre compte prestataire",
+  "registerSubtitle": "Commencez à répertorier votre entreprise sur Planovar",
+  "firstName": "Prénom",
+  "firstNameHint": "p. ex. Ada",
+  "lastName": "Nom",
+  "lastNameHint": "p. ex. Obi",
+  "businessName": "Nom de l'entreprise",
+  "businessNameHint": "p. ex. Sugared Dreams Cakery",
+  "dateOfBirth": "Date de naissance",
+  "dobPlaceholder": "JJ / MM / AAAA",
+  "selectDob": "Sélectionnez votre date de naissance",
+  "phoneNumber": "Numéro de téléphone",
+  "phoneNumberHint": "8012345678",
+  "createPassword": "Créer un mot de passe",
+  "createPasswordHint": "Min. 8 caractères",
+  "registerAgreePrefix": "En cochant la case, vous acceptez nos ",
+  "termsAndConditions": "Conditions générales",
+  "registerAgreeAnd": " et notre ",
+  "privacyPolicy": "Politique de confidentialité",
+  "continueWithGoogle": "Continuer avec Google",
+  "alreadyHaveAccount": "Vous avez déjà un compte ? ",
+  "signInAction": "Se connecter",
+  "forgotResetTitle": "Réinitialisez votre mot de passe",
+  "forgotResetIntro": "Saisissez votre adresse e-mail et nous vous enverrons un code à 6 chiffres pour réinitialiser votre mot de passe.",
+  "forgotResetSentTo": "Un code de réinitialisation a été envoyé à {email}. Vérifiez votre boîte de réception.",
+  "@forgotResetSentTo": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "resendCode": "Renvoyer le code",
+  "sendResetCode": "Envoyer le code de réinitialisation",
+  "backToSignIn": "Retour à la connexion",
+  "resetPasswordTitle": "Réinitialiser le mot de passe",
+  "resetPasswordSuccess": "Mot de passe réinitialisé avec succès. Veuillez vous connecter.",
+  "resetCreateNewPassword": "Créez un nouveau mot de passe",
+  "resetCodeSentTo": "Saisissez le code à 6 chiffres envoyé à ",
+  "resetChoosePassword": " et choisissez un nouveau mot de passe.",
+  "verificationCode": "Code de vérification",
+  "sixDigitCode": "Code à 6 chiffres",
+  "newPassword": "Nouveau mot de passe",
+  "atLeast8Chars": "Au moins 8 caractères",
+  "mustBeAtLeast8Chars": "Doit contenir au moins 8 caractères",
+  "confirmPassword": "Confirmer le mot de passe",
+  "confirmPasswordHint": "Ressaisissez votre nouveau mot de passe",
+  "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+  "verifyEmailTitle": "Vérifiez votre e-mail",
+  "verifyEmailIntro": "Nous avons envoyé un code OTP à 6 chiffres à votre adresse e-mail",
+  "verifyNewCodeSent": "Un nouveau code a été envoyé",
+  "verifyCouldNotResend": "Impossible de renvoyer le code : {error}",
+  "@verifyCouldNotResend": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "proceed": "Continuer",
+  "verifyResendIn": "Renvoyer le code dans {seconds} s",
+  "@verifyResendIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "resendCodeAction": "Renvoyer le code",
+  "setupBusinessSetup": "Configuration de l'entreprise",
+  "setupBusinessProfileTitle": "Profil de l'entreprise",
+  "setupBusinessProfileSubtitle": "Dites aux clients qui vous êtes",
+  "setupLicensedBusiness": "Entreprise agréée",
+  "setupLicensedBusinessDesc": "Société, agence ou studio enregistré",
+  "setupFreelancer": "Indépendant",
+  "setupFreelancerDesc": "Particulier proposant des services professionnels",
+  "setupCouldNotLoadCategories": "Impossible de charger les catégories",
+  "setupCouldNotReadFile": "Impossible de lire le fichier sélectionné",
+  "setupFileTooLarge": "Le fichier dépasse 5 Mo",
+  "setupBusinessLogoOptional": "Logo de l'entreprise (facultatif)",
+  "setupBusinessDescription": "Description de l'entreprise",
+  "setupBusinessDescriptionHint": "Dites aux clients ce qui rend votre entreprise spéciale, votre expérience et ce que vous proposez...",
+  "setupProofOfOwnership": "Preuve de propriété",
+  "setupProofOptionalFreelancers": "(facultatif pour les indépendants)",
+  "setupDocumentUploaded": "Document téléchargé",
+  "setupTapToReplace": "Appuyez pour remplacer",
+  "setupTapToUpload": "Appuyez pour télécharger",
+  "setupUploadFileTypes": "JPG, PNG ou PDF jusqu'à 5 Mo",
+  "setupCategoryTags": "Étiquettes de catégorie",
+  "setupNoCategories": "Aucune catégorie disponible pour le moment",
+  "setupLocationTitle": "Localisation et portée",
+  "setupLocationSubtitle": "Où opérez-vous ?",
+  "setupTurnOnLocation": "Activez les services de localisation pour utiliser ceci.",
+  "setupLocationDenied": "Autorisation de localisation refusée — choisissez votre ville manuellement.",
+  "setupCouldNotDetermineCity": "Impossible de déterminer votre ville — veuillez la choisir manuellement.",
+  "setupCouldNotGetLocation": "Impossible d'obtenir votre position. Veuillez choisir votre ville manuellement.",
+  "selectCountry": "Sélectionner le pays",
+  "selectCity": "Sélectionner la ville",
+  "selectYourCity": "Sélectionnez votre ville",
+  "country": "Pays",
+  "city": "Ville",
+  "setupLocating": "Localisation…",
+  "setupUseCurrentLocation": "Utiliser ma position actuelle",
+  "setupVendorType": "Type de prestataire",
+  "setupProductsOnly": "Produits uniquement",
+  "setupServicesOnly": "Services uniquement",
+  "setupBothProductsServices": "Produits et services",
+  "setupChoosePlanTitle": "Choisissez votre forfait",
+  "setupChoosePlanSubtitle": "Améliorez à tout moment. Annulez à tout moment.",
+  "setupCouldNotLoadPlans": "Impossible de charger les forfaits. Vérifiez votre connexion et réessayez.",
+  "setupSelectPlan": "Choisir {plan}",
+  "@setupSelectPlan": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "setupSkipForNow": "Ignorer pour l'instant",
+  "setupVerifyIdentityTitle": "Vérifiez votre identité",
+  "setupVerifyIdentitySubtitle": "Téléchargez votre NIN, et votre CAC si vous dirigez une entreprise agréée. Stocké en toute sécurité.",
+  "setupUploaded": "Téléchargé",
+  "setupUploadNin": "Téléchargez votre attestation NIN",
+  "setupUploadCac": "Téléchargez votre document CAC",
+  "setupPaymentNotCompleted": "Paiement non finalisé — vous pouvez souscrire à un forfait payant à tout moment depuis votre profil.",
+  "setupSomethingWentWrong": "Une erreur s'est produite",
+  "setupSettingUp": "Configuration…",
+  "setupFinishSetup": "Terminer la configuration",
+  "setupCompleteVerificationLater": "Vous pouvez compléter la vérification plus tard depuis votre profil.",
+  "selectBank": "Sélectionner la banque",
+  "setupPayoutTitle": "Détails de versement",
+  "setupPayoutSubtitle": "Où devons-nous envoyer vos gains ?",
+  "setupBankName": "Nom de la banque",
+  "setupSelectYourBank": "Sélectionnez votre banque",
+  "setupAccountNumber": "Numéro de compte",
+  "setupAccountNumberHint": "0123456789",
+  "setupAccountName": "Nom du compte",
+  "setupAutoVerified": "Vérifié automatiquement",
+  "setupPayoutSchedule": "Calendrier des versements",
+  "setupPayoutRolling": "En continu · 24–48 h après réalisation",
+  "setupPayoutCommission": "Commission de la plateforme · Déduite avant le versement",
+  "setupMinimumPayout": "Versement minimum · ₦1 000",
+  "setupSecuredByPaystack": "Sécurisé par Paystack",
+  "setupSavePayoutDetails": "Enregistrer les détails de versement",
+  "setupAllSet": "Tout est prêt !",
+  "setupProfileLive": "Votre profil prestataire est en ligne sur Planovar. Commencez à ajouter vos produits et services pour atteindre des milliers d'organisateurs d'événements à Lagos.",
+  "setupAddFirstListing": "Ajoutez votre première annonce",
+  "setupAddFirstListingSub": "Produits, services ou locations",
+  "setupUpgradePlan": "Améliorez votre forfait",
+  "setupUpgradePlanSub": "Obtenez plus de visibilité et d'analyses",
+  "setupGoToDashboard": "Aller au tableau de bord",
+  "payCompletePayment": "Finaliser le paiement",
+  "paySecurePayment": "Paiement sécurisé",
+  "payBrowserFailed": "Nous n'avons pas pu ouvrir votre navigateur. Appuyez ci-dessous pour ouvrir le paiement sécurisé Paystack.",
+  "payBrowserOpened": "Nous avons ouvert le paiement sécurisé Paystack dans votre navigateur. Finalisez votre paiement là-bas, puis revenez et appuyez sur le bouton ci-dessous.",
+  "payOpenPaymentPage": "Ouvrir la page de paiement",
+  "payReopenPaymentPage": "Rouvrir la page de paiement",
+  "payCompletedPayment": "J'ai finalisé le paiement",
+  "homeTodaysSchedule": "Programme du jour",
+  "homeQuickAction": "Action rapide",
+  "viewAll": "Voir tout",
+  "homeNewRequestsAttention": "{count} nouvelles demandes requièrent votre attention",
+  "@homeNewRequestsAttention": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeNewRequestsSubtitle": "Vous avez {count} nouvelles demandes pour vos annonces",
+  "@homeNewRequestsSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeConfirmedBookings": "Réservations confirmées",
+  "homePendingRequests": "Demandes en attente",
+  "homeThisMonth": "Ce mois-ci",
+  "homeBookingsCount": "{count} réservations",
+  "@homeBookingsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeAvgRating": "Note moyenne",
+  "homeFromReviews": "sur {count} avis",
+  "@homeFromReviews": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeNoSchedule": "Aucun programme pour aujourd'hui",
+  "homeAddListing": "Ajouter une annonce",
+  "homeAnalytics": "Analyses",
+  "homeUpgradePlanShort": "Améliorer le forfait",
+  "homePayouts": "Versements",
+  "homeGoodMorning": "Bonjour,",
+  "homeGoodAfternoon": "Bon après-midi,",
+  "homeGoodEvening": "Bonsoir,",
+  "listingTypeTitle": "Type d'annonce",
+  "listingTypeSubtitle": "Sélectionnez le type d'annonce que vous souhaitez créer",
+  "listingTypeService": "Service",
+  "listingTypeServiceDesc": "rendez-vous réservable",
+  "listingTypeProduct": "Produit",
+  "listingTypeProductDesc": "Article physique à louer ou à vendre",
+  "homeActionNeeded": "Action requise",
+  "homeAllCaughtUp": "Vous êtes à jour",
+  "homeNoInquiriesWaiting": "Aucune demande n'attend votre réponse.",
+  "homeNewInquiry": "Nouvelle demande",
+  "homeNewBadge": "Nouveau",
+  "homeOpenRespond": "Ouvrir et répondre",
+  "addListingNewListing": "Nouvelle annonce",
+  "addListingServiceDesc": "Rendez-vous réservable",
+  "addSuccessSuccessfully": "avec succès",
+  "addSuccessAddedTitle": "{label} ajouté ",
+  "@addSuccessAddedTitle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "addSuccessPendingSubtitle": "Votre {label} a été enregistré. Il deviendra visible pour les clients une fois votre compte vérifié.",
+  "@addSuccessPendingSubtitle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "addSuccessLiveService": "Votre service a été ajouté avec succès et est actuellement en ligne",
+  "addSuccessLiveProduct": "Votre produit a été ajouté avec succès et est actuellement en ligne",
+  "addSuccessPendingWarning": "Vérification en attente — les clients ne peuvent pas voir vos annonces tant qu'un administrateur n'a pas vérifié votre compte. Nous vous préviendrons une fois approuvé.",
+  "addSuccessIdLabel": "ID {label}",
+  "@addSuccessIdLabel": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "addSuccessSku": "SKU",
+  "addSuccessDateCreated": "Date de création",
+  "addSuccessViewLabel": "Voir {label}",
+  "@addSuccessViewLabel": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "listingBadgeProductRental": "Produit (Location)",
+  "listingPerDay": "{price} / jour",
+  "@listingPerDay": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "listingQuoteBased": "Sur devis",
+  "listingsMyListings": "Mes annonces",
+  "listingsTabAll": "Toutes ({count})",
+  "@listingsTabAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "listingsTabServices": "Services ({count})",
+  "@listingsTabServices": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "listingsTabProducts": "Produits ({count})",
+  "@listingsTabProducts": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "listingsTabRentals": "Locations ({count})",
+  "@listingsTabRentals": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "listingsOutOfStockCount": "{count} articles en rupture de stock, ",
+  "@listingsOutOfStockCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "listingsClickToUpdate": "Cliquez pour mettre à jour",
+  "statusActive": "Actif",
+  "statusInactive": "Inactif",
+  "listingsPendingReview": "En attente d'examen",
+  "listingsEmptyTitle": "Aucune annonce pour le moment",
+  "listingsEmptySubtitle": "Appuyez sur + pour ajouter votre première annonce",
+  "listingsAddListing": "Ajouter une annonce",
+  "listingsCouldNotLoad": "Impossible de charger vos annonces",
+  "oosTitle": "Annonces en rupture de stock",
+  "oosRental": "Location",
+  "oosReactivated": "{noun} réactivé",
+  "@oosReactivated": {
+    "placeholders": {
+      "noun": {
+        "type": "String"
+      }
+    }
+  },
+  "oosBadge": "Rupture de stock",
+  "oosRestock": "Réapprovisionner",
+  "oosEmptyTitle": "Toutes les annonces sont en stock !",
+  "oosEmptySubtitle": "Aucun article en rupture de stock dans cette catégorie",
+  "category": "Catégorie",
+  "selectCategory": "Sélectionner une catégorie",
+  "apGenerateSkuHint": "Saisissez d'abord le nom du produit, puis générez un SKU.",
+  "apNameDescRequired": "Le nom et la description du produit sont requis",
+  "apSelectCategory": "Veuillez sélectionner une catégorie",
+  "apSelectACategory": "Sélectionnez une catégorie",
+  "apNoCategoriesProfile": "Vous n'avez pas encore ajouté de catégories à votre profil. Ajoutez-les dans Profil → Détails de l'entreprise pour répertorier des produits ici.",
+  "apOnlyRegisteredCategories": "Seules vos catégories enregistrées sont affichées. Ajoutez-en plus dans Profil → Détails de l'entreprise.",
+  "apForSale": "À vendre",
+  "apForRent": "À louer",
+  "apTitle": "Ajouter un produit",
+  "apSubtitle": "Ajoutez un produit à votre catalogue",
+  "apProductName": "Nom du produit",
+  "apProductNameHint": "Saisissez le nom du produit...",
+  "apProductDescription": "Description du produit",
+  "apProductDescriptionHint": "Décrivez votre produit...",
+  "apProductPrice": "Prix du produit",
+  "apPricePerDay": "Prix par jour",
+  "apRefundableDeposit": "Caution remboursable",
+  "apRentalDuration": "Durée de location (jours)",
+  "apRentalDurationHint": "p. ex. 3",
+  "apSkuHint": "Saisissez le SKU du produit...",
+  "apGenerateForMe": "Générer pour moi",
+  "apQuantityInStock": "Quantité en stock",
+  "apQuantityHint": "Combien en avez-vous en stock",
+  "apAvailableSizes": "Tailles disponibles (facultatif)",
+  "apTags": "Étiquettes",
+  "apTagsHint": "p. ex. Mariage, Gâteau, Luxe",
+  "apProductPhotos": "Photos du produit",
+  "apFrontPhoto": "Photo de face",
+  "apBackPhoto": "Photo de dos",
+  "apSidePhoto": "Photo de côté",
+  "apDetailPhoto": "Photo de détail",
+  "apPublishing": "Publication…",
+  "apPublishProduct": "Publier le produit",
+  "gotIt": "Compris",
+  "asNameDescRequired": "Le nom et la description du service sont requis",
+  "asNoCategoriesProfile": "Vous n'avez pas encore ajouté de catégories à votre profil. Ajoutez-les dans Profil → Détails de l'entreprise pour répertorier des services ici.",
+  "asCancellationPolicy": "Politique d'annulation",
+  "policyFlexible": "Flexible",
+  "policyModerate": "Modérée",
+  "policyStrict": "Stricte",
+  "policyFlexibleDesc": "Remboursement intégral si le client annule jusqu'à 24 heures avant l'événement.",
+  "policyModerateDesc": "Remboursement de 50 % si annulé au moins 7 jours avant l'événement ; aucun après.",
+  "policyStrictDesc": "Aucun remboursement une fois la réservation confirmée.",
+  "asCategoryInfo": "La catégorie de service que les clients parcourent. Seules les catégories enregistrées sur votre profil apparaissent ici.",
+  "asPriceRange": "Fourchette de prix",
+  "asPriceRangeInfo": "La fourchette de prix habituelle pour ce service. Les clients la voient comme un guide ; le montant final est convenu dans votre devis.",
+  "asMin": "Min",
+  "asMax": "Max",
+  "asServiceDuration": "Durée du service",
+  "durationDays": "Jours",
+  "durationHours": "Heures",
+  "durationMins": "Min",
+  "asDurationHint": "Saisissez la valeur de durée...",
+  "asSelectPolicy": "Sélectionnez une politique",
+  "asCancellationPolicyInfo": "Comment fonctionnent les remboursements si un client annule. Choisissez le niveau qui convient le mieux à votre entreprise.",
+  "asTitle": "Ajouter un service",
+  "asSubtitle": "Ajoutez un service pour votre entreprise",
+  "asServiceName": "Nom du service",
+  "asServiceNameHint": "Saisissez le nom du service...",
+  "asServiceNameInfo": "Un nom court et clair que les clients verront, p. ex. « Photographie de mariage — Journée complète ».",
+  "asServiceDescription": "Description du service",
+  "asServiceDescriptionHint": "Décrivez votre service...",
+  "asServiceDescriptionInfo": "Ce qui est inclus, votre expérience et ce à quoi les clients peuvent s'attendre. Plus il y a de détails, plus il y a de confiance.",
+  "asTagsHint": "p. ex. Mariage, Photographie, Extérieur",
+  "asServicePhotos": "Photos du service",
+  "asPhotoNumber": "Photo {number}",
+  "@asPhotoNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "asPublishService": "Publier le service",
+  "loading": "Chargement…",
+  "ldNotFound": "Annonce introuvable",
+  "ldServiceLower": "service",
+  "ldProductLower": "produit",
+  "ldDeleted": "{noun} supprimé",
+  "@ldDeleted": {
+    "placeholders": {
+      "noun": {
+        "type": "String"
+      }
+    }
+  },
+  "ldDeactivated": "{noun} désactivé",
+  "@ldDeactivated": {
+    "placeholders": {
+      "noun": {
+        "type": "String"
+      }
+    }
+  },
+  "ldEditService": "Modifier le service",
+  "ldEditProduct": "Modifier le produit",
+  "ldDeleteService": "Supprimer le service",
+  "ldDeleteProduct": "Supprimer le produit",
+  "ldDeactivateService": "Désactiver le service",
+  "ldDeactivateProduct": "Désactiver le produit",
+  "ldViews30d": "Vues (30 j)",
+  "ldRating": "Note",
+  "ldNoReviews": "Aucun avis pour le moment",
+  "ldFixedPrice": "Prix fixe",
+  "ldStartingFrom": "À partir de",
+  "ldQuoteOnRequest": "Devis sur demande",
+  "ldType": "Type",
+  "ldPricePerDay": "Prix par jour",
+  "ldStock": "Stock",
+  "ldCancellationPolicy": "Politique d'annulation",
+  "ldPrice": "Prix",
+  "ldFrom": "À partir de {price}",
+  "@ldFrom": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "ldPricing": "Tarification",
+  "ldDuration": "Durée",
+  "ldInStock": "{count} en stock",
+  "@ldInStock": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ldStatus": "Statut",
+  "ldListed": "Publié",
+  "ldDeleteTitle": "Supprimer {noun}",
+  "@ldDeleteTitle": {
+    "placeholders": {
+      "noun": {
+        "type": "String"
+      }
+    }
+  },
+  "ldDeleteBody": "Êtes-vous sûr de vouloir supprimer définitivement ce {noun}",
+  "@ldDeleteBody": {
+    "placeholders": {
+      "noun": {
+        "type": "String"
+      }
+    }
+  },
+  "ldNevermind": "Annuler",
+  "ldYesDelete": "Oui, supprimer",
+  "ldDeactivateTitle": "Désactiver {noun}",
+  "@ldDeactivateTitle": {
+    "placeholders": {
+      "noun": {
+        "type": "String"
+      }
+    }
+  },
+  "ldDeactivateBody": "Êtes-vous sûr de vouloir désactiver temporairement ce {noun}",
+  "@ldDeactivateBody": {
+    "placeholders": {
+      "noun": {
+        "type": "String"
+      }
+    }
+  },
+  "ldDeactivationPeriod": "Période de désactivation",
+  "ldSelectDuration": "Sélectionner une durée",
+  "ldSelectDurationTitle": "Sélectionner une durée",
+  "ld1Week": "1 semaine",
+  "ld2Weeks": "2 semaines",
+  "ld1Month": "1 mois",
+  "ld3Months": "3 mois",
+  "ldYesDeactivate": "Oui, désactiver",
+  "done": "Terminé",
+  "elUpdateTitle": "Modifier {label}",
+  "@elUpdateTitle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "elServiceSubtitle": "Mettez à jour ce service pour votre entreprise",
+  "elProductSubtitle": "Mettez à jour votre produit et augmentez votre stock",
+  "elPhotoComingSoon": "Téléchargement de photo bientôt disponible",
+  "elSelectSizes": "Sélectionner les tailles",
+  "elForSale": "À vendre",
+  "elForRent": "À louer",
+  "elProductType": "Type de produit 📦",
+  "elSelectType": "Sélectionner le type",
+  "elProductTypeSheet": "Type de produit",
+  "elSizes": "Tailles ",
+  "elOptional": "(facultatif)",
+  "elSelectSizesPlaceholder": "Sélectionnez les tailles",
+  "elRentalDuration": "Durée de location",
+  "elSkuHint": "Saisissez le SKU...",
+  "elMainPhoto": "Photo principale",
+  "elSecondPhoto": "Deuxième photo",
+  "elThirdPhoto": "Troisième photo",
+  "elFourthPhoto": "Quatrième photo",
+  "elUpdatedSuccess": "Annonce mise à jour avec succès",
+  "trackingTitle": "Suivi de commande",
+  "trackingComingSoon": "Le suivi de commande arrive bientôt",
+  "trackingComingSoonBody": "Le suivi de livraison et de location apparaîtra ici une fois disponible.",
+  "reviewClientFallback": "Client",
+  "reviewTitle": "Avis",
+  "reviewSubtitle": "Dites-nous comment s'est passée votre expérience avec {name}",
+  "@reviewSubtitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewFeedbackLabel": "Laissez un avis détaillé",
+  "reviewFeedbackHint": "Dites-nous comment s'est passée votre expérience",
+  "reviewSubmitted": "Avis envoyé !",
+  "reviewSendReview": "Envoyer l'avis",
+  "cancelBookingTitle": "Annuler la réservation",
+  "coReason1": "Le client était impoli",
+  "coReason2": "L'événement dépassait ce qui était décrit",
+  "coReason3": "Le client était en retard à l'événement",
+  "coReason4": "Le client a refusé de payer le deuxième acompte",
+  "coReason5": "Autre problème",
+  "coNotice": "Notre équipe assure la médiation de tous les litiges. Nous visons une résolution sous 48 heures. Essayez d'abord de contacter le client — la plupart des problèmes se résolvent rapidement.",
+  "coReasonTitle": "Raison de l'annulation de la réservation",
+  "coDescribeIssue": "Décrivez le problème",
+  "coDescribeHint": "Décrivez en détail ce qui s'est passé, en incluant les dates, les montants et tout contexte pertinent",
+  "coAttachEvidence": "Joindre des preuves (facultatif)",
+  "coUploadImage": "Téléverser une image",
+  "coBookingCancelled": "Réservation annulée",
+  "coCancelOrder": "Annuler la commande",
+  "coMessageClient": "Contacter le client à la place"
 }

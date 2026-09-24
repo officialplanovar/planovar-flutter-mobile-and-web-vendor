@@ -8,6 +8,7 @@ import '../../../core/api/api_client.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/responsive/responsive.dart';
 import '../../../core/router/app_routes.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../data/auth_remote_data_source.dart';
 import '../bloc/auth_bloc.dart';
@@ -54,13 +55,15 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
           .sendOtp(email: widget.email, type: 'email-verification');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('A new code has been sent')),
+          SnackBar(content: Text(AppLocalizations.of(context).verifyNewCodeSent)),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not resend code: $e')),
+          SnackBar(
+              content: Text(
+                  AppLocalizations.of(context).verifyCouldNotResend('$e'))),
         );
       }
     }
@@ -74,6 +77,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final canProceed = _otp.length == 6;
 
     return Scaffold(
@@ -111,7 +115,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
             const SizedBox(height: 24),
 
             Text(
-              'Verify your Email',
+              t.verifyEmailTitle,
               style: GoogleFonts.urbanist(
                 fontSize: 26,
                 fontWeight: FontWeight.w700,
@@ -121,7 +125,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
             ),
             const SizedBox(height: 10),
             Text(
-              "We've sent a 6-digit OTP to your email",
+              t.verifyEmailIntro,
               style: GoogleFonts.urbanist(
                 fontSize: 15,
                 color: context.c.textSecondary,
@@ -210,7 +214,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               builder: (context, state) {
                 final loading = state is AuthLoading;
                 return AppButton.primary(
-                  'Proceed',
+                  t.proceed,
                   loading: loading,
                   onTap: (canProceed && !loading)
                       ? () => context.read<AuthBloc>().add(
@@ -228,7 +232,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
             // Resend
             if (_countdown > 0)
               Text(
-                'Resend code in ${_countdown}s',
+                t.verifyResendIn(_countdown),
                 style: GoogleFonts.urbanist(
                   fontSize: 14,
                   color: context.c.textSecondary,
@@ -238,7 +242,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               GestureDetector(
                 onTap: _resend,
                 child: Text(
-                  'Resend code',
+                  t.resendCodeAction,
                   style: GoogleFonts.urbanist(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,

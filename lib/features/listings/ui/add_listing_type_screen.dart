@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/router/app_routes.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_icon.dart';
 
@@ -18,6 +19,7 @@ class _AddListingTypeScreenState extends State<AddListingTypeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: context.c.surface,
       appBar: AppBar(
@@ -40,7 +42,7 @@ class _AddListingTypeScreenState extends State<AddListingTypeScreen> {
           ),
         ),
         title: Text(
-          'New Listing',
+          t.addListingNewListing,
           style: GoogleFonts.urbanist(
             fontSize: 18,
             fontWeight: FontWeight.w700,
@@ -55,7 +57,7 @@ class _AddListingTypeScreenState extends State<AddListingTypeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Listing Type',
+                t.listingTypeTitle,
                 style: GoogleFonts.urbanist(
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
@@ -64,7 +66,7 @@ class _AddListingTypeScreenState extends State<AddListingTypeScreen> {
               ),
               const SizedBox(height: 6),
               Text(
-                'Select the type of listing you want to create',
+                t.listingTypeSubtitle,
                 style: GoogleFonts.urbanist(
                   fontSize: 14,
                   color: context.c.textSecondary,
@@ -74,19 +76,19 @@ class _AddListingTypeScreenState extends State<AddListingTypeScreen> {
               _buildTypeCard(
                 type: 'service',
                 asset: 'service',
-                title: 'Service',
-                subtitle: 'Bookable appointment',
+                title: t.listingTypeService,
+                subtitle: t.addListingServiceDesc,
               ),
               const SizedBox(height: 16),
               _buildTypeCard(
                 type: 'product',
                 asset: 'product',
-                title: 'Product',
-                subtitle: 'Physical item for rent or sale',
+                title: t.listingTypeProduct,
+                subtitle: t.listingTypeProductDesc,
               ),
               const Spacer(),
               AppButton.primary(
-                'Proceed',
+                t.proceed,
                 onTap: _selectedType == null
                     ? null
                     : () {

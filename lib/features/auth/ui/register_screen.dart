@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/responsive/responsive.dart';
 import '../../../core/router/app_routes.dart';
+import '../../../l10n/app_localizations.dart';
 import '../data/auth_repository.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/data/dial_codes.dart';
@@ -108,7 +109,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       initialDate: _dob ?? DateTime(now.year - 25),
       firstDate: DateTime(now.year - 100),
       lastDate: DateTime(now.year - 13), // 13+ minimum age
-      helpText: 'Select your date of birth',
+      helpText: AppLocalizations.of(context).selectDob,
     );
     if (picked != null) setState(() => _dob = picked);
   }
@@ -125,13 +126,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Widget _buildDivider(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Row(
       children: [
         Expanded(child: Divider(color: context.c.border)),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            'or',
+            t.orLabel,
             style: GoogleFonts.urbanist(
               fontSize: 13,
               color: context.c.textHint,
@@ -144,6 +146,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Widget _buildGoogleButton(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
@@ -165,7 +168,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               const SizedBox(width: 10),
               Text(
-                'Continue with Google',
+                t.continueWithGoogle,
                 style: GoogleFonts.urbanist(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
@@ -192,6 +195,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: context.c.surface,
       appBar: AppBar(
@@ -208,7 +212,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Create your vendor account',
+              t.registerTitle,
               style: GoogleFonts.urbanist(
                 fontSize: 26,
                 fontWeight: FontWeight.w700,
@@ -217,7 +221,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 6),
             Text(
-              'Start listing your business on Planovar',
+              t.registerSubtitle,
               style: GoogleFonts.urbanist(
                 fontSize: 15,
                 color: context.c.textSecondary,
@@ -231,8 +235,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
               children: [
                 Expanded(
                   child: AppInput(
-                    label: 'First Name',
-                    hint: 'e.g. Ada',
+                    label: t.firstName,
+                    hint: t.firstNameHint,
                     controller: _firstNameCtrl,
                     keyboardType: TextInputType.name,
                   ),
@@ -240,8 +244,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: AppInput(
-                    label: 'Last Name',
-                    hint: 'e.g. Obi',
+                    label: t.lastName,
+                    hint: t.lastNameHint,
                     controller: _lastNameCtrl,
                     keyboardType: TextInputType.name,
                   ),
@@ -252,8 +256,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
             // Business Name
             AppInput(
-              label: 'Business Name',
-              hint: 'e.g. Sugared Dreams Cakery',
+              label: t.businessName,
+              hint: t.businessNameHint,
               controller: _businessNameCtrl,
             ),
             const SizedBox(height: 16),
@@ -263,7 +267,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Date of Birth',
+                  t.dateOfBirth,
                   style: GoogleFonts.urbanist(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -285,7 +289,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         Expanded(
                           child: Text(
                             _dob == null
-                                ? 'DD / MM / YYYY'
+                                ? t.dobPlaceholder
                                 : _fmtDobDisplay(_dob!),
                             style: GoogleFonts.urbanist(
                               fontSize: 15,
@@ -307,8 +311,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
             // Email
             AppInput(
-              label: 'Email Address',
-              hint: 'yourname@business.com',
+              label: t.emailAddress,
+              hint: t.emailPlaceholder,
               controller: _emailCtrl,
               keyboardType: TextInputType.emailAddress,
             ),
@@ -319,7 +323,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Phone Number',
+                  t.phoneNumber,
                   style: GoogleFonts.urbanist(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -360,7 +364,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: AppInput(
-                        hint: '8012345678',
+                        hint: t.phoneNumberHint,
                         controller: _phoneCtrl,
                         keyboardType: TextInputType.phone,
                       ),
@@ -373,8 +377,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
             // Password
             AppInput(
-              label: 'Create Password',
-              hint: 'Min 8 characters',
+              label: t.createPassword,
+              hint: t.createPasswordHint,
               controller: _passwordCtrl,
               obscureText: _obscurePassword,
               suffixIcon: IconButton(
@@ -416,10 +420,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         height: 1.5,
                       ),
                       children: [
-                        const TextSpan(
-                            text: 'By checking the box you agree to our '),
+                        TextSpan(text: t.registerAgreePrefix),
                         TextSpan(
-                          text: 'Terms & Conditions',
+                          text: t.termsAndConditions,
                           style: GoogleFonts.urbanist(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -427,9 +430,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             height: 1.5,
                           ),
                         ),
-                        const TextSpan(text: ' and '),
+                        TextSpan(text: t.registerAgreeAnd),
                         TextSpan(
-                          text: 'Privacy Policy',
+                          text: t.privacyPolicy,
                           style: GoogleFonts.urbanist(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -465,7 +468,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               builder: (context, state) {
                 final loading = state is AuthLoading;
                 return AppButton.primary(
-                  'Next',
+                  t.next,
                   loading: loading,
                   onTap: (_formValid && !loading)
                       ? () {
@@ -511,7 +514,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 Text(
-                  'Already have an account? ',
+                  t.alreadyHaveAccount,
                   style: GoogleFonts.urbanist(
                     fontSize: 14,
                     color: context.c.textSecondary,
@@ -520,7 +523,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 GestureDetector(
                   onTap: () => context.go(AppRoutes.login),
                   child: Text(
-                    'Sign in',
+                    t.signInAction,
                     style: GoogleFonts.urbanist(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,

@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/app_icon.dart';
 import '../../../shared/models/order_model.dart';
 import '../bloc/orders_cubit.dart';
@@ -24,13 +25,16 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
   int? _selectedReason;
   final TextEditingController _descriptionController = TextEditingController();
 
-  static const _reasons = [
-    'Client was rude',
-    'Event was more than described',
-    'The Client was late to the event',
-    'Client Refused to Pay the second installment',
-    'Other issue',
-  ];
+  List<String> _reasons(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    return [
+      t.coReason1,
+      t.coReason2,
+      t.coReason3,
+      t.coReason4,
+      t.coReason5,
+    ];
+  }
 
   @override
   void dispose() {
@@ -47,6 +51,8 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final reasons = _reasons(context);
     final orders = context.watch<OrdersCubit>().state.orders;
     final order = _orderFrom(orders);
     final bottomInset = MediaQuery.of(context).padding.bottom;
@@ -70,7 +76,7 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Cancel Booking',
+              t.cancelBookingTitle,
               style: GoogleFonts.urbanist(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
@@ -115,8 +121,7 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Our team mediates all disputes. We aim to resolve within 48 hours. '
-                      'Try messaging the client first — most issues are resolved quickly.',
+                      t.coNotice,
                       style: GoogleFonts.urbanist(
                         fontSize: 13,
                         color: context.c.textSecondary,
@@ -131,7 +136,7 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
             // ── Reasons Section ────────────────────────────────────────
             const SizedBox(height: 24),
             Text(
-              'Reason for Cancelling Booking',
+              t.coReasonTitle,
               style: GoogleFonts.urbanist(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -139,7 +144,7 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
               ),
             ),
             const SizedBox(height: 14),
-            ...List.generate(_reasons.length, (i) {
+            ...List.generate(reasons.length, (i) {
               final selected = _selectedReason == i;
               return GestureDetector(
                 onTap: () => setState(() => _selectedReason = i),
@@ -159,7 +164,7 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
                     ),
                   ),
                   child: Text(
-                    _reasons[i],
+                    reasons[i],
                     style: GoogleFonts.urbanist(
                       fontSize: 14,
                       fontWeight:
@@ -176,7 +181,7 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
             // ── Describe the Issue ─────────────────────────────────────
             const SizedBox(height: 24),
             Text(
-              'Describe the issue',
+              t.coDescribeIssue,
               style: GoogleFonts.urbanist(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -195,8 +200,7 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
               decoration: InputDecoration(
                 filled: true,
                 fillColor: context.c.surfaceElevated,
-                hintText:
-                    'Describe what happened in detail, include dates, amounts, and any relevant context',
+                hintText: t.coDescribeHint,
                 hintStyle: GoogleFonts.urbanist(
                   fontSize: 13,
                   color: context.c.textHint,
@@ -222,7 +226,7 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
             // ── Attach Evidence ────────────────────────────────────────
             const SizedBox(height: 24),
             Text(
-              'Attach evidence (optional)',
+              t.coAttachEvidence,
               style: GoogleFonts.urbanist(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -252,7 +256,7 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
                             size: 28, color: AppColors.primary),
                         const SizedBox(height: 8),
                         Text(
-                          'Upload Image',
+                          t.coUploadImage,
                           style: GoogleFonts.urbanist(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -283,7 +287,7 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
             GestureDetector(
               onTap: () async {
                 final reason = _selectedReason != null
-                    ? _reasons[_selectedReason!]
+                    ? reasons[_selectedReason!]
                     : null;
                 final note = _descriptionController.text.trim();
                 final messenger = ScaffoldMessenger.of(context);
@@ -297,8 +301,8 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
                       );
                   navigator.pop();
                   messenger.showSnackBar(
-                    const SnackBar(
-                      content: Text('Booking cancelled'),
+                    SnackBar(
+                      content: Text(t.coBookingCancelled),
                       behavior: SnackBarBehavior.floating,
                     ),
                   );
@@ -323,7 +327,7 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
                 ),
                 child: Center(
                   child: Text(
-                    'Cancel Order',
+                    t.coCancelOrder,
                     style: GoogleFonts.urbanist(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -347,7 +351,7 @@ class _CancelOrderScreenState extends State<CancelOrderScreen> {
                 ),
                 child: Center(
                   child: Text(
-                    'Message Client Instead',
+                    t.coMessageClient,
                     style: GoogleFonts.urbanist(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,

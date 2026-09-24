@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../l10n/app_localizations.dart';
 import '../bloc/listings_cubit.dart';
 import '../../../shared/models/listing_model.dart';
 import '../../../shared/widgets/app_button.dart';
@@ -17,17 +18,19 @@ class ListingDetailScreen extends StatelessWidget {
   bool _isService(ListingModel listing) =>
       listing.pricingType != 'FIXED' && !listing.isRentable;
 
-  String _typeLabel(ListingModel listing) {
-    if (listing.isRentable) return 'Rental';
-    if (_isService(listing)) return 'Service';
-    return 'Product';
+  String _typeLabel(BuildContext context, ListingModel listing) {
+    final t = AppLocalizations.of(context);
+    if (listing.isRentable) return t.oosRental;
+    if (_isService(listing)) return t.listingTypeService;
+    return t.listingTypeProduct;
   }
 
   void _showDeleteDialog(BuildContext context, ListingModel listing) {
+    final t = AppLocalizations.of(context);
     final cubit = context.read<ListingsCubit>();
     final messenger = ScaffoldMessenger.of(context);
     final router = GoRouter.of(context);
-    final noun = _isService(listing) ? 'Service' : 'Product';
+    final noun = _isService(listing) ? t.listingTypeService : t.listingTypeProduct;
     showDialog<void>(
       context: context,
       builder: (dialogCtx) => _DeleteDialog(
@@ -38,7 +41,7 @@ class ListingDetailScreen extends StatelessWidget {
             await cubit.remove(listing.id);
             messenger.showSnackBar(
               SnackBar(
-                content: Text('$noun deleted'),
+                content: Text(t.ldDeleted(noun)),
                 backgroundColor: AppColors.success,
               ),
             );
@@ -56,9 +59,10 @@ class ListingDetailScreen extends StatelessWidget {
   }
 
   void _showDeactivateDialog(BuildContext context, ListingModel listing) {
+    final t = AppLocalizations.of(context);
     final cubit = context.read<ListingsCubit>();
     final messenger = ScaffoldMessenger.of(context);
-    final noun = _isService(listing) ? 'Service' : 'Product';
+    final noun = _isService(listing) ? t.listingTypeService : t.listingTypeProduct;
     showDialog<void>(
       context: context,
       builder: (dialogCtx) => _DeactivateDialog(
@@ -69,7 +73,7 @@ class ListingDetailScreen extends StatelessWidget {
             await cubit.toggleActive(listing.id, false);
             messenger.showSnackBar(
               SnackBar(
-                content: Text('$noun deactivated'),
+                content: Text(t.ldDeactivated(noun)),
                 backgroundColor: AppColors.success,
               ),
             );
@@ -87,6 +91,7 @@ class ListingDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final lState = context.watch<ListingsCubit>().state;
     final matches = lState.listings.where((l) => l.id == listingId);
     if (matches.isEmpty) {
@@ -100,8 +105,8 @@ class ListingDetailScreen extends StatelessWidget {
         body: Center(
           child: Text(
             lState.status == ListingsStatus.loading
-                ? 'Loading…'
-                : 'Listing not found',
+                ? t.loading
+                : t.ldNotFound,
             style: GoogleFonts.urbanist(color: context.c.textSecondary),
           ),
         ),
@@ -110,7 +115,7 @@ class ListingDetailScreen extends StatelessWidget {
     final listing = matches.first;
 
     final isService = _isService(listing);
-    final typeLabel = _typeLabel(listing);
+    final typeLabel = _typeLabel(context, listing);
 
     return Scaffold(
       backgroundColor: context.c.background,
@@ -250,7 +255,7 @@ class ListingDetailScreen extends StatelessWidget {
 
                   // Edit button
                   AppButton.primary(
-                    isService ? 'Edit Service' : 'Edit Product',
+                    isService ? t.ldEditService : t.ldEditProduct,
                     onTap: () =>
                         context.push('/listings/edit/${listing.id}'),
                   ),
@@ -273,7 +278,7 @@ class ListingDetailScreen extends StatelessWidget {
                       ),
                       child: Center(
                         child: Text(
-                          isService ? 'Delete Service' : 'Delete Product',
+                          isService ? t.ldDeleteService : t.ldDeleteProduct,
                           style: GoogleFonts.urbanist(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
@@ -303,8 +308,8 @@ class ListingDetailScreen extends StatelessWidget {
                       child: Center(
                         child: Text(
                           isService
-                              ? 'Deactivate Service'
-                              : 'Deactivate Product',
+                              ? t.ldDeactivateService
+                              : t.ldDeactivateProduct,
                           style: GoogleFonts.urbanist(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
@@ -340,7 +345,9 @@ class _StatusChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
       ),
       child: Text(
-        isActive ? 'Active' : 'Inactive',
+        isActive
+            ? AppLocalizations.of(context).statusActive
+            : AppLocalizations.of(context).statusInactive,
         style: GoogleFonts.urbanist(
           fontSize: 12,
           fontWeight: FontWeight.w600,
@@ -360,19 +367,20 @@ class _MetricCards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     // Real listing metrics. (Earnings/orders would need per-listing order
     // aggregation from the backend, which isn't available yet.)
     final rating = listing.reviewCount > 0
         ? '${listing.ratingAvg.toStringAsFixed(1)} (${listing.reviewCount})'
-        : 'No reviews yet';
+        : t.ldNoReviews;
     return Row(
       children: [
         Expanded(
           child: _MetricCard(
-              label: 'Views (30d)', value: '${listing.viewCount}'),
+              label: t.ldViews30d, value: '${listing.viewCount}'),
         ),
         const SizedBox(width: 12),
-        Expanded(child: _MetricCard(label: 'Rating', value: rating)),
+        Expanded(child: _MetricCard(label: t.ldRating, value: rating)),
       ],
     );
   }
@@ -432,14 +440,15 @@ class _DetailsTable extends StatelessWidget {
     required this.typeLabel,
   });
 
-  String get _pricingTypeLabel {
+  String _pricingTypeLabel(BuildContext context) {
+    final t = AppLocalizations.of(context);
     switch (listing.pricingType) {
       case 'FIXED':
-        return 'Fixed price';
+        return t.ldFixedPrice;
       case 'STARTING_FROM':
-        return 'Starting from';
+        return t.ldStartingFrom;
       case 'QUOTE':
-        return 'Quote on request';
+        return t.ldQuoteOnRequest;
       default:
         return listing.pricingType;
     }
@@ -451,85 +460,87 @@ class _DetailsTable extends StatelessWidget {
     return '${listing.durationValue}${unit.isNotEmpty ? ' $unit' : ''}';
   }
 
-  List<(String, String)> _buildRows() {
+  List<(String, String)> _buildRows(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final rows = <(String, String)>[];
 
     // ALL listings
-    rows.add(('Type', typeLabel));
+    rows.add((t.ldType, typeLabel));
 
     String tagsValue() => listing.tags.isNotEmpty
-        ? listing.tags.map((t) => '#$t').join(' ')
+        ? listing.tags.map((tag) => '#$tag').join(' ')
         : '—';
 
     if (listing.isRentable) {
       // Rental
       rows.add((
-        'Price per day',
+        t.ldPricePerDay,
         listing.perDayRate != null
             ? Formatters.currency(listing.perDayRate!)
             : '—',
       ));
       rows.add((
-        'Refundable Deposit',
+        t.apRefundableDeposit,
         listing.depositAmount != null
             ? Formatters.currency(listing.depositAmount!)
             : '—',
       ));
       if (listing.sku != null && listing.sku!.isNotEmpty) {
-        rows.add(('SKU', listing.sku!));
+        rows.add((t.addSuccessSku, listing.sku!));
       }
       if (listing.stockQuantity != null) {
-        rows.add(('Stock', '${listing.stockQuantity}'));
+        rows.add((t.ldStock, '${listing.stockQuantity}'));
       }
       if (listing.cancellationPolicy != null &&
           listing.cancellationPolicy!.isNotEmpty) {
-        rows.add(('Cancellation policy', listing.cancellationPolicy!));
+        rows.add((t.ldCancellationPolicy, listing.cancellationPolicy!));
       }
-      rows.add(('Category', listing.categoryName ?? '—'));
+      rows.add((t.category, listing.categoryName ?? '—'));
     } else if (isService) {
       // Service (STARTING_FROM / QUOTE, !isRentable)
       final base = listing.basePrice ?? 0;
-      final price =
-          base > 0 ? 'From ${Formatters.currency(base)}' : 'Quote on request';
-      rows.add(('Price', price));
-      rows.add(('Pricing', _pricingTypeLabel));
+      final price = base > 0
+          ? t.ldFrom(Formatters.currency(base))
+          : t.ldQuoteOnRequest;
+      rows.add((t.ldPrice, price));
+      rows.add((t.ldPricing, _pricingTypeLabel(context)));
       if (listing.durationValue != null) {
-        rows.add(('Duration', _durationLabel));
+        rows.add((t.ldDuration, _durationLabel));
       }
       if (listing.cancellationPolicy != null &&
           listing.cancellationPolicy!.isNotEmpty) {
-        rows.add(('Cancellation policy', listing.cancellationPolicy!));
+        rows.add((t.ldCancellationPolicy, listing.cancellationPolicy!));
       }
-      rows.add(('Category', listing.categoryName ?? '—'));
+      rows.add((t.category, listing.categoryName ?? '—'));
     } else {
       // Product (FIXED, !isRentable)
       rows.add((
-        'Price',
+        t.ldPrice,
         listing.basePrice != null
             ? Formatters.currency(listing.basePrice!)
             : '—',
       ));
       if (listing.sku != null && listing.sku!.isNotEmpty) {
-        rows.add(('SKU', listing.sku!));
+        rows.add((t.addSuccessSku, listing.sku!));
       }
       if (listing.stockQuantity != null) {
-        rows.add(('Stock', '${listing.stockQuantity} in stock'));
+        rows.add((t.ldStock, t.ldInStock(listing.stockQuantity!)));
       }
-      rows.add(('Category', listing.categoryName ?? '—'));
+      rows.add((t.category, listing.categoryName ?? '—'));
     }
 
     // Common footer rows for every listing
-    rows.add(('Status', listing.isActive ? 'Active' : 'Inactive'));
-    rows.add(('Listed', Formatters.date(listing.createdAt)));
-    rows.add(('Views (30d)', '${listing.viewCount}'));
-    rows.add(('Tags', tagsValue()));
+    rows.add((t.ldStatus, listing.isActive ? t.statusActive : t.statusInactive));
+    rows.add((t.ldListed, Formatters.date(listing.createdAt)));
+    rows.add((t.ldViews30d, '${listing.viewCount}'));
+    rows.add((t.apTags, tagsValue()));
 
     return rows;
   }
 
   @override
   Widget build(BuildContext context) {
-    final rows = _buildRows();
+    final rows = _buildRows(context);
 
     return Container(
       decoration: BoxDecoration(
@@ -597,11 +608,11 @@ class _DeleteDialog extends StatelessWidget {
   bool get _isService =>
       listing.pricingType != 'FIXED' && !listing.isRentable;
 
-  String get _noun => _isService ? 'service' : 'product';
-  String get _nounCap => _isService ? 'Service' : 'Product';
-
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final nounCap = _isService ? t.listingTypeService : t.listingTypeProduct;
+    final nounLower = _isService ? t.ldServiceLower : t.ldProductLower;
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(24),
@@ -631,7 +642,7 @@ class _DeleteDialog extends StatelessWidget {
 
             // Title
             Text(
-              'Delete $_nounCap',
+              t.ldDeleteTitle(nounCap),
               style: GoogleFonts.urbanist(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
@@ -643,7 +654,7 @@ class _DeleteDialog extends StatelessWidget {
 
             // Subtitle
             Text(
-              'Are you sure you want to permanently delete this $_noun',
+              t.ldDeleteBody(nounLower),
               textAlign: TextAlign.center,
               style: GoogleFonts.urbanist(
                 fontSize: 14,
@@ -659,7 +670,7 @@ class _DeleteDialog extends StatelessWidget {
               children: [
                 Expanded(
                   child: AppButton.primary(
-                    'Nevermind',
+                    t.ldNevermind,
                     onTap: () => Navigator.of(context).pop(),
                   ),
                 ),
@@ -679,7 +690,7 @@ class _DeleteDialog extends StatelessWidget {
                       ),
                       child: Center(
                         child: Text(
-                          'Yes, Delete',
+                          t.ldYesDelete,
                           style: GoogleFonts.urbanist(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -719,8 +730,22 @@ class _DeactivateDialogState extends State<_DeactivateDialog> {
   bool get _isService =>
       widget.listing.pricingType != 'FIXED' && !widget.listing.isRentable;
 
-  String get _noun => _isService ? 'service' : 'product';
-  String get _nounCap => _isService ? 'Service' : 'Product';
+  /// Localized label for a deactivation-duration identifier.
+  String _durationLabel(BuildContext context, String d) {
+    final t = AppLocalizations.of(context);
+    switch (d) {
+      case '1 week':
+        return t.ld1Week;
+      case '2 weeks':
+        return t.ld2Weeks;
+      case '1 month':
+        return t.ld1Month;
+      case '3 months':
+        return t.ld3Months;
+      default:
+        return d;
+    }
+  }
 
   void _showDurationPicker() {
     showModalBottomSheet<String>(
@@ -744,7 +769,7 @@ class _DeactivateDialogState extends State<_DeactivateDialog> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Select Duration',
+                AppLocalizations.of(context).ldSelectDurationTitle,
                 style: GoogleFonts.urbanist(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
@@ -755,7 +780,7 @@ class _DeactivateDialogState extends State<_DeactivateDialog> {
               ..._durations.map((d) {
                 return ListTile(
                   title: Text(
-                    d,
+                    _durationLabel(context, d),
                     style: GoogleFonts.urbanist(
                       fontSize: 15,
                       color: context.c.textPrimary,
@@ -784,6 +809,9 @@ class _DeactivateDialogState extends State<_DeactivateDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final nounCap = _isService ? t.listingTypeService : t.listingTypeProduct;
+    final nounLower = _isService ? t.ldServiceLower : t.ldProductLower;
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(24),
@@ -840,7 +868,7 @@ class _DeactivateDialogState extends State<_DeactivateDialog> {
 
             // Title
             Text(
-              'Deactivate $_nounCap',
+              t.ldDeactivateTitle(nounCap),
               style: GoogleFonts.urbanist(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
@@ -852,7 +880,7 @@ class _DeactivateDialogState extends State<_DeactivateDialog> {
 
             // Subtitle
             Text(
-              'Are you sure you want to temporarily deactivate this $_noun',
+              t.ldDeactivateBody(nounLower),
               textAlign: TextAlign.center,
               style: GoogleFonts.urbanist(
                 fontSize: 14,
@@ -867,7 +895,7 @@ class _DeactivateDialogState extends State<_DeactivateDialog> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Deactivation Period',
+                t.ldDeactivationPeriod,
                 style: GoogleFonts.urbanist(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -893,7 +921,9 @@ class _DeactivateDialogState extends State<_DeactivateDialog> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      _selectedDuration ?? 'Select duration',
+                      _selectedDuration != null
+                          ? _durationLabel(context, _selectedDuration!)
+                          : t.ldSelectDuration,
                       style: GoogleFonts.urbanist(
                         fontSize: 14,
                         color: _selectedDuration != null
@@ -918,7 +948,7 @@ class _DeactivateDialogState extends State<_DeactivateDialog> {
               children: [
                 Expanded(
                   child: AppButton.primary(
-                    'Nevermind',
+                    t.ldNevermind,
                     onTap: () => Navigator.of(context).pop(),
                   ),
                 ),
@@ -938,7 +968,7 @@ class _DeactivateDialogState extends State<_DeactivateDialog> {
                       ),
                       child: Center(
                         child: Text(
-                          'Yes, Deactivate',
+                          t.ldYesDeactivate,
                           style: GoogleFonts.urbanist(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,

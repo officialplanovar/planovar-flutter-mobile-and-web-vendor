@@ -11,6 +11,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/responsive/responsive.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../core/services/upload_service.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_input.dart';
 import '../../../shared/widgets/plan_card.dart';
@@ -89,7 +90,7 @@ PreferredSizeWidget _buildSetupAppBar(
       onPressed: () => context.pop(),
     ),
     title: Text(
-      'Business Setup',
+      AppLocalizations.of(context).setupBusinessSetup,
       style: GoogleFonts.urbanist(
         fontSize: 17,
         fontWeight: FontWeight.w600,
@@ -190,6 +191,7 @@ class _SetupBusinessTypeScreenState extends State<SetupBusinessTypeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: context.c.surface,
       appBar: _buildSetupAppBar(context, step: 1, total: 6),
@@ -199,27 +201,27 @@ class _SetupBusinessTypeScreenState extends State<SetupBusinessTypeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const _SetupHeader(
-                title: 'Business profile',
-                subtitle: 'Tell clients who you are',
+              _SetupHeader(
+                title: t.setupBusinessProfileTitle,
+                subtitle: t.setupBusinessProfileSubtitle,
               ),
               const SizedBox(height: 32),
               _buildTypeCard(
                 value: 'licensed',
-                label: 'Licensed Business',
-                subtitle: 'Registered company, agency or studio',
+                label: t.setupLicensedBusiness,
+                subtitle: t.setupLicensedBusinessDesc,
                 icon: Icons.verified_rounded,
               ),
               const SizedBox(height: 16),
               _buildTypeCard(
                 value: 'freelancer',
-                label: 'Freelancer',
-                subtitle: 'Individual offering professional services',
+                label: t.setupFreelancer,
+                subtitle: t.setupFreelancerDesc,
                 icon: Icons.person_rounded,
               ),
               const Spacer(),
               AppButton.primary(
-                'Proceed',
+                t.proceed,
                 onTap: _selected != null
                     ? () {
                         context.read<SetupCubit>().setBusinessType(_selected!);
@@ -291,7 +293,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _catsError = 'Could not load categories';
+        _catsError = AppLocalizations.of(context).setupCouldNotLoadCategories;
         _loadingCats = false;
       });
     }
@@ -326,6 +328,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
   }
 
   Future<void> _pickProof() async {
+    final t = AppLocalizations.of(context);
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
@@ -336,11 +339,11 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
       final f = result.files.first;
       final bytes = f.bytes;
       if (bytes == null) {
-        _toast('Could not read the selected file');
+        _toast(t.setupCouldNotReadFile);
         return;
       }
       if (bytes.length > 5 * 1024 * 1024) {
-        _toast('File is larger than 5 MB');
+        _toast(t.setupFileTooLarge);
         return;
       }
       setState(() => _uploadingProof = true);
@@ -359,6 +362,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: context.c.surface,
       appBar: _buildSetupAppBar(context, step: 2, total: 6),
@@ -371,9 +375,9 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const _SetupHeader(
-                      title: 'Business profile',
-                      subtitle: 'Tell clients who you are',
+                    _SetupHeader(
+                      title: t.setupBusinessProfileTitle,
+                      subtitle: t.setupBusinessProfileSubtitle,
                     ),
                     const SizedBox(height: 28),
 
@@ -424,7 +428,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Business logo (optional)',
+                            t.setupBusinessLogoOptional,
                             style: GoogleFonts.urbanist(
                               fontSize: 13,
                               color: context.c.textSecondary,
@@ -437,9 +441,8 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
 
                     // Description
                     AppInput(
-                      label: 'Business Description',
-                      hint:
-                          'Tell clients what makes your business special, your experience, and what you offer...',
+                      label: t.setupBusinessDescription,
+                      hint: t.setupBusinessDescriptionHint,
                       controller: _descCtrl,
                       maxLines: 4,
                       keyboardType: TextInputType.multiline,
@@ -454,7 +457,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                         Row(
                           children: [
                             Text(
-                              'Proof of Ownership',
+                              t.setupProofOfOwnership,
                               style: GoogleFonts.urbanist(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
@@ -463,7 +466,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              '(optional for freelancers)',
+                              t.setupProofOptionalFreelancers,
                               style: GoogleFonts.urbanist(
                                 fontSize: 12,
                                 color: context.c.textHint,
@@ -514,7 +517,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                                             padding: const EdgeInsets.symmetric(
                                                 horizontal: 16),
                                             child: Text(
-                                              _proofName ?? 'Document uploaded',
+                                              _proofName ?? t.setupDocumentUploaded,
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                               style: GoogleFonts.urbanist(
@@ -526,7 +529,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                                           ),
                                           const SizedBox(height: 2),
                                           Text(
-                                            'Tap to replace',
+                                            t.setupTapToReplace,
                                             style: GoogleFonts.urbanist(
                                               fontSize: 12,
                                               color: context.c.textSecondary,
@@ -541,7 +544,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                                           ),
                                           const SizedBox(height: 8),
                                           Text(
-                                            'Tap to upload',
+                                            t.setupTapToUpload,
                                             style: GoogleFonts.urbanist(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w600,
@@ -550,7 +553,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
-                                            'JPG, PNG or PDF up to 5mb',
+                                            t.setupUploadFileTypes,
                                             style: GoogleFonts.urbanist(
                                               fontSize: 12,
                                               color: context.c.textHint,
@@ -566,7 +569,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
 
                     // Category tags
                     Text(
-                      'Category tags',
+                      t.setupCategoryTags,
                       style: GoogleFonts.urbanist(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -596,7 +599,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                           GestureDetector(
                             onTap: _loadCategories,
                             child: Text(
-                              'Retry',
+                              t.retry,
                               style: GoogleFonts.urbanist(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
@@ -608,7 +611,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                       )
                     else if (_categories.isEmpty)
                       Text(
-                        'No categories available yet',
+                        t.setupNoCategories,
                         style: GoogleFonts.urbanist(
                             fontSize: 13, color: context.c.textHint),
                       )
@@ -661,7 +664,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
             Padding(
               padding: pagePadding(context, base: 24).add(const EdgeInsets.only(top: 12, bottom: 32)),
               child: AppButton.primary(
-                'Proceed',
+                t.proceed,
                 onTap: () {
                   final desc = _descCtrl.text.trim();
                   context.read<SetupCubit>().setProfile(
@@ -721,7 +724,7 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
     setState(() => _locating = true);
     try {
       if (!await Geolocator.isLocationServiceEnabled()) {
-        _toast('Turn on location services to use this.');
+        if (mounted) _toast(AppLocalizations.of(context).setupTurnOnLocation);
         return;
       }
       var perm = await Geolocator.checkPermission();
@@ -730,7 +733,7 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
       }
       if (perm == LocationPermission.denied ||
           perm == LocationPermission.deniedForever) {
-        _toast('Location permission denied — pick your city manually.');
+        if (mounted) _toast(AppLocalizations.of(context).setupLocationDenied);
         return;
       }
 
@@ -765,10 +768,10 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
         if (city != null && city.isNotEmpty) _city = city;
       });
       if (city == null || city.isEmpty) {
-        _toast("Couldn't determine your city — please pick it manually.");
+        if (mounted) _toast(AppLocalizations.of(context).setupCouldNotDetermineCity);
       }
     } catch (_) {
-      _toast("Couldn't get your location. Please pick your city manually.");
+      if (mounted) _toast(AppLocalizations.of(context).setupCouldNotGetLocation);
     } finally {
       if (mounted) setState(() => _locating = false);
     }
@@ -781,7 +784,7 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
         backgroundColor: context.c.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
-          'Select Country',
+          AppLocalizations.of(context).selectCountry,
           style: GoogleFonts.urbanist(
               fontSize: 17, fontWeight: FontWeight.w700,
               color: context.c.textPrimary),
@@ -823,7 +826,7 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
           Padding(
             padding: pagePadding(context, base: 24).add(const EdgeInsets.only(top: 20, bottom: 8)),
             child: Text(
-              'Select City',
+              AppLocalizations.of(context).selectCity,
               style: GoogleFonts.urbanist(
                   fontSize: 17, fontWeight: FontWeight.w700,
                   color: context.c.textPrimary),
@@ -944,6 +947,7 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: context.c.surface,
       appBar: _buildSetupAppBar(context, step: 3, total: 6),
@@ -956,21 +960,21 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const _SetupHeader(
-                      title: 'Location & reach',
-                      subtitle: 'Where do you operate?',
+                    _SetupHeader(
+                      title: t.setupLocationTitle,
+                      subtitle: t.setupLocationSubtitle,
                     ),
                     const SizedBox(height: 28),
 
                     _buildDropdownField(
-                      label: 'Country',
+                      label: t.country,
                       displayValue: _country,
                       onTap: _showCountryDialog,
                     ),
                     const SizedBox(height: 16),
                     _buildDropdownField(
-                      label: 'City',
-                      displayValue: _city ?? 'Select your city',
+                      label: t.city,
+                      displayValue: _city ?? t.selectYourCity,
                       onTap: _showCitySheet,
                     ),
 
@@ -982,7 +986,7 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Text(
-                            'or',
+                            t.orLabel,
                             style: GoogleFonts.urbanist(
                                 fontSize: 13, color: context.c.textHint),
                           ),
@@ -1022,8 +1026,8 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
                             const SizedBox(width: 8),
                             Text(
                               _locating
-                                  ? 'Locating…'
-                                  : 'Use my current location',
+                                  ? t.setupLocating
+                                  : t.setupUseCurrentLocation,
                               style: GoogleFonts.urbanist(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
@@ -1037,7 +1041,7 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
                     const SizedBox(height: 28),
 
                     Text(
-                      'Vendor type',
+                      t.setupVendorType,
                       style: GoogleFonts.urbanist(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
@@ -1045,10 +1049,10 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    _buildRadioTile('products', 'Products Only'),
-                    _buildRadioTile('services', 'Services only'),
+                    _buildRadioTile('products', t.setupProductsOnly),
+                    _buildRadioTile('services', t.setupServicesOnly),
                     _buildRadioTile(
-                        'both', 'Both products & services'),
+                        'both', t.setupBothProductsServices),
                     const SizedBox(height: 24),
                   ],
                 ),
@@ -1057,7 +1061,7 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
             Padding(
               padding: pagePadding(context, base: 24).add(const EdgeInsets.only(top: 12, bottom: 32)),
               child: AppButton.primary(
-                'Proceed',
+                t.proceed,
                 onTap: () {
                   context.read<SetupCubit>().setLocation(
                         country: _country,
@@ -1113,6 +1117,7 @@ class _SetupPlanScreenState extends State<SetupPlanScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: context.c.surface,
       appBar: _buildSetupAppBar(context, step: 4, total: 6),
@@ -1122,9 +1127,9 @@ class _SetupPlanScreenState extends State<SetupPlanScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const _SetupHeader(
-                title: 'Choose your plan',
-                subtitle: 'Upgrade anytime. Cancel anytime.',
+              _SetupHeader(
+                title: t.setupChoosePlanTitle,
+                subtitle: t.setupChoosePlanSubtitle,
               ),
               const SizedBox(height: 24),
               BillingToggle(yearly: _yearly, onChanged: _setYearly),
@@ -1142,12 +1147,12 @@ class _SetupPlanScreenState extends State<SetupPlanScreen> {
                     return Column(
                       children: [
                         Text(
-                          'Could not load plans. Check your connection and try again.',
+                          t.setupCouldNotLoadPlans,
                           style: GoogleFonts.urbanist(
                             fontSize: 14, color: context.c.textSecondary),
                         ),
                         const SizedBox(height: 12),
-                        AppButton.secondary('Retry',
+                        AppButton.secondary(t.retry,
                             onTap: () => setState(
                                 () => _plansFuture = _subscriptions.listPlans())),
                       ],
@@ -1167,7 +1172,7 @@ class _SetupPlanScreenState extends State<SetupPlanScreen> {
                               : plan.tier == 'GOLD'
                                   ? PlanStyle.gold
                                   : PlanStyle.basic,
-                          ctaLabel: 'Select ${plan.name}',
+                          ctaLabel: t.setupSelectPlan(plan.name),
                           onSelect: () => _selectPlan(plan),
                         ),
                         const SizedBox(height: 18),
@@ -1181,7 +1186,7 @@ class _SetupPlanScreenState extends State<SetupPlanScreen> {
                 child: TextButton(
                   onPressed: _skip,
                   child: Text(
-                    'Skip for now',
+                    t.setupSkipForNow,
                     style: GoogleFonts.urbanist(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -1223,6 +1228,7 @@ class _SetupKycScreenState extends State<SetupKycScreen> {
   }
 
   Future<void> _pickDoc({required bool isNin}) async {
+    final t = AppLocalizations.of(context);
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
@@ -1233,11 +1239,11 @@ class _SetupKycScreenState extends State<SetupKycScreen> {
       final f = result.files.first;
       final bytes = f.bytes;
       if (bytes == null) {
-        _toast('Could not read the selected file');
+        _toast(t.setupCouldNotReadFile);
         return;
       }
       if (bytes.length > 5 * 1024 * 1024) {
-        _toast('File is larger than 5 MB');
+        _toast(t.setupFileTooLarge);
         return;
       }
       setState(() => isNin ? _uploadingNin = true : _uploadingCac = true);
@@ -1272,6 +1278,7 @@ class _SetupKycScreenState extends State<SetupKycScreen> {
     required bool uploading,
     required VoidCallback onTap,
   }) {
+    final t = AppLocalizations.of(context);
     final done = url != null;
     return GestureDetector(
       onTap: uploading ? null : onTap,
@@ -1306,7 +1313,7 @@ class _SetupKycScreenState extends State<SetupKycScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
-                          name ?? 'Uploaded',
+                          name ?? t.setupUploaded,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.urbanist(
@@ -1315,7 +1322,7 @@ class _SetupKycScreenState extends State<SetupKycScreen> {
                               color: AppColors.primary),
                         ),
                       ),
-                      Text('Tap to replace',
+                      Text(t.setupTapToReplace,
                           style: GoogleFonts.urbanist(
                               fontSize: 12, color: context.c.textSecondary)),
                     ]
@@ -1328,7 +1335,7 @@ class _SetupKycScreenState extends State<SetupKycScreen> {
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: context.c.textSecondary)),
-                      Text('JPG, PNG or PDF up to 5mb',
+                      Text(t.setupUploadFileTypes,
                           style: GoogleFonts.urbanist(
                               fontSize: 12, color: context.c.textHint)),
                     ],
@@ -1366,9 +1373,9 @@ class _SetupKycScreenState extends State<SetupKycScreen> {
                   } catch (_) {/* surfaced below if not active */}
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
+                    SnackBar(
                       content: Text(
-                          'Payment not completed — you can subscribe to a paid plan anytime from your profile.'),
+                          AppLocalizations.of(context).setupPaymentNotCompleted),
                     ),
                   );
                 }
@@ -1376,11 +1383,14 @@ class _SetupKycScreenState extends State<SetupKycScreen> {
               if (context.mounted) context.go(AppRoutes.setupSuccess);
             } else if (state.status == SetupStatus.error) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.error ?? 'Something went wrong')),
+                SnackBar(
+                    content: Text(state.error ??
+                        AppLocalizations.of(context).setupSomethingWentWrong)),
               );
             }
           },
           builder: (context, state) {
+            final t = AppLocalizations.of(context);
             final submitting = state.status == SetupStatus.submitting;
             return Column(
               children: [
@@ -1390,21 +1400,20 @@ class _SetupKycScreenState extends State<SetupKycScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const _SetupHeader(
-                          title: 'Verify your identity',
-                          subtitle:
-                              'Upload your NIN, and CAC if you run a licensed business. Stored securely.',
+                        _SetupHeader(
+                          title: t.setupVerifyIdentityTitle,
+                          subtitle: t.setupVerifyIdentitySubtitle,
                         ),
                         const SizedBox(height: 28),
                         _uploadBox(
-                          label: 'Upload your NIN slip',
+                          label: t.setupUploadNin,
                           url: _ninUrl,
                           name: _ninName,
                           uploading: _uploadingNin,
                           onTap: () => _pickDoc(isNin: true),
                         ),
                         _uploadBox(
-                          label: 'Upload your CAC document',
+                          label: t.setupUploadCac,
                           url: _cacUrl,
                           name: _cacName,
                           uploading: _uploadingCac,
@@ -1419,7 +1428,7 @@ class _SetupKycScreenState extends State<SetupKycScreen> {
                   child: Column(
                     children: [
                       AppButton.primary(
-                        submitting ? 'Setting up…' : 'Finish setup',
+                        submitting ? t.setupSettingUp : t.setupFinishSetup,
                         onTap: submitting
                             ? null
                             : () {
@@ -1436,7 +1445,7 @@ class _SetupKycScreenState extends State<SetupKycScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'You can complete verification later from your profile.',
+                        t.setupCompleteVerificationLater,
                         style: GoogleFonts.urbanist(
                             fontSize: 12, color: context.c.textHint),
                         textAlign: TextAlign.center,
@@ -1507,7 +1516,7 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
           Padding(
             padding: pagePadding(context, base: 24).add(const EdgeInsets.only(top: 20, bottom: 8)),
             child: Text(
-              'Select Bank',
+              AppLocalizations.of(context).selectBank,
               style: GoogleFonts.urbanist(
                   fontSize: 17, fontWeight: FontWeight.w700,
                   color: context.c.textPrimary),
@@ -1563,6 +1572,7 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: context.c.surface,
       appBar: _buildSetupAppBar(context, step: 5, total: 6),
@@ -1575,9 +1585,9 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const _SetupHeader(
-                      title: 'Payout details',
-                      subtitle: 'Where should we send your earnings?',
+                    _SetupHeader(
+                      title: t.setupPayoutTitle,
+                      subtitle: t.setupPayoutSubtitle,
                     ),
                     const SizedBox(height: 28),
 
@@ -1586,7 +1596,7 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Bank name',
+                          t.setupBankName,
                           style: GoogleFonts.urbanist(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -1608,7 +1618,7 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    _selectedBank ?? 'Select your bank',
+                                    _selectedBank ?? t.setupSelectYourBank,
                                     style: GoogleFonts.urbanist(
                                       fontSize: 15,
                                       color: _selectedBank != null
@@ -1630,8 +1640,8 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
 
                     // Account number
                     AppInput(
-                      label: 'Account number',
-                      hint: '0123456789',
+                      label: t.setupAccountNumber,
+                      hint: t.setupAccountNumberHint,
                       controller: _accountNumberCtrl,
                       keyboardType: TextInputType.number,
                       inputFormatters: [
@@ -1643,8 +1653,8 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
 
                     // Account name (read-only)
                     AppInput(
-                      label: 'Account name',
-                      hint: 'Auto verified',
+                      label: t.setupAccountName,
+                      hint: t.setupAutoVerified,
                       readOnly: true,
                       enabled: false,
                     ),
@@ -1662,7 +1672,7 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Payout schedule',
+                            t.setupPayoutSchedule,
                             style: GoogleFonts.urbanist(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
@@ -1671,13 +1681,13 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
                           ),
                           const SizedBox(height: 10),
                           _payoutRow(Icons.schedule_rounded,
-                              'Rolling · 24–48hrs after completion'),
+                              t.setupPayoutRolling),
                           const SizedBox(height: 8),
                           _payoutRow(Icons.percent_rounded,
-                              'Platform commission · Deducted before payout'),
+                              t.setupPayoutCommission),
                           const SizedBox(height: 8),
                           _payoutRow(Icons.account_balance_wallet_rounded,
-                              'Minimum payout · ₦1,000'),
+                              t.setupMinimumPayout),
                         ],
                       ),
                     ),
@@ -1691,7 +1701,7 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
                             color: AppColors.success, size: 18),
                         const SizedBox(width: 6),
                         Text(
-                          'Secured by Paystack',
+                          t.setupSecuredByPaystack,
                           style: GoogleFonts.urbanist(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
@@ -1708,7 +1718,7 @@ class _SetupPayoutScreenState extends State<SetupPayoutScreen> {
             Padding(
               padding: pagePadding(context, base: 24).add(const EdgeInsets.only(top: 12, bottom: 32)),
               child: AppButton.primary(
-                'Save Payout Details',
+                t.setupSavePayoutDetails,
                 loading: _loading,
                 onTap: _loading ? null : _saveAndContinue,
               ),
@@ -1747,6 +1757,7 @@ class SetupSuccessScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: context.c.surface,
       body: SafeArea(
@@ -1771,7 +1782,7 @@ class SetupSuccessScreen extends StatelessWidget {
               const SizedBox(height: 28),
 
               Text(
-                "You're all set!",
+                t.setupAllSet,
                 style: GoogleFonts.urbanist(
                   fontSize: 28,
                   fontWeight: FontWeight.w800,
@@ -1781,7 +1792,7 @@ class SetupSuccessScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Your vendor profile is live on Planovar. Start adding your products and services to reach thousands of event planners in Lagos.',
+                t.setupProfileLive,
                 style: GoogleFonts.urbanist(
                   fontSize: 15,
                   color: context.c.textSecondary,
@@ -1794,21 +1805,21 @@ class SetupSuccessScreen extends StatelessWidget {
               // Action cards
               _ActionCard(
                 icon: Icons.add_business_rounded,
-                title: 'Add your first listing',
-                subtitle: 'Products, services or rentals',
+                title: t.setupAddFirstListing,
+                subtitle: t.setupAddFirstListingSub,
                 onTap: () => context.go(AppRoutes.listings),
               ),
               const SizedBox(height: 12),
               _ActionCard(
                 icon: Icons.workspace_premium_rounded,
-                title: 'Upgrade your plan',
-                subtitle: 'Get more visibility & analytics',
+                title: t.setupUpgradePlan,
+                subtitle: t.setupUpgradePlanSub,
                 onTap: () => context.go(AppRoutes.listings),
               ),
               const SizedBox(height: 40),
 
               AppButton.primary(
-                'Go to Dashboard',
+                t.setupGoToDashboard,
                 onTap: () => context.go(AppRoutes.home),
               ),
             ],

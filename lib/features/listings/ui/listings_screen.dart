@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/app_icon.dart';
 import '../../../shared/models/listing_model.dart';
 import '../../../shared/widgets/network_image_widget.dart';
@@ -79,15 +80,17 @@ class _ListingsScreenState extends State<ListingsScreen> {
   // ── Helpers ────────────────────────────────────────────────────────────────
 
   String _listingTypeBadge(ListingModel listing) {
-    if (listing.isRentable) return 'Product (Rental)';
-    if (listing.pricingType == 'FIXED') return 'Product';
-    return 'Service';
+    final t = AppLocalizations.of(context);
+    if (listing.isRentable) return t.listingBadgeProductRental;
+    if (listing.pricingType == 'FIXED') return t.listingTypeProduct;
+    return t.listingTypeService;
   }
 
   String _listingPrice(ListingModel listing) {
+    final t = AppLocalizations.of(context);
     if (listing.isRentable) {
       final rate = listing.perDayRate ?? listing.basePrice ?? 0;
-      return '${Formatters.formatCurrency(rate)} / day';
+      return t.listingPerDay(Formatters.formatCurrency(rate));
     }
     if (listing.pricingType == 'FIXED') {
       return Formatters.formatCurrency(listing.basePrice ?? 0);
@@ -98,7 +101,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
     if (listing.basePrice != null) {
       return '${Formatters.formatCurrency(min)} – ${Formatters.formatCurrency(max)}';
     }
-    return 'Quote based';
+    return t.listingQuoteBased;
   }
 
   // ── Bottom Sheet (reused from HomeScreen logic) ────────────────────────────
@@ -140,11 +143,11 @@ class _ListingsScreenState extends State<ListingsScreen> {
                 icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
                 onPressed: () => context.pop(),
               ),
-              const Expanded(
+              Expanded(
                 child: Center(
                   child: Text(
-                    'My Listings',
-                    style: TextStyle(
+                    AppLocalizations.of(context).listingsMyListings,
+                    style: const TextStyle(
                       fontFamily: 'Urbanist',
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
@@ -165,11 +168,12 @@ class _ListingsScreenState extends State<ListingsScreen> {
   // ── Filter Tabs ────────────────────────────────────────────────────────────
 
   Widget _buildFilterTabs() {
+    final t = AppLocalizations.of(context);
     final tabs = [
-      'All ($_allCount)',
-      'Services ($_serviceCount)',
-      'Products ($_productCount)',
-      'Rentals ($_rentalCount)',
+      t.listingsTabAll(_allCount),
+      t.listingsTabServices(_serviceCount),
+      t.listingsTabProducts(_productCount),
+      t.listingsTabRentals(_rentalCount),
     ];
     return SizedBox(
       height: 40,
@@ -247,11 +251,12 @@ class _ListingsScreenState extends State<ListingsScreen> {
                   ),
                   children: [
                     TextSpan(
-                      text: '$_outOfStockCount Items are out of Stock, ',
+                      text: AppLocalizations.of(context)
+                          .listingsOutOfStockCount(_outOfStockCount),
                       style: const TextStyle(fontWeight: FontWeight.w700),
                     ),
                     TextSpan(
-                      text: 'Click to update',
+                      text: AppLocalizations.of(context).listingsClickToUpdate,
                       style: TextStyle(
                         color: AppColors.error,
                         fontWeight: FontWeight.w600,
@@ -399,7 +404,9 @@ class _ListingsScreenState extends State<ListingsScreen> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          isActive ? 'Active' : 'Inactive',
+                          isActive
+                              ? AppLocalizations.of(context).statusActive
+                              : AppLocalizations.of(context).statusInactive,
                           style: GoogleFonts.urbanist(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
@@ -420,12 +427,12 @@ class _ListingsScreenState extends State<ListingsScreen> {
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
-                            children: const [
-                              Icon(Icons.visibility_off_outlined,
+                            children: [
+                              const Icon(Icons.visibility_off_outlined,
                                   size: 11, color: Color(0xFFEA580C)),
-                              SizedBox(width: 3),
-                              Text('Pending review',
-                                  style: TextStyle(
+                              const SizedBox(width: 3),
+                              Text(AppLocalizations.of(context).listingsPendingReview,
+                                  style: const TextStyle(
                                     fontFamily: 'Urbanist',
                                     fontSize: 10,
                                     fontWeight: FontWeight.w600,
@@ -479,7 +486,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            'No listings here yet',
+            AppLocalizations.of(context).listingsEmptyTitle,
             style: GoogleFonts.urbanist(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -488,7 +495,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Tap + to add your first listing',
+            AppLocalizations.of(context).listingsEmptySubtitle,
             style: GoogleFonts.urbanist(
               fontSize: 13,
               color: context.c.textHint,
@@ -536,7 +543,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
                 const AppIcon('add', size: 24, color: Colors.white),
                 const SizedBox(width: 8),
                 Text(
-                  'Add listing',
+                  AppLocalizations.of(context).listingsAddListing,
                   style: GoogleFonts.urbanist(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
@@ -613,13 +620,13 @@ class _ListingsScreenState extends State<ListingsScreen> {
                 size: 44, color: context.c.textHint),
             const SizedBox(height: 12),
             Text(
-              error ?? 'Could not load your listings',
+              error ?? AppLocalizations.of(context).listingsCouldNotLoad,
               style: GoogleFonts.urbanist(
                   fontSize: 14, color: context.c.textSecondary),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            AppButton.secondary('Retry',
+            AppButton.secondary(AppLocalizations.of(context).retry,
                 onTap: () => context.read<ListingsCubit>().load()),
           ],
         ),
@@ -644,6 +651,7 @@ class _ListingTypeSheetState extends State<_ListingTypeSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Container(
       decoration: BoxDecoration(
         color: context.c.surface,
@@ -676,7 +684,7 @@ class _ListingTypeSheetState extends State<_ListingTypeSheet> {
               GestureDetector(
                 onTap: () => Navigator.pop(context),
                 child: Text(
-                  'Cancel',
+                  t.cancel,
                   style: GoogleFonts.urbanist(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -691,7 +699,7 @@ class _ListingTypeSheetState extends State<_ListingTypeSheet> {
           const SizedBox(height: 16),
 
           Text(
-            'Listing Type',
+            t.listingTypeTitle,
             style: GoogleFonts.urbanist(
               fontSize: 22,
               fontWeight: FontWeight.w800,
@@ -700,7 +708,7 @@ class _ListingTypeSheetState extends State<_ListingTypeSheet> {
           ),
           const SizedBox(height: 6),
           Text(
-            'Select the type of listing you want to create',
+            t.listingTypeSubtitle,
             style: GoogleFonts.urbanist(
               fontSize: 14,
               color: context.c.textSecondary,
@@ -713,10 +721,10 @@ class _ListingTypeSheetState extends State<_ListingTypeSheet> {
           _TypeCard(
             type: 'service',
             icon: Icons.work_outline_rounded,
-            title: 'Service',
-            subtitle: 'Bookable appointment',
+            title: t.listingTypeService,
+            subtitle: t.addListingServiceDesc,
             selected: _selected,
-            onTap: (t) => setState(() => _selected = t),
+            onTap: (v) => setState(() => _selected = v),
           ),
 
           const SizedBox(height: 14),
@@ -724,16 +732,16 @@ class _ListingTypeSheetState extends State<_ListingTypeSheet> {
           _TypeCard(
             type: 'product',
             icon: Icons.inventory_2_outlined,
-            title: 'Product',
-            subtitle: 'Physical item for rent or sale',
+            title: t.listingTypeProduct,
+            subtitle: t.listingTypeProductDesc,
             selected: _selected,
-            onTap: (t) => setState(() => _selected = t),
+            onTap: (v) => setState(() => _selected = v),
           ),
 
           const SizedBox(height: 28),
 
           AppButton.primary(
-            'Proceed',
+            t.proceed,
             onTap: _selected == null
                 ? null
                 : () {

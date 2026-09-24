@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/router/app_routes.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/models/order_model.dart';
 import '../../orders/bloc/orders_cubit.dart';
 
@@ -40,7 +41,7 @@ class ActionNeededScreen extends StatelessWidget {
               child: const Icon(Icons.arrow_back_rounded, color: Colors.white),
             ),
             title: Text(
-              'Action Needed',
+              AppLocalizations.of(context).homeActionNeeded,
               style: GoogleFonts.urbanist(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -80,7 +81,7 @@ class _EmptyState extends StatelessWidget {
             Icon(Icons.inbox_outlined, size: 56, color: context.c.textHint),
             const SizedBox(height: 12),
             Text(
-              'You’re all caught up',
+              AppLocalizations.of(context).homeAllCaughtUp,
               style: GoogleFonts.urbanist(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
@@ -89,7 +90,7 @@ class _EmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'No inquiries are waiting on your response.',
+              AppLocalizations.of(context).homeNoInquiriesWaiting,
               textAlign: TextAlign.center,
               style: GoogleFonts.urbanist(
                 fontSize: 14,
@@ -168,7 +169,7 @@ class _ActionCard extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'New inquiry',
+                                AppLocalizations.of(context).homeNewInquiry,
                                 style: GoogleFonts.urbanist(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w700,
@@ -196,7 +197,7 @@ class _ActionCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
-                            'New',
+                            AppLocalizations.of(context).homeNewBadge,
                             style: GoogleFonts.urbanist(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -219,7 +220,7 @@ class _ActionCard extends StatelessWidget {
                         ),
                         child: Center(
                           child: Text(
-                            'Open & Respond',
+                            AppLocalizations.of(context).homeOpenRespond,
                             style: GoogleFonts.urbanist(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,

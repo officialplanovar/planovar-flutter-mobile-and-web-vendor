@@ -128,7 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 6),
             Text(
-              'Sign in to your vendor account',
+              t.loginSubtitle,
               style: GoogleFonts.urbanist(
                 fontSize: 15,
                 color: context.c.textSecondary,
@@ -139,7 +139,7 @@ class _LoginScreenState extends State<LoginScreen> {
             // Email
             AppInput(
               label: t.emailAddress,
-              hint: 'yourname@business.com',
+              hint: t.emailPlaceholder,
               controller: _emailCtrl,
               keyboardType: TextInputType.emailAddress,
             ),
@@ -148,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
             // Password
             AppInput(
               label: t.password,
-              hint: 'Enter your password',
+              hint: t.loginPasswordHint,
               controller: _passwordCtrl,
               obscureText: _obscure,
               suffixIcon: IconButton(

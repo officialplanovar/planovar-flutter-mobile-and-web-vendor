@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../core/responsive/responsive.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_input.dart';
 import '../bloc/auth_bloc.dart';
@@ -30,6 +31,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: context.c.surface,
       appBar: AppBar(
@@ -40,7 +42,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          'Forgot Password',
+          t.forgotPassword,
           style: GoogleFonts.urbanist(
             fontSize: 17,
             fontWeight: FontWeight.w600,
@@ -68,7 +70,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ),
             const SizedBox(height: 20),
             Text(
-              'Reset your password',
+              t.forgotResetTitle,
               style: GoogleFonts.urbanist(
                 fontSize: 24,
                 fontWeight: FontWeight.w700,
@@ -77,7 +79,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              "Enter your email address and we'll send you a 6-digit code to reset your password.",
+              t.forgotResetIntro,
               style: GoogleFonts.urbanist(
                 fontSize: 15,
                 color: context.c.textSecondary,
@@ -87,8 +89,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             const SizedBox(height: 28),
 
             AppInput(
-              label: 'Email Address',
-              hint: 'yourname@business.com',
+              label: t.emailAddress,
+              hint: t.emailPlaceholder,
               controller: _emailCtrl,
               keyboardType: TextInputType.emailAddress,
               enabled: !_sent,
@@ -115,7 +117,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'A reset code has been sent to ${_emailCtrl.text.trim()}. Check your inbox.',
+                        t.forgotResetSentTo(_emailCtrl.text.trim()),
                         style: GoogleFonts.urbanist(
                           fontSize: 13,
                           color: AppColors.activeText,
@@ -147,7 +149,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               builder: (context, state) {
                 final loading = state is AuthLoading;
                 return AppButton.primary(
-                  _sent ? 'Resend Code' : 'Send Reset Code',
+                  _sent ? t.resendCode : t.sendResetCode,
                   loading: loading,
                   onTap: loading
                       ? null
@@ -165,7 +167,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             if (_sent) ...[
               const SizedBox(height: 16),
               AppButton.secondary(
-                'Back to Sign In',
+                t.backToSignIn,
                 onTap: () => context.pop(),
               ),
             ],

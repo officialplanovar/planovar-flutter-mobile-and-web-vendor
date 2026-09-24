@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 
 /// Delivery/rental order tracking has no backend yet, so this is a placeholder.
 /// The full tracking timeline UI returns once a tracking API exists.
@@ -10,6 +11,7 @@ class OrderTrackingDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: context.c.background,
       appBar: AppBar(
@@ -20,7 +22,7 @@ class OrderTrackingDetailScreen extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          'Order Tracking',
+          t.trackingTitle,
           style: GoogleFonts.urbanist(
             fontSize: 18,
             fontWeight: FontWeight.w700,
@@ -39,7 +41,7 @@ class OrderTrackingDetailScreen extends StatelessWidget {
                   size: 56, color: context.c.textHint),
               const SizedBox(height: 12),
               Text(
-                'Order tracking is coming soon',
+                t.trackingComingSoon,
                 style: GoogleFonts.urbanist(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
@@ -48,7 +50,7 @@ class OrderTrackingDetailScreen extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                'Delivery and rental tracking will appear here once it’s available.',
+                t.trackingComingSoonBody,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.urbanist(
                   fontSize: 14,

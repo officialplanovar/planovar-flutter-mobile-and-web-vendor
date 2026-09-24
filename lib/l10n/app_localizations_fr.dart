@@ -96,4 +96,1217 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get signUp => 'S\'inscrire';
+
+  @override
+  String get onboardingTitle1 =>
+      'Accédez à des milliers de clients événementiels';
+
+  @override
+  String get onboardingSubtitle1 =>
+      'Connectez-vous avec des couples, des entreprises et des organisateurs d\'événements de votre région, tous à la recherche active de prestataires comme vous';
+
+  @override
+  String get onboardingTitle2 => 'Gérez tout depuis un seul tableau de bord';
+
+  @override
+  String get onboardingSubtitle2 =>
+      'Suivez vos demandes, réservations et conversations depuis un espace de travail unique';
+
+  @override
+  String get onboardingTitle3 =>
+      'Présentez votre travail, faites-vous découvrir';
+
+  @override
+  String get onboardingSubtitle3 =>
+      'Répertoriez vos produits, services et locations, puis abonnez-vous pour grimper dans les classements de recherche et atteindre les organisateurs d\'événements en premier.';
+
+  @override
+  String get onboardingListBusiness => 'Répertorier mon entreprise';
+
+  @override
+  String get onboardingHaveAccount => 'J\'ai déjà un compte';
+
+  @override
+  String get loginSubtitle => 'Connectez-vous à votre compte prestataire';
+
+  @override
+  String get emailPlaceholder => 'votrenom@entreprise.com';
+
+  @override
+  String get loginPasswordHint => 'Saisissez votre mot de passe';
+
+  @override
+  String get registerTitle => 'Créez votre compte prestataire';
+
+  @override
+  String get registerSubtitle =>
+      'Commencez à répertorier votre entreprise sur Planovar';
+
+  @override
+  String get firstName => 'Prénom';
+
+  @override
+  String get firstNameHint => 'p. ex. Ada';
+
+  @override
+  String get lastName => 'Nom';
+
+  @override
+  String get lastNameHint => 'p. ex. Obi';
+
+  @override
+  String get businessName => 'Nom de l\'entreprise';
+
+  @override
+  String get businessNameHint => 'p. ex. Sugared Dreams Cakery';
+
+  @override
+  String get dateOfBirth => 'Date de naissance';
+
+  @override
+  String get dobPlaceholder => 'JJ / MM / AAAA';
+
+  @override
+  String get selectDob => 'Sélectionnez votre date de naissance';
+
+  @override
+  String get phoneNumber => 'Numéro de téléphone';
+
+  @override
+  String get phoneNumberHint => '8012345678';
+
+  @override
+  String get createPassword => 'Créer un mot de passe';
+
+  @override
+  String get createPasswordHint => 'Min. 8 caractères';
+
+  @override
+  String get registerAgreePrefix => 'En cochant la case, vous acceptez nos ';
+
+  @override
+  String get termsAndConditions => 'Conditions générales';
+
+  @override
+  String get registerAgreeAnd => ' et notre ';
+
+  @override
+  String get privacyPolicy => 'Politique de confidentialité';
+
+  @override
+  String get continueWithGoogle => 'Continuer avec Google';
+
+  @override
+  String get alreadyHaveAccount => 'Vous avez déjà un compte ? ';
+
+  @override
+  String get signInAction => 'Se connecter';
+
+  @override
+  String get forgotResetTitle => 'Réinitialisez votre mot de passe';
+
+  @override
+  String get forgotResetIntro =>
+      'Saisissez votre adresse e-mail et nous vous enverrons un code à 6 chiffres pour réinitialiser votre mot de passe.';
+
+  @override
+  String forgotResetSentTo(String email) {
+    return 'Un code de réinitialisation a été envoyé à $email. Vérifiez votre boîte de réception.';
+  }
+
+  @override
+  String get resendCode => 'Renvoyer le code';
+
+  @override
+  String get sendResetCode => 'Envoyer le code de réinitialisation';
+
+  @override
+  String get backToSignIn => 'Retour à la connexion';
+
+  @override
+  String get resetPasswordTitle => 'Réinitialiser le mot de passe';
+
+  @override
+  String get resetPasswordSuccess =>
+      'Mot de passe réinitialisé avec succès. Veuillez vous connecter.';
+
+  @override
+  String get resetCreateNewPassword => 'Créez un nouveau mot de passe';
+
+  @override
+  String get resetCodeSentTo => 'Saisissez le code à 6 chiffres envoyé à ';
+
+  @override
+  String get resetChoosePassword => ' et choisissez un nouveau mot de passe.';
+
+  @override
+  String get verificationCode => 'Code de vérification';
+
+  @override
+  String get sixDigitCode => 'Code à 6 chiffres';
+
+  @override
+  String get newPassword => 'Nouveau mot de passe';
+
+  @override
+  String get atLeast8Chars => 'Au moins 8 caractères';
+
+  @override
+  String get mustBeAtLeast8Chars => 'Doit contenir au moins 8 caractères';
+
+  @override
+  String get confirmPassword => 'Confirmer le mot de passe';
+
+  @override
+  String get confirmPasswordHint => 'Ressaisissez votre nouveau mot de passe';
+
+  @override
+  String get passwordsDoNotMatch => 'Les mots de passe ne correspondent pas';
+
+  @override
+  String get verifyEmailTitle => 'Vérifiez votre e-mail';
+
+  @override
+  String get verifyEmailIntro =>
+      'Nous avons envoyé un code OTP à 6 chiffres à votre adresse e-mail';
+
+  @override
+  String get verifyNewCodeSent => 'Un nouveau code a été envoyé';
+
+  @override
+  String verifyCouldNotResend(String error) {
+    return 'Impossible de renvoyer le code : $error';
+  }
+
+  @override
+  String get proceed => 'Continuer';
+
+  @override
+  String verifyResendIn(int seconds) {
+    return 'Renvoyer le code dans $seconds s';
+  }
+
+  @override
+  String get resendCodeAction => 'Renvoyer le code';
+
+  @override
+  String get setupBusinessSetup => 'Configuration de l\'entreprise';
+
+  @override
+  String get setupBusinessProfileTitle => 'Profil de l\'entreprise';
+
+  @override
+  String get setupBusinessProfileSubtitle => 'Dites aux clients qui vous êtes';
+
+  @override
+  String get setupLicensedBusiness => 'Entreprise agréée';
+
+  @override
+  String get setupLicensedBusinessDesc =>
+      'Société, agence ou studio enregistré';
+
+  @override
+  String get setupFreelancer => 'Indépendant';
+
+  @override
+  String get setupFreelancerDesc =>
+      'Particulier proposant des services professionnels';
+
+  @override
+  String get setupCouldNotLoadCategories =>
+      'Impossible de charger les catégories';
+
+  @override
+  String get setupCouldNotReadFile =>
+      'Impossible de lire le fichier sélectionné';
+
+  @override
+  String get setupFileTooLarge => 'Le fichier dépasse 5 Mo';
+
+  @override
+  String get setupBusinessLogoOptional => 'Logo de l\'entreprise (facultatif)';
+
+  @override
+  String get setupBusinessDescription => 'Description de l\'entreprise';
+
+  @override
+  String get setupBusinessDescriptionHint =>
+      'Dites aux clients ce qui rend votre entreprise spéciale, votre expérience et ce que vous proposez...';
+
+  @override
+  String get setupProofOfOwnership => 'Preuve de propriété';
+
+  @override
+  String get setupProofOptionalFreelancers =>
+      '(facultatif pour les indépendants)';
+
+  @override
+  String get setupDocumentUploaded => 'Document téléchargé';
+
+  @override
+  String get setupTapToReplace => 'Appuyez pour remplacer';
+
+  @override
+  String get setupTapToUpload => 'Appuyez pour télécharger';
+
+  @override
+  String get setupUploadFileTypes => 'JPG, PNG ou PDF jusqu\'à 5 Mo';
+
+  @override
+  String get setupCategoryTags => 'Étiquettes de catégorie';
+
+  @override
+  String get setupNoCategories => 'Aucune catégorie disponible pour le moment';
+
+  @override
+  String get setupLocationTitle => 'Localisation et portée';
+
+  @override
+  String get setupLocationSubtitle => 'Où opérez-vous ?';
+
+  @override
+  String get setupTurnOnLocation =>
+      'Activez les services de localisation pour utiliser ceci.';
+
+  @override
+  String get setupLocationDenied =>
+      'Autorisation de localisation refusée — choisissez votre ville manuellement.';
+
+  @override
+  String get setupCouldNotDetermineCity =>
+      'Impossible de déterminer votre ville — veuillez la choisir manuellement.';
+
+  @override
+  String get setupCouldNotGetLocation =>
+      'Impossible d\'obtenir votre position. Veuillez choisir votre ville manuellement.';
+
+  @override
+  String get selectCountry => 'Sélectionner le pays';
+
+  @override
+  String get selectCity => 'Sélectionner la ville';
+
+  @override
+  String get selectYourCity => 'Sélectionnez votre ville';
+
+  @override
+  String get country => 'Pays';
+
+  @override
+  String get city => 'Ville';
+
+  @override
+  String get setupLocating => 'Localisation…';
+
+  @override
+  String get setupUseCurrentLocation => 'Utiliser ma position actuelle';
+
+  @override
+  String get setupVendorType => 'Type de prestataire';
+
+  @override
+  String get setupProductsOnly => 'Produits uniquement';
+
+  @override
+  String get setupServicesOnly => 'Services uniquement';
+
+  @override
+  String get setupBothProductsServices => 'Produits et services';
+
+  @override
+  String get setupChoosePlanTitle => 'Choisissez votre forfait';
+
+  @override
+  String get setupChoosePlanSubtitle =>
+      'Améliorez à tout moment. Annulez à tout moment.';
+
+  @override
+  String get setupCouldNotLoadPlans =>
+      'Impossible de charger les forfaits. Vérifiez votre connexion et réessayez.';
+
+  @override
+  String setupSelectPlan(String plan) {
+    return 'Choisir $plan';
+  }
+
+  @override
+  String get setupSkipForNow => 'Ignorer pour l\'instant';
+
+  @override
+  String get setupVerifyIdentityTitle => 'Vérifiez votre identité';
+
+  @override
+  String get setupVerifyIdentitySubtitle =>
+      'Téléchargez votre NIN, et votre CAC si vous dirigez une entreprise agréée. Stocké en toute sécurité.';
+
+  @override
+  String get setupUploaded => 'Téléchargé';
+
+  @override
+  String get setupUploadNin => 'Téléchargez votre attestation NIN';
+
+  @override
+  String get setupUploadCac => 'Téléchargez votre document CAC';
+
+  @override
+  String get setupPaymentNotCompleted =>
+      'Paiement non finalisé — vous pouvez souscrire à un forfait payant à tout moment depuis votre profil.';
+
+  @override
+  String get setupSomethingWentWrong => 'Une erreur s\'est produite';
+
+  @override
+  String get setupSettingUp => 'Configuration…';
+
+  @override
+  String get setupFinishSetup => 'Terminer la configuration';
+
+  @override
+  String get setupCompleteVerificationLater =>
+      'Vous pouvez compléter la vérification plus tard depuis votre profil.';
+
+  @override
+  String get selectBank => 'Sélectionner la banque';
+
+  @override
+  String get setupPayoutTitle => 'Détails de versement';
+
+  @override
+  String get setupPayoutSubtitle => 'Où devons-nous envoyer vos gains ?';
+
+  @override
+  String get setupBankName => 'Nom de la banque';
+
+  @override
+  String get setupSelectYourBank => 'Sélectionnez votre banque';
+
+  @override
+  String get setupAccountNumber => 'Numéro de compte';
+
+  @override
+  String get setupAccountNumberHint => '0123456789';
+
+  @override
+  String get setupAccountName => 'Nom du compte';
+
+  @override
+  String get setupAutoVerified => 'Vérifié automatiquement';
+
+  @override
+  String get setupPayoutSchedule => 'Calendrier des versements';
+
+  @override
+  String get setupPayoutRolling => 'En continu · 24–48 h après réalisation';
+
+  @override
+  String get setupPayoutCommission =>
+      'Commission de la plateforme · Déduite avant le versement';
+
+  @override
+  String get setupMinimumPayout => 'Versement minimum · ₦1 000';
+
+  @override
+  String get setupSecuredByPaystack => 'Sécurisé par Paystack';
+
+  @override
+  String get setupSavePayoutDetails => 'Enregistrer les détails de versement';
+
+  @override
+  String get setupAllSet => 'Tout est prêt !';
+
+  @override
+  String get setupProfileLive =>
+      'Votre profil prestataire est en ligne sur Planovar. Commencez à ajouter vos produits et services pour atteindre des milliers d\'organisateurs d\'événements à Lagos.';
+
+  @override
+  String get setupAddFirstListing => 'Ajoutez votre première annonce';
+
+  @override
+  String get setupAddFirstListingSub => 'Produits, services ou locations';
+
+  @override
+  String get setupUpgradePlan => 'Améliorez votre forfait';
+
+  @override
+  String get setupUpgradePlanSub => 'Obtenez plus de visibilité et d\'analyses';
+
+  @override
+  String get setupGoToDashboard => 'Aller au tableau de bord';
+
+  @override
+  String get payCompletePayment => 'Finaliser le paiement';
+
+  @override
+  String get paySecurePayment => 'Paiement sécurisé';
+
+  @override
+  String get payBrowserFailed =>
+      'Nous n\'avons pas pu ouvrir votre navigateur. Appuyez ci-dessous pour ouvrir le paiement sécurisé Paystack.';
+
+  @override
+  String get payBrowserOpened =>
+      'Nous avons ouvert le paiement sécurisé Paystack dans votre navigateur. Finalisez votre paiement là-bas, puis revenez et appuyez sur le bouton ci-dessous.';
+
+  @override
+  String get payOpenPaymentPage => 'Ouvrir la page de paiement';
+
+  @override
+  String get payReopenPaymentPage => 'Rouvrir la page de paiement';
+
+  @override
+  String get payCompletedPayment => 'J\'ai finalisé le paiement';
+
+  @override
+  String get homeTodaysSchedule => 'Programme du jour';
+
+  @override
+  String get homeQuickAction => 'Action rapide';
+
+  @override
+  String get viewAll => 'Voir tout';
+
+  @override
+  String homeNewRequestsAttention(int count) {
+    return '$count nouvelles demandes requièrent votre attention';
+  }
+
+  @override
+  String homeNewRequestsSubtitle(int count) {
+    return 'Vous avez $count nouvelles demandes pour vos annonces';
+  }
+
+  @override
+  String get homeConfirmedBookings => 'Réservations confirmées';
+
+  @override
+  String get homePendingRequests => 'Demandes en attente';
+
+  @override
+  String get homeThisMonth => 'Ce mois-ci';
+
+  @override
+  String homeBookingsCount(int count) {
+    return '$count réservations';
+  }
+
+  @override
+  String get homeAvgRating => 'Note moyenne';
+
+  @override
+  String homeFromReviews(int count) {
+    return 'sur $count avis';
+  }
+
+  @override
+  String get homeNoSchedule => 'Aucun programme pour aujourd\'hui';
+
+  @override
+  String get homeAddListing => 'Ajouter une annonce';
+
+  @override
+  String get homeAnalytics => 'Analyses';
+
+  @override
+  String get homeUpgradePlanShort => 'Améliorer le forfait';
+
+  @override
+  String get homePayouts => 'Versements';
+
+  @override
+  String get homeGoodMorning => 'Bonjour,';
+
+  @override
+  String get homeGoodAfternoon => 'Bon après-midi,';
+
+  @override
+  String get homeGoodEvening => 'Bonsoir,';
+
+  @override
+  String get listingTypeTitle => 'Type d\'annonce';
+
+  @override
+  String get listingTypeSubtitle =>
+      'Sélectionnez le type d\'annonce que vous souhaitez créer';
+
+  @override
+  String get listingTypeService => 'Service';
+
+  @override
+  String get listingTypeServiceDesc => 'rendez-vous réservable';
+
+  @override
+  String get listingTypeProduct => 'Produit';
+
+  @override
+  String get listingTypeProductDesc => 'Article physique à louer ou à vendre';
+
+  @override
+  String get homeActionNeeded => 'Action requise';
+
+  @override
+  String get homeAllCaughtUp => 'Vous êtes à jour';
+
+  @override
+  String get homeNoInquiriesWaiting =>
+      'Aucune demande n\'attend votre réponse.';
+
+  @override
+  String get homeNewInquiry => 'Nouvelle demande';
+
+  @override
+  String get homeNewBadge => 'Nouveau';
+
+  @override
+  String get homeOpenRespond => 'Ouvrir et répondre';
+
+  @override
+  String get addListingNewListing => 'Nouvelle annonce';
+
+  @override
+  String get addListingServiceDesc => 'Rendez-vous réservable';
+
+  @override
+  String get addSuccessSuccessfully => 'avec succès';
+
+  @override
+  String addSuccessAddedTitle(String label) {
+    return '$label ajouté ';
+  }
+
+  @override
+  String addSuccessPendingSubtitle(String label) {
+    return 'Votre $label a été enregistré. Il deviendra visible pour les clients une fois votre compte vérifié.';
+  }
+
+  @override
+  String get addSuccessLiveService =>
+      'Votre service a été ajouté avec succès et est actuellement en ligne';
+
+  @override
+  String get addSuccessLiveProduct =>
+      'Votre produit a été ajouté avec succès et est actuellement en ligne';
+
+  @override
+  String get addSuccessPendingWarning =>
+      'Vérification en attente — les clients ne peuvent pas voir vos annonces tant qu\'un administrateur n\'a pas vérifié votre compte. Nous vous préviendrons une fois approuvé.';
+
+  @override
+  String addSuccessIdLabel(String label) {
+    return 'ID $label';
+  }
+
+  @override
+  String get addSuccessSku => 'SKU';
+
+  @override
+  String get addSuccessDateCreated => 'Date de création';
+
+  @override
+  String addSuccessViewLabel(String label) {
+    return 'Voir $label';
+  }
+
+  @override
+  String get listingBadgeProductRental => 'Produit (Location)';
+
+  @override
+  String listingPerDay(String price) {
+    return '$price / jour';
+  }
+
+  @override
+  String get listingQuoteBased => 'Sur devis';
+
+  @override
+  String get listingsMyListings => 'Mes annonces';
+
+  @override
+  String listingsTabAll(int count) {
+    return 'Toutes ($count)';
+  }
+
+  @override
+  String listingsTabServices(int count) {
+    return 'Services ($count)';
+  }
+
+  @override
+  String listingsTabProducts(int count) {
+    return 'Produits ($count)';
+  }
+
+  @override
+  String listingsTabRentals(int count) {
+    return 'Locations ($count)';
+  }
+
+  @override
+  String listingsOutOfStockCount(int count) {
+    return '$count articles en rupture de stock, ';
+  }
+
+  @override
+  String get listingsClickToUpdate => 'Cliquez pour mettre à jour';
+
+  @override
+  String get statusActive => 'Actif';
+
+  @override
+  String get statusInactive => 'Inactif';
+
+  @override
+  String get listingsPendingReview => 'En attente d\'examen';
+
+  @override
+  String get listingsEmptyTitle => 'Aucune annonce pour le moment';
+
+  @override
+  String get listingsEmptySubtitle =>
+      'Appuyez sur + pour ajouter votre première annonce';
+
+  @override
+  String get listingsAddListing => 'Ajouter une annonce';
+
+  @override
+  String get listingsCouldNotLoad => 'Impossible de charger vos annonces';
+
+  @override
+  String get oosTitle => 'Annonces en rupture de stock';
+
+  @override
+  String get oosRental => 'Location';
+
+  @override
+  String oosReactivated(String noun) {
+    return '$noun réactivé';
+  }
+
+  @override
+  String get oosBadge => 'Rupture de stock';
+
+  @override
+  String get oosRestock => 'Réapprovisionner';
+
+  @override
+  String get oosEmptyTitle => 'Toutes les annonces sont en stock !';
+
+  @override
+  String get oosEmptySubtitle =>
+      'Aucun article en rupture de stock dans cette catégorie';
+
+  @override
+  String get category => 'Catégorie';
+
+  @override
+  String get selectCategory => 'Sélectionner une catégorie';
+
+  @override
+  String get apGenerateSkuHint =>
+      'Saisissez d\'abord le nom du produit, puis générez un SKU.';
+
+  @override
+  String get apNameDescRequired =>
+      'Le nom et la description du produit sont requis';
+
+  @override
+  String get apSelectCategory => 'Veuillez sélectionner une catégorie';
+
+  @override
+  String get apSelectACategory => 'Sélectionnez une catégorie';
+
+  @override
+  String get apNoCategoriesProfile =>
+      'Vous n\'avez pas encore ajouté de catégories à votre profil. Ajoutez-les dans Profil → Détails de l\'entreprise pour répertorier des produits ici.';
+
+  @override
+  String get apOnlyRegisteredCategories =>
+      'Seules vos catégories enregistrées sont affichées. Ajoutez-en plus dans Profil → Détails de l\'entreprise.';
+
+  @override
+  String get apForSale => 'À vendre';
+
+  @override
+  String get apForRent => 'À louer';
+
+  @override
+  String get apTitle => 'Ajouter un produit';
+
+  @override
+  String get apSubtitle => 'Ajoutez un produit à votre catalogue';
+
+  @override
+  String get apProductName => 'Nom du produit';
+
+  @override
+  String get apProductNameHint => 'Saisissez le nom du produit...';
+
+  @override
+  String get apProductDescription => 'Description du produit';
+
+  @override
+  String get apProductDescriptionHint => 'Décrivez votre produit...';
+
+  @override
+  String get apProductPrice => 'Prix du produit';
+
+  @override
+  String get apPricePerDay => 'Prix par jour';
+
+  @override
+  String get apRefundableDeposit => 'Caution remboursable';
+
+  @override
+  String get apRentalDuration => 'Durée de location (jours)';
+
+  @override
+  String get apRentalDurationHint => 'p. ex. 3';
+
+  @override
+  String get apSkuHint => 'Saisissez le SKU du produit...';
+
+  @override
+  String get apGenerateForMe => 'Générer pour moi';
+
+  @override
+  String get apQuantityInStock => 'Quantité en stock';
+
+  @override
+  String get apQuantityHint => 'Combien en avez-vous en stock';
+
+  @override
+  String get apAvailableSizes => 'Tailles disponibles (facultatif)';
+
+  @override
+  String get apTags => 'Étiquettes';
+
+  @override
+  String get apTagsHint => 'p. ex. Mariage, Gâteau, Luxe';
+
+  @override
+  String get apProductPhotos => 'Photos du produit';
+
+  @override
+  String get apFrontPhoto => 'Photo de face';
+
+  @override
+  String get apBackPhoto => 'Photo de dos';
+
+  @override
+  String get apSidePhoto => 'Photo de côté';
+
+  @override
+  String get apDetailPhoto => 'Photo de détail';
+
+  @override
+  String get apPublishing => 'Publication…';
+
+  @override
+  String get apPublishProduct => 'Publier le produit';
+
+  @override
+  String get gotIt => 'Compris';
+
+  @override
+  String get asNameDescRequired =>
+      'Le nom et la description du service sont requis';
+
+  @override
+  String get asNoCategoriesProfile =>
+      'Vous n\'avez pas encore ajouté de catégories à votre profil. Ajoutez-les dans Profil → Détails de l\'entreprise pour répertorier des services ici.';
+
+  @override
+  String get asCancellationPolicy => 'Politique d\'annulation';
+
+  @override
+  String get policyFlexible => 'Flexible';
+
+  @override
+  String get policyModerate => 'Modérée';
+
+  @override
+  String get policyStrict => 'Stricte';
+
+  @override
+  String get policyFlexibleDesc =>
+      'Remboursement intégral si le client annule jusqu\'à 24 heures avant l\'événement.';
+
+  @override
+  String get policyModerateDesc =>
+      'Remboursement de 50 % si annulé au moins 7 jours avant l\'événement ; aucun après.';
+
+  @override
+  String get policyStrictDesc =>
+      'Aucun remboursement une fois la réservation confirmée.';
+
+  @override
+  String get asCategoryInfo =>
+      'La catégorie de service que les clients parcourent. Seules les catégories enregistrées sur votre profil apparaissent ici.';
+
+  @override
+  String get asPriceRange => 'Fourchette de prix';
+
+  @override
+  String get asPriceRangeInfo =>
+      'La fourchette de prix habituelle pour ce service. Les clients la voient comme un guide ; le montant final est convenu dans votre devis.';
+
+  @override
+  String get asMin => 'Min';
+
+  @override
+  String get asMax => 'Max';
+
+  @override
+  String get asServiceDuration => 'Durée du service';
+
+  @override
+  String get durationDays => 'Jours';
+
+  @override
+  String get durationHours => 'Heures';
+
+  @override
+  String get durationMins => 'Min';
+
+  @override
+  String get asDurationHint => 'Saisissez la valeur de durée...';
+
+  @override
+  String get asSelectPolicy => 'Sélectionnez une politique';
+
+  @override
+  String get asCancellationPolicyInfo =>
+      'Comment fonctionnent les remboursements si un client annule. Choisissez le niveau qui convient le mieux à votre entreprise.';
+
+  @override
+  String get asTitle => 'Ajouter un service';
+
+  @override
+  String get asSubtitle => 'Ajoutez un service pour votre entreprise';
+
+  @override
+  String get asServiceName => 'Nom du service';
+
+  @override
+  String get asServiceNameHint => 'Saisissez le nom du service...';
+
+  @override
+  String get asServiceNameInfo =>
+      'Un nom court et clair que les clients verront, p. ex. « Photographie de mariage — Journée complète ».';
+
+  @override
+  String get asServiceDescription => 'Description du service';
+
+  @override
+  String get asServiceDescriptionHint => 'Décrivez votre service...';
+
+  @override
+  String get asServiceDescriptionInfo =>
+      'Ce qui est inclus, votre expérience et ce à quoi les clients peuvent s\'attendre. Plus il y a de détails, plus il y a de confiance.';
+
+  @override
+  String get asTagsHint => 'p. ex. Mariage, Photographie, Extérieur';
+
+  @override
+  String get asServicePhotos => 'Photos du service';
+
+  @override
+  String asPhotoNumber(int number) {
+    return 'Photo $number';
+  }
+
+  @override
+  String get asPublishService => 'Publier le service';
+
+  @override
+  String get loading => 'Chargement…';
+
+  @override
+  String get ldNotFound => 'Annonce introuvable';
+
+  @override
+  String get ldServiceLower => 'service';
+
+  @override
+  String get ldProductLower => 'produit';
+
+  @override
+  String ldDeleted(String noun) {
+    return '$noun supprimé';
+  }
+
+  @override
+  String ldDeactivated(String noun) {
+    return '$noun désactivé';
+  }
+
+  @override
+  String get ldEditService => 'Modifier le service';
+
+  @override
+  String get ldEditProduct => 'Modifier le produit';
+
+  @override
+  String get ldDeleteService => 'Supprimer le service';
+
+  @override
+  String get ldDeleteProduct => 'Supprimer le produit';
+
+  @override
+  String get ldDeactivateService => 'Désactiver le service';
+
+  @override
+  String get ldDeactivateProduct => 'Désactiver le produit';
+
+  @override
+  String get ldViews30d => 'Vues (30 j)';
+
+  @override
+  String get ldRating => 'Note';
+
+  @override
+  String get ldNoReviews => 'Aucun avis pour le moment';
+
+  @override
+  String get ldFixedPrice => 'Prix fixe';
+
+  @override
+  String get ldStartingFrom => 'À partir de';
+
+  @override
+  String get ldQuoteOnRequest => 'Devis sur demande';
+
+  @override
+  String get ldType => 'Type';
+
+  @override
+  String get ldPricePerDay => 'Prix par jour';
+
+  @override
+  String get ldStock => 'Stock';
+
+  @override
+  String get ldCancellationPolicy => 'Politique d\'annulation';
+
+  @override
+  String get ldPrice => 'Prix';
+
+  @override
+  String ldFrom(String price) {
+    return 'À partir de $price';
+  }
+
+  @override
+  String get ldPricing => 'Tarification';
+
+  @override
+  String get ldDuration => 'Durée';
+
+  @override
+  String ldInStock(int count) {
+    return '$count en stock';
+  }
+
+  @override
+  String get ldStatus => 'Statut';
+
+  @override
+  String get ldListed => 'Publié';
+
+  @override
+  String ldDeleteTitle(String noun) {
+    return 'Supprimer $noun';
+  }
+
+  @override
+  String ldDeleteBody(String noun) {
+    return 'Êtes-vous sûr de vouloir supprimer définitivement ce $noun';
+  }
+
+  @override
+  String get ldNevermind => 'Annuler';
+
+  @override
+  String get ldYesDelete => 'Oui, supprimer';
+
+  @override
+  String ldDeactivateTitle(String noun) {
+    return 'Désactiver $noun';
+  }
+
+  @override
+  String ldDeactivateBody(String noun) {
+    return 'Êtes-vous sûr de vouloir désactiver temporairement ce $noun';
+  }
+
+  @override
+  String get ldDeactivationPeriod => 'Période de désactivation';
+
+  @override
+  String get ldSelectDuration => 'Sélectionner une durée';
+
+  @override
+  String get ldSelectDurationTitle => 'Sélectionner une durée';
+
+  @override
+  String get ld1Week => '1 semaine';
+
+  @override
+  String get ld2Weeks => '2 semaines';
+
+  @override
+  String get ld1Month => '1 mois';
+
+  @override
+  String get ld3Months => '3 mois';
+
+  @override
+  String get ldYesDeactivate => 'Oui, désactiver';
+
+  @override
+  String get done => 'Terminé';
+
+  @override
+  String elUpdateTitle(String label) {
+    return 'Modifier $label';
+  }
+
+  @override
+  String get elServiceSubtitle =>
+      'Mettez à jour ce service pour votre entreprise';
+
+  @override
+  String get elProductSubtitle =>
+      'Mettez à jour votre produit et augmentez votre stock';
+
+  @override
+  String get elPhotoComingSoon => 'Téléchargement de photo bientôt disponible';
+
+  @override
+  String get elSelectSizes => 'Sélectionner les tailles';
+
+  @override
+  String get elForSale => 'À vendre';
+
+  @override
+  String get elForRent => 'À louer';
+
+  @override
+  String get elProductType => 'Type de produit 📦';
+
+  @override
+  String get elSelectType => 'Sélectionner le type';
+
+  @override
+  String get elProductTypeSheet => 'Type de produit';
+
+  @override
+  String get elSizes => 'Tailles ';
+
+  @override
+  String get elOptional => '(facultatif)';
+
+  @override
+  String get elSelectSizesPlaceholder => 'Sélectionnez les tailles';
+
+  @override
+  String get elRentalDuration => 'Durée de location';
+
+  @override
+  String get elSkuHint => 'Saisissez le SKU...';
+
+  @override
+  String get elMainPhoto => 'Photo principale';
+
+  @override
+  String get elSecondPhoto => 'Deuxième photo';
+
+  @override
+  String get elThirdPhoto => 'Troisième photo';
+
+  @override
+  String get elFourthPhoto => 'Quatrième photo';
+
+  @override
+  String get elUpdatedSuccess => 'Annonce mise à jour avec succès';
+
+  @override
+  String get trackingTitle => 'Suivi de commande';
+
+  @override
+  String get trackingComingSoon => 'Le suivi de commande arrive bientôt';
+
+  @override
+  String get trackingComingSoonBody =>
+      'Le suivi de livraison et de location apparaîtra ici une fois disponible.';
+
+  @override
+  String get reviewClientFallback => 'Client';
+
+  @override
+  String get reviewTitle => 'Avis';
+
+  @override
+  String reviewSubtitle(String name) {
+    return 'Dites-nous comment s\'est passée votre expérience avec $name';
+  }
+
+  @override
+  String get reviewFeedbackLabel => 'Laissez un avis détaillé';
+
+  @override
+  String get reviewFeedbackHint =>
+      'Dites-nous comment s\'est passée votre expérience';
+
+  @override
+  String get reviewSubmitted => 'Avis envoyé !';
+
+  @override
+  String get reviewSendReview => 'Envoyer l\'avis';
+
+  @override
+  String get cancelBookingTitle => 'Annuler la réservation';
+
+  @override
+  String get coReason1 => 'Le client était impoli';
+
+  @override
+  String get coReason2 => 'L\'événement dépassait ce qui était décrit';
+
+  @override
+  String get coReason3 => 'Le client était en retard à l\'événement';
+
+  @override
+  String get coReason4 => 'Le client a refusé de payer le deuxième acompte';
+
+  @override
+  String get coReason5 => 'Autre problème';
+
+  @override
+  String get coNotice =>
+      'Notre équipe assure la médiation de tous les litiges. Nous visons une résolution sous 48 heures. Essayez d\'abord de contacter le client — la plupart des problèmes se résolvent rapidement.';
+
+  @override
+  String get coReasonTitle => 'Raison de l\'annulation de la réservation';
+
+  @override
+  String get coDescribeIssue => 'Décrivez le problème';
+
+  @override
+  String get coDescribeHint =>
+      'Décrivez en détail ce qui s\'est passé, en incluant les dates, les montants et tout contexte pertinent';
+
+  @override
+  String get coAttachEvidence => 'Joindre des preuves (facultatif)';
+
+  @override
+  String get coUploadImage => 'Téléverser une image';
+
+  @override
+  String get coBookingCancelled => 'Réservation annulée';
+
+  @override
+  String get coCancelOrder => 'Annuler la commande';
+
+  @override
+  String get coMessageClient => 'Contacter le client à la place';
 }

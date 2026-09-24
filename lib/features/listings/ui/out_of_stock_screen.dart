@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/theme/app_colors.dart';
 import '../bloc/listings_cubit.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/models/listing_model.dart';
 import '../../../shared/widgets/network_image_widget.dart';
 
@@ -51,18 +52,19 @@ class _OutOfStockScreenState extends State<OutOfStockScreen> {
   // ── Helpers ────────────────────────────────────────────────────────────────
 
   Future<void> _reactivate(ListingModel listing) async {
+    final t = AppLocalizations.of(context);
     final cubit = context.read<ListingsCubit>();
     final messenger = ScaffoldMessenger.of(context);
     final noun = listing.pricingType == 'FIXED' && !listing.isRentable
-        ? 'Product'
+        ? t.listingTypeProduct
         : listing.isRentable
-            ? 'Rental'
-            : 'Service';
+            ? t.oosRental
+            : t.listingTypeService;
     try {
       await cubit.toggleActive(listing.id, true);
       messenger.showSnackBar(
         SnackBar(
-          content: Text('$noun reactivated'),
+          content: Text(t.oosReactivated(noun)),
           backgroundColor: AppColors.success,
         ),
       );
@@ -74,15 +76,17 @@ class _OutOfStockScreenState extends State<OutOfStockScreen> {
   }
 
   String _listingTypeBadge(ListingModel listing) {
-    if (listing.isRentable) return 'Product (Rental)';
-    if (listing.pricingType == 'FIXED') return 'Product';
-    return 'Service';
+    final t = AppLocalizations.of(context);
+    if (listing.isRentable) return t.listingBadgeProductRental;
+    if (listing.pricingType == 'FIXED') return t.listingTypeProduct;
+    return t.listingTypeService;
   }
 
   String _listingPrice(ListingModel listing) {
+    final t = AppLocalizations.of(context);
     if (listing.isRentable) {
       final rate = listing.perDayRate ?? listing.basePrice ?? 0;
-      return '${Formatters.formatCurrency(rate)} / day';
+      return t.listingPerDay(Formatters.formatCurrency(rate));
     }
     if (listing.pricingType == 'FIXED') {
       return Formatters.formatCurrency(listing.basePrice ?? 0);
@@ -92,7 +96,7 @@ class _OutOfStockScreenState extends State<OutOfStockScreen> {
       final max = listing.basePrice! * 2;
       return '${Formatters.formatCurrency(min)} – ${Formatters.formatCurrency(max)}';
     }
-    return 'Quote based';
+    return t.listingQuoteBased;
   }
 
   // ── Gradient AppBar ────────────────────────────────────────────────────────
@@ -122,11 +126,11 @@ class _OutOfStockScreenState extends State<OutOfStockScreen> {
                 icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
                 onPressed: () => context.pop(),
               ),
-              const Expanded(
+              Expanded(
                 child: Center(
                   child: Text(
-                    'Listings out of stock',
-                    style: TextStyle(
+                    AppLocalizations.of(context).oosTitle,
+                    style: const TextStyle(
                       fontFamily: 'Urbanist',
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
@@ -147,10 +151,11 @@ class _OutOfStockScreenState extends State<OutOfStockScreen> {
   // ── Filter Tabs ────────────────────────────────────────────────────────────
 
   Widget _buildFilterTabs() {
+    final t = AppLocalizations.of(context);
     final tabs = [
-      'All (${_outOfStockAll.length})',
-      'Products (${_outOfStockProducts.length})',
-      'Rentals (${_outOfStockRentals.length})',
+      t.listingsTabAll(_outOfStockAll.length),
+      t.listingsTabProducts(_outOfStockProducts.length),
+      t.listingsTabRentals(_outOfStockRentals.length),
     ];
     return SizedBox(
       height: 40,
@@ -323,7 +328,7 @@ class _OutOfStockScreenState extends State<OutOfStockScreen> {
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
-                                  'Out of Stock',
+                                  AppLocalizations.of(context).oosBadge,
                                   style: GoogleFonts.urbanist(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w700,
@@ -373,7 +378,7 @@ class _OutOfStockScreenState extends State<OutOfStockScreen> {
                             ),
                             child: Center(
                               child: Text(
-                                'Re stock',
+                                AppLocalizations.of(context).oosRestock,
                                 style: GoogleFonts.urbanist(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
@@ -409,7 +414,7 @@ class _OutOfStockScreenState extends State<OutOfStockScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            'All listings are in stock!',
+            AppLocalizations.of(context).oosEmptyTitle,
             style: GoogleFonts.urbanist(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -418,7 +423,7 @@ class _OutOfStockScreenState extends State<OutOfStockScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            'No out-of-stock items in this category',
+            AppLocalizations.of(context).oosEmptySubtitle,
             style: GoogleFonts.urbanist(
               fontSize: 13,
               color: context.c.textHint,

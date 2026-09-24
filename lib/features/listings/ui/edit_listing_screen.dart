@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/responsive/responsive.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/app_icon.dart';
 import '../bloc/listings_cubit.dart';
 import '../data/listings_repository.dart';
@@ -66,6 +67,36 @@ class _EditListingScreenState extends State<EditListingScreen> {
 
   bool get _isService =>
       listing.pricingType != 'FIXED' && !listing.isRentable;
+
+  /// Localized label for a cancellation-policy identifier.
+  String _policyLabel(BuildContext context, String policy) {
+    final t = AppLocalizations.of(context);
+    switch (policy) {
+      case 'Flexible':
+        return t.policyFlexible;
+      case 'Moderate':
+        return t.policyModerate;
+      case 'Strict':
+        return t.policyStrict;
+      default:
+        return policy;
+    }
+  }
+
+  /// Localized label for a duration-unit identifier.
+  String _durationUnitLabel(BuildContext context, String unit) {
+    final t = AppLocalizations.of(context);
+    switch (unit) {
+      case 'Days':
+        return t.durationDays;
+      case 'Hours':
+        return t.durationHours;
+      case 'Mins':
+        return t.durationMins;
+      default:
+        return unit;
+    }
+  }
 
   static const _gradientDecoration = BoxDecoration(
     gradient: LinearGradient(
@@ -174,10 +205,11 @@ class _EditListingScreenState extends State<EditListingScreen> {
   // ─── AppBar ────────────────────────────────────────────────────────────────
 
   PreferredSizeWidget _buildAppBar() {
-    final label = _isService ? 'Service' : 'Product';
+    final t = AppLocalizations.of(context);
+    final label = _isService ? t.listingTypeService : t.listingTypeProduct;
     final subtitle = _isService
-        ? 'Update this service for your business'
-        : 'Update your product and increase your stock count';
+        ? t.elServiceSubtitle
+        : t.elProductSubtitle;
 
     return PreferredSize(
       preferredSize: const Size.fromHeight(72),
@@ -208,7 +240,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Update $label',
+                  t.elUpdateTitle(label),
                   style: GoogleFonts.urbanist(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
@@ -351,7 +383,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
     return GestureDetector(
       onTap: () {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Photo upload coming soon')),
+          SnackBar(content: Text(AppLocalizations.of(context).elPhotoComingSoon)),
         );
       },
       child: Container(
@@ -409,6 +441,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
     required List<String> options,
     required String? selected,
     required ValueChanged<String> onSelect,
+    String Function(String)? labelFor,
   }) {
     showModalBottomSheet(
       context: context,
@@ -451,7 +484,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
                               .map(
                                 (opt) => ListTile(
                                   title: Text(
-                                    opt,
+                                    labelFor?.call(opt) ?? opt,
                                     style: GoogleFonts.urbanist(
                                       fontSize: 15,
                                       color: context.c.textPrimary,
@@ -494,7 +527,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Select Sizes',
+                    AppLocalizations.of(context).elSelectSizes,
                     style: GoogleFonts.urbanist(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
@@ -550,7 +583,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
                   ),
                   const SizedBox(height: 20),
                   AppButton.primary(
-                    'Done',
+                    AppLocalizations.of(context).done,
                     onTap: () => Navigator.pop(ctx),
                   ),
                 ],
@@ -565,16 +598,19 @@ class _EditListingScreenState extends State<EditListingScreen> {
   // ─── Product form ──────────────────────────────────────────────────────────
 
   Widget _buildProductTypeDropdown() {
-    final typeLabel = _isForRent ? 'For rent' : 'For sale';
+    final t = AppLocalizations.of(context);
+    final typeId = _isForRent ? 'For rent' : 'For sale';
+    final typeLabel = _isForRent ? t.elForRent : t.elForSale;
     return _buildDropdownSelector(
-      label: 'Product type 📦',
+      label: t.elProductType,
       value: typeLabel,
-      placeholder: 'Select type',
+      placeholder: t.elSelectType,
       onTap: () {
         _showSimpleBottomSheet(
-          title: 'Product Type',
-          options: ['For sale', 'For rent'],
-          selected: typeLabel,
+          title: t.elProductTypeSheet,
+          options: const ['For sale', 'For rent'],
+          selected: typeId,
+          labelFor: (o) => o == 'For rent' ? t.elForRent : t.elForSale,
           onSelect: (val) {
             setState(() => _isForRent = val == 'For rent');
           },
@@ -590,7 +626,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
         Row(
           children: [
             Text(
-              'Sizes ',
+              AppLocalizations.of(context).elSizes,
               style: GoogleFonts.urbanist(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -598,7 +634,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
               ),
             ),
             Text(
-              '(optional)',
+              AppLocalizations.of(context).elOptional,
               style: GoogleFonts.urbanist(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -623,7 +659,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
                 Expanded(
                   child: _selectedSizes.isEmpty
                       ? Text(
-                          'Select sizes',
+                          AppLocalizations.of(context).elSelectSizesPlaceholder,
                           style: GoogleFonts.urbanist(
                             fontSize: 15,
                             color: context.c.textHint,
@@ -688,20 +724,21 @@ class _EditListingScreenState extends State<EditListingScreen> {
   }
 
   Widget _buildProductForm() {
+    final t = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         AppInput(
-          label: 'Product Name',
-          hint: 'Enter product name...',
+          label: t.apProductName,
+          hint: t.apProductNameHint,
           controller: _nameCtrl,
         ),
         const SizedBox(height: 16),
         _buildProductTypeDropdown(),
         const SizedBox(height: 16),
         AppInput(
-          label: 'Product Description',
-          hint: 'Describe your product...',
+          label: t.apProductDescription,
+          hint: t.apProductDescriptionHint,
           controller: _descCtrl,
           maxLines: 4,
           keyboardType: TextInputType.multiline,
@@ -709,12 +746,12 @@ class _EditListingScreenState extends State<EditListingScreen> {
         ),
         const SizedBox(height: 16),
         _buildDropdownSelector(
-          label: 'Category',
+          label: t.category,
           value: _selectedCategory,
-          placeholder: 'Select a category',
+          placeholder: t.apSelectACategory,
           onTap: () {
             _showSimpleBottomSheet(
-              title: 'Select Category',
+              title: t.selectCategory,
               options: _apiCategoryNames,
               selected: _selectedCategory,
               onSelect: (cat) => setState(() => _selectedCategory = cat),
@@ -726,7 +763,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
         // Conditional price fields
         if (!_isForRent) ...[
           AppInput(
-            label: 'Product Price',
+            label: t.apProductPrice,
             hint: '0',
             controller: _priceCtrl,
             keyboardType: TextInputType.number,
@@ -735,7 +772,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
           ),
         ] else ...[
           AppInput(
-            label: 'Price per day',
+            label: t.ldPricePerDay,
             hint: '0',
             controller: _perDayCtrl,
             keyboardType: TextInputType.number,
@@ -744,7 +781,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
           ),
           const SizedBox(height: 16),
           AppInput(
-            label: 'Refundable Deposit',
+            label: t.apRefundableDeposit,
             hint: '0',
             controller: _depositCtrl,
             keyboardType: TextInputType.number,
@@ -757,7 +794,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Rental Duration',
+                t.elRentalDuration,
                 style: GoogleFonts.urbanist(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -818,7 +855,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Text(
-                      'Days',
+                      t.durationDays,
                       style: GoogleFonts.urbanist(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -834,13 +871,13 @@ class _EditListingScreenState extends State<EditListingScreen> {
 
         const SizedBox(height: 16),
         AppInput(
-          label: 'SKU',
-          hint: 'Enter SKU...',
+          label: t.addSuccessSku,
+          hint: t.elSkuHint,
           controller: _skuCtrl,
         ),
         const SizedBox(height: 16),
         AppInput(
-          label: 'Quantity in Stock',
+          label: t.apQuantityInStock,
           hint: '0',
           controller: _quantityCtrl,
           keyboardType: TextInputType.number,
@@ -851,17 +888,17 @@ class _EditListingScreenState extends State<EditListingScreen> {
         const SizedBox(height: 16),
         TagInputField(
           tags: _tags,
-          label: 'Tags',
-          hint: 'e.g. Wedding, Cake, Luxury',
+          label: t.apTags,
+          hint: t.apTagsHint,
           onChanged: (updated) => setState(() => _tags = updated),
         ),
         const SizedBox(height: 20),
-        _buildSectionTitle('Product Photos'),
+        _buildSectionTitle(t.apProductPhotos),
         _buildPhotosGrid([
-          'Main Photo',
-          'Second Photo',
-          'Third Photo',
-          'Fourth Photo',
+          t.elMainPhoto,
+          t.elSecondPhoto,
+          t.elThirdPhoto,
+          t.elFourthPhoto,
         ]),
         const SizedBox(height: 8),
       ],
@@ -875,7 +912,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Price Range',
+          AppLocalizations.of(context).asPriceRange,
           style: GoogleFonts.urbanist(
             fontSize: 13,
             fontWeight: FontWeight.w600,
@@ -905,9 +942,13 @@ class _EditListingScreenState extends State<EditListingScreen> {
         const SizedBox(height: 8),
         Row(
           children: [
-            Expanded(child: _buildPriceDisplay('Min', _priceRange.start.round())),
+            Expanded(
+                child: _buildPriceDisplay(
+                    AppLocalizations.of(context).asMin, _priceRange.start.round())),
             const SizedBox(width: 12),
-            Expanded(child: _buildPriceDisplay('Max', _priceRange.end.round())),
+            Expanded(
+                child: _buildPriceDisplay(
+                    AppLocalizations.of(context).asMax, _priceRange.end.round())),
           ],
         ),
       ],
@@ -1050,7 +1091,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Service Duration',
+          AppLocalizations.of(context).asServiceDuration,
           style: GoogleFonts.urbanist(
             fontSize: 13,
             fontWeight: FontWeight.w600,
@@ -1060,11 +1101,17 @@ class _EditListingScreenState extends State<EditListingScreen> {
         const SizedBox(height: 8),
         Row(
           children: [
-            _buildDurationBox(label: 'Days', controller: _durationDaysCtrl),
+            _buildDurationBox(
+                label: _durationUnitLabel(context, 'Days'),
+                controller: _durationDaysCtrl),
             const SizedBox(width: 10),
-            _buildDurationBox(label: 'Hours', controller: _durationHoursCtrl),
+            _buildDurationBox(
+                label: _durationUnitLabel(context, 'Hours'),
+                controller: _durationHoursCtrl),
             const SizedBox(width: 10),
-            _buildDurationBox(label: 'Mins', controller: _durationMinsCtrl),
+            _buildDurationBox(
+                label: _durationUnitLabel(context, 'Mins'),
+                controller: _durationMinsCtrl),
           ],
         ),
       ],
@@ -1072,18 +1119,19 @@ class _EditListingScreenState extends State<EditListingScreen> {
   }
 
   Widget _buildServiceForm() {
+    final t = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         AppInput(
-          label: 'Service Name',
-          hint: 'Enter service name...',
+          label: t.asServiceName,
+          hint: t.asServiceNameHint,
           controller: _nameCtrl,
         ),
         const SizedBox(height: 16),
         AppInput(
-          label: 'Service Description',
-          hint: 'Describe your service...',
+          label: t.asServiceDescription,
+          hint: t.asServiceDescriptionHint,
           controller: _descCtrl,
           maxLines: 4,
           keyboardType: TextInputType.multiline,
@@ -1091,12 +1139,12 @@ class _EditListingScreenState extends State<EditListingScreen> {
         ),
         const SizedBox(height: 16),
         _buildDropdownSelector(
-          label: 'Category',
+          label: t.category,
           value: _selectedCategory,
-          placeholder: 'Select a category',
+          placeholder: t.apSelectACategory,
           onTap: () {
             _showSimpleBottomSheet(
-              title: 'Select Category',
+              title: t.selectCategory,
               options: _apiCategoryNames,
               selected: _selectedCategory,
               onSelect: (cat) => setState(() => _selectedCategory = cat),
@@ -1109,16 +1157,17 @@ class _EditListingScreenState extends State<EditListingScreen> {
         _buildServiceDuration(),
         const SizedBox(height: 16),
         _buildDropdownSelector(
-          label: 'Cancellation Policy',
+          label: t.asCancellationPolicy,
           value: _selectedCancellationPolicy.isEmpty
               ? null
-              : _selectedCancellationPolicy,
-          placeholder: 'Select a policy',
+              : _policyLabel(context, _selectedCancellationPolicy),
+          placeholder: t.asSelectPolicy,
           onTap: () {
             _showSimpleBottomSheet(
-              title: 'Cancellation Policy',
+              title: t.asCancellationPolicy,
               options: _cancellationPolicies,
               selected: _selectedCancellationPolicy,
+              labelFor: (p) => _policyLabel(context, p),
               onSelect: (p) =>
                   setState(() => _selectedCancellationPolicy = p),
             );
@@ -1127,17 +1176,17 @@ class _EditListingScreenState extends State<EditListingScreen> {
         const SizedBox(height: 16),
         TagInputField(
           tags: _tags,
-          label: 'Tags',
-          hint: 'e.g. Wedding, Photography, Outdoor',
+          label: t.apTags,
+          hint: t.asTagsHint,
           onChanged: (updated) => setState(() => _tags = updated),
         ),
         const SizedBox(height: 20),
-        _buildSectionTitle('Service Photos'),
+        _buildSectionTitle(t.asServicePhotos),
         _buildPhotosGrid([
-          'Main Photo',
-          'Second Photo',
-          'Third Photo',
-          'Fourth Photo',
+          t.elMainPhoto,
+          t.elSecondPhoto,
+          t.elThirdPhoto,
+          t.elFourthPhoto,
         ]),
         const SizedBox(height: 8),
       ],
@@ -1148,7 +1197,8 @@ class _EditListingScreenState extends State<EditListingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final label = _isService ? 'Service' : 'Product';
+    final t = AppLocalizations.of(context);
+    final label = _isService ? t.listingTypeService : t.listingTypeProduct;
     return Scaffold(
       backgroundColor: context.c.surface,
       appBar: _buildAppBar(),
@@ -1169,7 +1219,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
               border: Border(top: BorderSide(color: context.c.border)),
             ),
             child: AppButton.primary(
-              'Update $label',
+              t.elUpdateTitle(label),
               onTap: () async {
                 final messenger = ScaffoldMessenger.of(context);
                 final router = GoRouter.of(context);
@@ -1221,8 +1271,8 @@ class _EditListingScreenState extends State<EditListingScreen> {
                   if (!mounted) return;
                   cubit.load();
                   messenger.showSnackBar(
-                    const SnackBar(
-                      content: Text('Listing updated successfully'),
+                    SnackBar(
+                      content: Text(t.elUpdatedSuccess),
                       backgroundColor: AppColors.success,
                     ),
                   );

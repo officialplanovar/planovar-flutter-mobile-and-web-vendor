@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/responsive/responsive.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/router/app_routes.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/models/vendor_model.dart';
 import '../../../shared/widgets/network_image_widget.dart';
 import '../../../shared/widgets/app_button.dart';
@@ -63,6 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     // Live data; neutral placeholders while the profile loads (no mock).
     final vendor = _vendor ?? _kEmptyVendor;
     final authState = context.watch<AuthBloc>().state;
@@ -114,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: _SectionHeader(
-                      title: "Today's Schedule",
+                      title: t.homeTodaysSchedule,
                       onViewAll: () {},
                     ),
                   ),
@@ -130,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: _SectionHeader(
-                      title: 'Quick Action',
+                      title: t.homeQuickAction,
                       onViewAll: () {},
                     ),
                   ),
@@ -231,7 +233,7 @@ class _GradientHeader extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _timeGreeting(),
+                        _timeGreeting(context),
                         style: GoogleFonts.urbanist(
                           fontSize: 14,
                           color: Colors.white70,
@@ -297,6 +299,7 @@ class _AlertBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -335,7 +338,7 @@ class _AlertBanner extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '$count New requests need your attention',
+                    t.homeNewRequestsAttention(count),
                     style: GoogleFonts.urbanist(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -344,7 +347,7 @@ class _AlertBanner extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'You have $count new requests for your listings',
+                    t.homeNewRequestsSubtitle(count),
                     style: GoogleFonts.urbanist(
                       fontSize: 12,
                       color: context.c.textSecondary,
@@ -375,6 +378,7 @@ class _StatsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final reviewCount = (vendor.reviewCount as int?) ?? 0;
 
     return GridView.count(
@@ -387,25 +391,25 @@ class _StatsGrid extends StatelessWidget {
       mainAxisSpacing: 12,
       children: [
         _StatCard(
-          label: 'Confirmed Bookings',
+          label: t.homeConfirmedBookings,
           value: '$activeCount',
           badge: _StatBadge.up(''),
         ),
         _StatCard(
-          label: 'Pending Requests',
+          label: t.homePendingRequests,
           value: '$pendingCount',
           badge: _StatBadge.down(''),
         ),
         _StatCard(
-          label: 'This month',
-          value: '$activeCount bookings',
+          label: t.homeThisMonth,
+          value: t.homeBookingsCount(activeCount),
           badge: _StatBadge.up(''),
         ),
         _StatCard(
-          label: 'Avg Rating',
+          label: t.homeAvgRating,
           value: '${(vendor.ratingAvg as num?) ?? 0}',
           ratingPrefix: true,
-          reviewsText: 'from $reviewCount reviews',
+          reviewsText: t.homeFromReviews(reviewCount),
         ),
       ],
     );
@@ -548,7 +552,7 @@ class _SectionHeader extends StatelessWidget {
           GestureDetector(
             onTap: onViewAll,
             child: Text(
-              'View all',
+              AppLocalizations.of(context).viewAll,
               style: GoogleFonts.urbanist(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -580,7 +584,7 @@ class _ScheduleSection extends StatelessWidget {
         ),
         child: Center(
           child: Text(
-            'No schedule for today',
+            AppLocalizations.of(context).homeNoSchedule,
             style: GoogleFonts.urbanist(
               fontSize: 14,
               color: context.c.textSecondary,
@@ -700,31 +704,32 @@ class _QuickActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final actions = [
       _QuickAction(
         icon: Icons.add_rounded,
-        label: 'Add Listing',
+        label: t.homeAddListing,
         bgColor: AppColors.primary,
         iconColor: Colors.white,
         onTap: () => _showListingTypeBottomSheet(context),
       ),
       _QuickAction(
         icon: Icons.bar_chart_rounded,
-        label: 'Analytics',
+        label: t.homeAnalytics,
         bgColor: const Color(0xFFFFF3DC),
         iconColor: const Color(0xFFF5A623),
         onTap: () => context.push(AppRoutes.analytics),
       ),
       _QuickAction(
         icon: Icons.upload_rounded,
-        label: 'Upgrade Plan',
+        label: t.homeUpgradePlanShort,
         bgColor: const Color(0xFFF0EFFE),
         iconColor: AppColors.primary,
         onTap: () => context.push(AppRoutes.subscriptionPlan),
       ),
       _QuickAction(
         icon: Icons.account_balance_wallet_outlined,
-        label: 'Payouts',
+        label: t.homePayouts,
         bgColor: const Color(0xFFE6F9F0),
         iconColor: const Color(0xFF27AE60),
         onTap: () => context.push(AppRoutes.payouts),
@@ -820,6 +825,7 @@ class _ListingTypeSheetState extends State<_ListingTypeSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Container(
       decoration: BoxDecoration(
         color: context.c.surface,
@@ -849,7 +855,7 @@ class _ListingTypeSheetState extends State<_ListingTypeSheet> {
               GestureDetector(
                 onTap: () => Navigator.pop(context),
                 child: Text(
-                  'Cancel',
+                  t.cancel,
                   style: GoogleFonts.urbanist(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -864,7 +870,7 @@ class _ListingTypeSheetState extends State<_ListingTypeSheet> {
           const SizedBox(height: 16),
 
           Text(
-            'Listing Type',
+            t.listingTypeTitle,
             style: GoogleFonts.urbanist(
               fontSize: 22,
               fontWeight: FontWeight.w800,
@@ -873,7 +879,7 @@ class _ListingTypeSheetState extends State<_ListingTypeSheet> {
           ),
           const SizedBox(height: 6),
           Text(
-            'Select the type of listing you want to create',
+            t.listingTypeSubtitle,
             style: GoogleFonts.urbanist(
               fontSize: 14,
               color: context.c.textSecondary,
@@ -886,10 +892,10 @@ class _ListingTypeSheetState extends State<_ListingTypeSheet> {
           _TypeCard(
             type: 'service',
             icon: Icons.work_outline_rounded,
-            title: 'Service',
-            subtitle: 'bookable appointment',
+            title: t.listingTypeService,
+            subtitle: t.listingTypeServiceDesc,
             selected: _selected,
-            onTap: (t) => setState(() => _selected = t),
+            onTap: (v) => setState(() => _selected = v),
           ),
 
           const SizedBox(height: 14),
@@ -897,16 +903,16 @@ class _ListingTypeSheetState extends State<_ListingTypeSheet> {
           _TypeCard(
             type: 'product',
             icon: Icons.inventory_2_outlined,
-            title: 'Product',
-            subtitle: 'Physical item for rent or sale',
+            title: t.listingTypeProduct,
+            subtitle: t.listingTypeProductDesc,
             selected: _selected,
-            onTap: (t) => setState(() => _selected = t),
+            onTap: (v) => setState(() => _selected = v),
           ),
 
           const SizedBox(height: 28),
 
           AppButton.primary(
-            'Proceed',
+            t.proceed,
             onTap: _selected == null
                 ? null
                 : () {
@@ -1011,9 +1017,10 @@ class _TypeCard extends StatelessWidget {
 }
 
 /// Time-of-day greeting ("Good morning/afternoon/evening,").
-String _timeGreeting() {
+String _timeGreeting(BuildContext context) {
+  final t = AppLocalizations.of(context);
   final h = DateTime.now().hour;
-  if (h < 12) return 'Good morning,';
-  if (h < 17) return 'Good afternoon,';
-  return 'Good evening,';
+  if (h < 12) return t.homeGoodMorning;
+  if (h < 17) return t.homeGoodAfternoon;
+  return t.homeGoodEvening;
 }

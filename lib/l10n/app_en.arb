@@ -31,5 +31,581 @@
   "signInWithGoogle": "Sign In with Google",
   "orLabel": "or",
   "noAccountQuestion": "Don't Have an account?",
-  "signUp": "Sign up"
+  "signUp": "Sign up",
+  "onboardingTitle1": "Unlock thousands of event clients",
+  "onboardingSubtitle1": "Connect with couples, corporates, and event planners in your location, all actively searching for vendors like you",
+  "onboardingTitle2": "Manage Everything in one Dashboard",
+  "onboardingSubtitle2": "Track your inquiries, bookings, and conversations from a single workspace",
+  "onboardingTitle3": "Showcase your work, get discovered",
+  "onboardingSubtitle3": "List your products, services and rentals — then subscribe to climb search rankings and reach event planners first.",
+  "onboardingListBusiness": "List my business",
+  "onboardingHaveAccount": "I already have an account",
+  "loginSubtitle": "Sign in to your vendor account",
+  "emailPlaceholder": "yourname@business.com",
+  "loginPasswordHint": "Enter your password",
+  "registerTitle": "Create your vendor account",
+  "registerSubtitle": "Start listing your business on Planovar",
+  "firstName": "First Name",
+  "firstNameHint": "e.g. Ada",
+  "lastName": "Last Name",
+  "lastNameHint": "e.g. Obi",
+  "businessName": "Business Name",
+  "businessNameHint": "e.g. Sugared Dreams Cakery",
+  "dateOfBirth": "Date of Birth",
+  "dobPlaceholder": "DD / MM / YYYY",
+  "selectDob": "Select your date of birth",
+  "phoneNumber": "Phone Number",
+  "phoneNumberHint": "8012345678",
+  "createPassword": "Create Password",
+  "createPasswordHint": "Min 8 characters",
+  "registerAgreePrefix": "By checking the box you agree to our ",
+  "termsAndConditions": "Terms & Conditions",
+  "registerAgreeAnd": " and ",
+  "privacyPolicy": "Privacy Policy",
+  "continueWithGoogle": "Continue with Google",
+  "alreadyHaveAccount": "Already have an account? ",
+  "signInAction": "Sign in",
+  "forgotResetTitle": "Reset your password",
+  "forgotResetIntro": "Enter your email address and we'll send you a 6-digit code to reset your password.",
+  "forgotResetSentTo": "A reset code has been sent to {email}. Check your inbox.",
+  "@forgotResetSentTo": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "resendCode": "Resend Code",
+  "sendResetCode": "Send Reset Code",
+  "backToSignIn": "Back to Sign In",
+  "resetPasswordTitle": "Reset Password",
+  "resetPasswordSuccess": "Password reset successfully. Please sign in.",
+  "resetCreateNewPassword": "Create a new password",
+  "resetCodeSentTo": "Enter the 6-digit code sent to ",
+  "resetChoosePassword": " and choose a new password.",
+  "verificationCode": "Verification Code",
+  "sixDigitCode": "6-digit code",
+  "newPassword": "New Password",
+  "atLeast8Chars": "At least 8 characters",
+  "mustBeAtLeast8Chars": "Must be at least 8 characters",
+  "confirmPassword": "Confirm Password",
+  "confirmPasswordHint": "Re-enter your new password",
+  "passwordsDoNotMatch": "Passwords do not match",
+  "verifyEmailTitle": "Verify your Email",
+  "verifyEmailIntro": "We've sent a 6-digit OTP to your email",
+  "verifyNewCodeSent": "A new code has been sent",
+  "verifyCouldNotResend": "Could not resend code: {error}",
+  "@verifyCouldNotResend": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "proceed": "Proceed",
+  "verifyResendIn": "Resend code in {seconds}s",
+  "@verifyResendIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "resendCodeAction": "Resend code",
+  "setupBusinessSetup": "Business Setup",
+  "setupBusinessProfileTitle": "Business profile",
+  "setupBusinessProfileSubtitle": "Tell clients who you are",
+  "setupLicensedBusiness": "Licensed Business",
+  "setupLicensedBusinessDesc": "Registered company, agency or studio",
+  "setupFreelancer": "Freelancer",
+  "setupFreelancerDesc": "Individual offering professional services",
+  "setupCouldNotLoadCategories": "Could not load categories",
+  "setupCouldNotReadFile": "Could not read the selected file",
+  "setupFileTooLarge": "File is larger than 5 MB",
+  "setupBusinessLogoOptional": "Business logo (optional)",
+  "setupBusinessDescription": "Business Description",
+  "setupBusinessDescriptionHint": "Tell clients what makes your business special, your experience, and what you offer...",
+  "setupProofOfOwnership": "Proof of Ownership",
+  "setupProofOptionalFreelancers": "(optional for freelancers)",
+  "setupDocumentUploaded": "Document uploaded",
+  "setupTapToReplace": "Tap to replace",
+  "setupTapToUpload": "Tap to upload",
+  "setupUploadFileTypes": "JPG, PNG or PDF up to 5mb",
+  "setupCategoryTags": "Category tags",
+  "setupNoCategories": "No categories available yet",
+  "setupLocationTitle": "Location & reach",
+  "setupLocationSubtitle": "Where do you operate?",
+  "setupTurnOnLocation": "Turn on location services to use this.",
+  "setupLocationDenied": "Location permission denied — pick your city manually.",
+  "setupCouldNotDetermineCity": "Couldn't determine your city — please pick it manually.",
+  "setupCouldNotGetLocation": "Couldn't get your location. Please pick your city manually.",
+  "selectCountry": "Select Country",
+  "selectCity": "Select City",
+  "selectYourCity": "Select your city",
+  "country": "Country",
+  "city": "City",
+  "setupLocating": "Locating…",
+  "setupUseCurrentLocation": "Use my current location",
+  "setupVendorType": "Vendor type",
+  "setupProductsOnly": "Products Only",
+  "setupServicesOnly": "Services only",
+  "setupBothProductsServices": "Both products & services",
+  "setupChoosePlanTitle": "Choose your plan",
+  "setupChoosePlanSubtitle": "Upgrade anytime. Cancel anytime.",
+  "setupCouldNotLoadPlans": "Could not load plans. Check your connection and try again.",
+  "setupSelectPlan": "Select {plan}",
+  "@setupSelectPlan": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "setupSkipForNow": "Skip for now",
+  "setupVerifyIdentityTitle": "Verify your identity",
+  "setupVerifyIdentitySubtitle": "Upload your NIN, and CAC if you run a licensed business. Stored securely.",
+  "setupUploaded": "Uploaded",
+  "setupUploadNin": "Upload your NIN slip",
+  "setupUploadCac": "Upload your CAC document",
+  "setupPaymentNotCompleted": "Payment not completed — you can subscribe to a paid plan anytime from your profile.",
+  "setupSomethingWentWrong": "Something went wrong",
+  "setupSettingUp": "Setting up…",
+  "setupFinishSetup": "Finish setup",
+  "setupCompleteVerificationLater": "You can complete verification later from your profile.",
+  "selectBank": "Select Bank",
+  "setupPayoutTitle": "Payout details",
+  "setupPayoutSubtitle": "Where should we send your earnings?",
+  "setupBankName": "Bank name",
+  "setupSelectYourBank": "Select your bank",
+  "setupAccountNumber": "Account number",
+  "setupAccountNumberHint": "0123456789",
+  "setupAccountName": "Account name",
+  "setupAutoVerified": "Auto verified",
+  "setupPayoutSchedule": "Payout schedule",
+  "setupPayoutRolling": "Rolling · 24–48hrs after completion",
+  "setupPayoutCommission": "Platform commission · Deducted before payout",
+  "setupMinimumPayout": "Minimum payout · ₦1,000",
+  "setupSecuredByPaystack": "Secured by Paystack",
+  "setupSavePayoutDetails": "Save Payout Details",
+  "setupAllSet": "You're all set!",
+  "setupProfileLive": "Your vendor profile is live on Planovar. Start adding your products and services to reach thousands of event planners in Lagos.",
+  "setupAddFirstListing": "Add your first listing",
+  "setupAddFirstListingSub": "Products, services or rentals",
+  "setupUpgradePlan": "Upgrade your plan",
+  "setupUpgradePlanSub": "Get more visibility & analytics",
+  "setupGoToDashboard": "Go to Dashboard",
+  "payCompletePayment": "Complete payment",
+  "paySecurePayment": "Secure payment",
+  "payBrowserFailed": "We couldn't open your browser. Tap below to open the secure Paystack checkout.",
+  "payBrowserOpened": "We've opened the secure Paystack checkout in your browser. Finish your payment there, then come back and tap the button below.",
+  "payOpenPaymentPage": "Open payment page",
+  "payReopenPaymentPage": "Reopen payment page",
+  "payCompletedPayment": "I've completed payment",
+  "homeTodaysSchedule": "Today's Schedule",
+  "homeQuickAction": "Quick Action",
+  "viewAll": "View all",
+  "homeNewRequestsAttention": "{count} New requests need your attention",
+  "@homeNewRequestsAttention": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeNewRequestsSubtitle": "You have {count} new requests for your listings",
+  "@homeNewRequestsSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeConfirmedBookings": "Confirmed Bookings",
+  "homePendingRequests": "Pending Requests",
+  "homeThisMonth": "This month",
+  "homeBookingsCount": "{count} bookings",
+  "@homeBookingsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeAvgRating": "Avg Rating",
+  "homeFromReviews": "from {count} reviews",
+  "@homeFromReviews": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeNoSchedule": "No schedule for today",
+  "homeAddListing": "Add Listing",
+  "homeAnalytics": "Analytics",
+  "homeUpgradePlanShort": "Upgrade Plan",
+  "homePayouts": "Payouts",
+  "homeGoodMorning": "Good morning,",
+  "homeGoodAfternoon": "Good afternoon,",
+  "homeGoodEvening": "Good evening,",
+  "listingTypeTitle": "Listing Type",
+  "listingTypeSubtitle": "Select the type of listing you want to create",
+  "listingTypeService": "Service",
+  "listingTypeServiceDesc": "bookable appointment",
+  "listingTypeProduct": "Product",
+  "listingTypeProductDesc": "Physical item for rent or sale",
+  "homeActionNeeded": "Action Needed",
+  "homeAllCaughtUp": "You’re all caught up",
+  "homeNoInquiriesWaiting": "No inquiries are waiting on your response.",
+  "homeNewInquiry": "New inquiry",
+  "homeNewBadge": "New",
+  "homeOpenRespond": "Open & Respond",
+  "addListingNewListing": "New Listing",
+  "addListingServiceDesc": "Bookable appointment",
+  "addSuccessSuccessfully": "Successfully",
+  "addSuccessAddedTitle": "{label} Added ",
+  "@addSuccessAddedTitle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "addSuccessPendingSubtitle": "Your {label} has been saved. It will become visible to clients once your account is verified.",
+  "@addSuccessPendingSubtitle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "addSuccessLiveService": "Your service has been added successfully and is currently Live",
+  "addSuccessLiveProduct": "Your product has been added successfully and is currently Live",
+  "addSuccessPendingWarning": "Pending verification — clients can't see your listings until an admin verifies your account. We'll let you know once you're approved.",
+  "addSuccessIdLabel": "{label} ID",
+  "@addSuccessIdLabel": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "addSuccessSku": "SKU",
+  "addSuccessDateCreated": "Date Created",
+  "addSuccessViewLabel": "View {label}",
+  "@addSuccessViewLabel": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "listingBadgeProductRental": "Product (Rental)",
+  "listingPerDay": "{price} / day",
+  "@listingPerDay": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "listingQuoteBased": "Quote based",
+  "listingsMyListings": "My Listings",
+  "listingsTabAll": "All ({count})",
+  "@listingsTabAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "listingsTabServices": "Services ({count})",
+  "@listingsTabServices": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "listingsTabProducts": "Products ({count})",
+  "@listingsTabProducts": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "listingsTabRentals": "Rentals ({count})",
+  "@listingsTabRentals": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "listingsOutOfStockCount": "{count} Items are out of Stock, ",
+  "@listingsOutOfStockCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "listingsClickToUpdate": "Click to update",
+  "statusActive": "Active",
+  "statusInactive": "Inactive",
+  "listingsPendingReview": "Pending review",
+  "listingsEmptyTitle": "No listings here yet",
+  "listingsEmptySubtitle": "Tap + to add your first listing",
+  "listingsAddListing": "Add listing",
+  "listingsCouldNotLoad": "Could not load your listings",
+  "oosTitle": "Listings out of stock",
+  "oosRental": "Rental",
+  "oosReactivated": "{noun} reactivated",
+  "@oosReactivated": {
+    "placeholders": {
+      "noun": {
+        "type": "String"
+      }
+    }
+  },
+  "oosBadge": "Out of Stock",
+  "oosRestock": "Re stock",
+  "oosEmptyTitle": "All listings are in stock!",
+  "oosEmptySubtitle": "No out-of-stock items in this category",
+  "category": "Category",
+  "selectCategory": "Select Category",
+  "apGenerateSkuHint": "Enter the product name first, then generate an SKU.",
+  "apNameDescRequired": "Product name and description are required",
+  "apSelectCategory": "Please select a category",
+  "apSelectACategory": "Select a category",
+  "apNoCategoriesProfile": "You haven't added any categories to your profile yet. Add them under Profile → Business Details to list products here.",
+  "apOnlyRegisteredCategories": "Only your registered categories are shown. Add more in Profile → Business Details.",
+  "apForSale": "For Sale",
+  "apForRent": "For Rent",
+  "apTitle": "Add a Product",
+  "apSubtitle": "Add a product to your catalogue",
+  "apProductName": "Product Name",
+  "apProductNameHint": "Enter product name...",
+  "apProductDescription": "Product Description",
+  "apProductDescriptionHint": "Describe your product...",
+  "apProductPrice": "Product Price",
+  "apPricePerDay": "Price Per Day",
+  "apRefundableDeposit": "Refundable Deposit",
+  "apRentalDuration": "Rental Duration (days)",
+  "apRentalDurationHint": "e.g. 3",
+  "apSkuHint": "Enter product SKU...",
+  "apGenerateForMe": "Generate for me",
+  "apQuantityInStock": "Quantity in Stock",
+  "apQuantityHint": "How many do you have in stock",
+  "apAvailableSizes": "Available Sizes (Optional)",
+  "apTags": "Tags",
+  "apTagsHint": "e.g. Wedding, Cake, Luxury",
+  "apProductPhotos": "Product Photos",
+  "apFrontPhoto": "Front Photo",
+  "apBackPhoto": "Back Photo",
+  "apSidePhoto": "Side Photo",
+  "apDetailPhoto": "Detail Photo",
+  "apPublishing": "Publishing…",
+  "apPublishProduct": "Publish Product",
+  "gotIt": "Got it",
+  "asNameDescRequired": "Service name and description are required",
+  "asNoCategoriesProfile": "You haven't added any categories to your profile yet. Add them under Profile → Business Details to list services here.",
+  "asCancellationPolicy": "Cancellation Policy",
+  "policyFlexible": "Flexible",
+  "policyModerate": "Moderate",
+  "policyStrict": "Strict",
+  "policyFlexibleDesc": "Full refund if the client cancels up to 24 hours before the event.",
+  "policyModerateDesc": "50% refund if cancelled at least 7 days before the event; none after.",
+  "policyStrictDesc": "No refund once the booking is confirmed.",
+  "asCategoryInfo": "The service category clients browse by. Only the categories you registered on your profile appear here.",
+  "asPriceRange": "Price Range",
+  "asPriceRangeInfo": "The typical price band for this service. Clients see it as a guide; the final amount is agreed in your quote.",
+  "asMin": "Min",
+  "asMax": "Max",
+  "asServiceDuration": "Service Duration",
+  "durationDays": "Days",
+  "durationHours": "Hours",
+  "durationMins": "Mins",
+  "asDurationHint": "Enter duration value...",
+  "asSelectPolicy": "Select a policy",
+  "asCancellationPolicyInfo": "How refunds work if a client cancels. Choose the level that best fits your business.",
+  "asTitle": "Add a Service",
+  "asSubtitle": "Add a service for your business",
+  "asServiceName": "Service Name",
+  "asServiceNameHint": "Enter service name...",
+  "asServiceNameInfo": "A short, clear name clients will see, e.g. \"Wedding Photography — Full Day\".",
+  "asServiceDescription": "Service Description",
+  "asServiceDescriptionHint": "Describe your service...",
+  "asServiceDescriptionInfo": "What's included, your experience, and what clients can expect. The more detail, the more trust.",
+  "asTagsHint": "e.g. Wedding, Photography, Outdoor",
+  "asServicePhotos": "Service Photos",
+  "asPhotoNumber": "Photo {number}",
+  "@asPhotoNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "asPublishService": "Publish Service",
+  "loading": "Loading…",
+  "ldNotFound": "Listing not found",
+  "ldServiceLower": "service",
+  "ldProductLower": "product",
+  "ldDeleted": "{noun} deleted",
+  "@ldDeleted": {
+    "placeholders": {
+      "noun": {
+        "type": "String"
+      }
+    }
+  },
+  "ldDeactivated": "{noun} deactivated",
+  "@ldDeactivated": {
+    "placeholders": {
+      "noun": {
+        "type": "String"
+      }
+    }
+  },
+  "ldEditService": "Edit Service",
+  "ldEditProduct": "Edit Product",
+  "ldDeleteService": "Delete Service",
+  "ldDeleteProduct": "Delete Product",
+  "ldDeactivateService": "Deactivate Service",
+  "ldDeactivateProduct": "Deactivate Product",
+  "ldViews30d": "Views (30d)",
+  "ldRating": "Rating",
+  "ldNoReviews": "No reviews yet",
+  "ldFixedPrice": "Fixed price",
+  "ldStartingFrom": "Starting from",
+  "ldQuoteOnRequest": "Quote on request",
+  "ldType": "Type",
+  "ldPricePerDay": "Price per day",
+  "ldStock": "Stock",
+  "ldCancellationPolicy": "Cancellation policy",
+  "ldPrice": "Price",
+  "ldFrom": "From {price}",
+  "@ldFrom": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "ldPricing": "Pricing",
+  "ldDuration": "Duration",
+  "ldInStock": "{count} in stock",
+  "@ldInStock": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ldStatus": "Status",
+  "ldListed": "Listed",
+  "ldDeleteTitle": "Delete {noun}",
+  "@ldDeleteTitle": {
+    "placeholders": {
+      "noun": {
+        "type": "String"
+      }
+    }
+  },
+  "ldDeleteBody": "Are you sure you want to permanently delete this {noun}",
+  "@ldDeleteBody": {
+    "placeholders": {
+      "noun": {
+        "type": "String"
+      }
+    }
+  },
+  "ldNevermind": "Nevermind",
+  "ldYesDelete": "Yes, Delete",
+  "ldDeactivateTitle": "Deactivate {noun}",
+  "@ldDeactivateTitle": {
+    "placeholders": {
+      "noun": {
+        "type": "String"
+      }
+    }
+  },
+  "ldDeactivateBody": "Are you sure you want to temporarily deactivate this {noun}",
+  "@ldDeactivateBody": {
+    "placeholders": {
+      "noun": {
+        "type": "String"
+      }
+    }
+  },
+  "ldDeactivationPeriod": "Deactivation Period",
+  "ldSelectDuration": "Select duration",
+  "ldSelectDurationTitle": "Select Duration",
+  "ld1Week": "1 week",
+  "ld2Weeks": "2 weeks",
+  "ld1Month": "1 month",
+  "ld3Months": "3 months",
+  "ldYesDeactivate": "Yes, Deactivate",
+  "done": "Done",
+  "elUpdateTitle": "Update {label}",
+  "@elUpdateTitle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "elServiceSubtitle": "Update this service for your business",
+  "elProductSubtitle": "Update your product and increase your stock count",
+  "elPhotoComingSoon": "Photo upload coming soon",
+  "elSelectSizes": "Select Sizes",
+  "elForSale": "For sale",
+  "elForRent": "For rent",
+  "elProductType": "Product type 📦",
+  "elSelectType": "Select type",
+  "elProductTypeSheet": "Product Type",
+  "elSizes": "Sizes ",
+  "elOptional": "(optional)",
+  "elSelectSizesPlaceholder": "Select sizes",
+  "elRentalDuration": "Rental Duration",
+  "elSkuHint": "Enter SKU...",
+  "elMainPhoto": "Main Photo",
+  "elSecondPhoto": "Second Photo",
+  "elThirdPhoto": "Third Photo",
+  "elFourthPhoto": "Fourth Photo",
+  "elUpdatedSuccess": "Listing updated successfully",
+  "trackingTitle": "Order Tracking",
+  "trackingComingSoon": "Order tracking is coming soon",
+  "trackingComingSoonBody": "Delivery and rental tracking will appear here once it’s available.",
+  "reviewClientFallback": "Client",
+  "reviewTitle": "Review",
+  "reviewSubtitle": "Let us know how your experience was with {name}",
+  "@reviewSubtitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewFeedbackLabel": "Leave a Detailed feedback",
+  "reviewFeedbackHint": "Let us know how your experience was",
+  "reviewSubmitted": "Review submitted!",
+  "reviewSendReview": "Send Review",
+  "cancelBookingTitle": "Cancel Booking",
+  "coReason1": "Client was rude",
+  "coReason2": "Event was more than described",
+  "coReason3": "The Client was late to the event",
+  "coReason4": "Client Refused to Pay the second installment",
+  "coReason5": "Other issue",
+  "coNotice": "Our team mediates all disputes. We aim to resolve within 48 hours. Try messaging the client first — most issues are resolved quickly.",
+  "coReasonTitle": "Reason for Cancelling Booking",
+  "coDescribeIssue": "Describe the issue",
+  "coDescribeHint": "Describe what happened in detail, include dates, amounts, and any relevant context",
+  "coAttachEvidence": "Attach evidence (optional)",
+  "coUploadImage": "Upload Image",
+  "coBookingCancelled": "Booking cancelled",
+  "coCancelOrder": "Cancel Order",
+  "coMessageClient": "Message Client Instead"
 }

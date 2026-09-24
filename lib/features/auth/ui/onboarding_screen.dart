@@ -5,19 +5,16 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../core/widgets/planovar_logo.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/app_button.dart';
 
 class _OnboardingSlide {
   final String image; // asset hero illustration
   final IconData fallbackIcon; // shown if the asset is missing
-  final String title;
-  final String subtitle;
 
   const _OnboardingSlide({
     required this.image,
     required this.fallbackIcon,
-    required this.title,
-    required this.subtitle,
   });
 }
 
@@ -25,25 +22,29 @@ const _slides = [
   _OnboardingSlide(
     image: 'assets/images/onboarding/onboarding_1.png',
     fallbackIcon: Icons.storefront_rounded,
-    title: 'Unlock thousands of event clients',
-    subtitle:
-        'Connect with couples, corporates, and event planners in your location, all actively searching for vendors like you',
   ),
   _OnboardingSlide(
     image: 'assets/images/onboarding/onboarding_2.png',
     fallbackIcon: Icons.dashboard_rounded,
-    title: 'Manage Everything in one Dashboard',
-    subtitle:
-        'Track your inquiries, bookings, and conversations from a single workspace',
   ),
   _OnboardingSlide(
     image: 'assets/images/onboarding/onboarding_3.png',
     fallbackIcon: Icons.workspace_premium_rounded,
-    title: 'Showcase your work, get discovered',
-    subtitle:
-        'List your products, services and rentals — then subscribe to climb search rankings and reach event planners first.',
   ),
 ];
+
+/// Localized (title, subtitle) for a slide index.
+(String, String) _slideText(BuildContext context, int index) {
+  final t = AppLocalizations.of(context);
+  switch (index) {
+    case 0:
+      return (t.onboardingTitle1, t.onboardingSubtitle1);
+    case 1:
+      return (t.onboardingTitle2, t.onboardingSubtitle2);
+    default:
+      return (t.onboardingTitle3, t.onboardingSubtitle3);
+  }
+}
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -73,6 +74,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final isLastPage = _currentPage == _slides.length - 1;
 
     return Scaffold(
@@ -97,7 +99,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       TextButton(
                         onPressed: () => context.go(AppRoutes.register),
                         child: Text(
-                          'Skip',
+                          t.skip,
                           style: GoogleFonts.urbanist(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -118,6 +120,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 onPageChanged: (i) => setState(() => _currentPage = i),
                 itemBuilder: (context, index) {
                   final slide = _slides[index];
+                  final (title, subtitle) = _slideText(context, index);
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32),
                     child: Column(
@@ -149,7 +152,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                         const SizedBox(height: 40),
                         Text(
-                          slide.title,
+                          title,
                           textAlign: TextAlign.center,
                           style: GoogleFonts.urbanist(
                             fontSize: 28,
@@ -160,7 +163,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          slide.subtitle,
+                          subtitle,
                           textAlign: TextAlign.center,
                           style: GoogleFonts.urbanist(
                             fontSize: 15,
@@ -202,18 +205,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ? Column(
                           children: [
                             AppButton.primary(
-                              'List my business',
+                              t.onboardingListBusiness,
                               onTap: () => context.go(AppRoutes.register),
                             ),
                             const SizedBox(height: 12),
                             AppButton.secondary(
-                              'I already have an account',
+                              t.onboardingHaveAccount,
                               onTap: () => context.go(AppRoutes.login),
                             ),
                           ],
                         )
                       : AppButton.primary(
-                          'Next',
+                          t.next,
                           onTap: _nextPage,
                         ),
                 ),

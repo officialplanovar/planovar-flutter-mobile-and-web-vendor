@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/models/order_model.dart';
 import '../../../shared/widgets/network_image_widget.dart';
 import '../bloc/orders_cubit.dart';
@@ -35,9 +36,10 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final orders = context.watch<OrdersCubit>().state.orders;
     final order = _orderFrom(orders);
-    final clientName = order?.clientName ?? 'Client';
+    final clientName = order?.clientName ?? t.reviewClientFallback;
     final clientImage = order?.clientImage;
     final bottomInset = MediaQuery.of(context).padding.bottom;
 
@@ -69,7 +71,7 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
                       child: Column(
                         children: [
                           Text(
-                            'Review',
+                            t.reviewTitle,
                             style: GoogleFonts.urbanist(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
@@ -78,7 +80,7 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Let us know how your experience was with $clientName',
+                            t.reviewSubtitle(clientName),
                             style: GoogleFonts.urbanist(
                               fontSize: 13,
                               color: Colors.white70,
@@ -171,7 +173,7 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
 
             // ── Feedback Label ─────────────────────────────────────────
             Text(
-              'Leave a Detailed feedback',
+              t.reviewFeedbackLabel,
               style: GoogleFonts.urbanist(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -192,7 +194,7 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
               decoration: InputDecoration(
                 filled: true,
                 fillColor: context.c.surface,
-                hintText: 'Let us know how your experience was',
+                hintText: t.reviewFeedbackHint,
                 hintStyle: GoogleFonts.urbanist(
                   fontSize: 13,
                   color: context.c.textHint,
@@ -231,7 +233,7 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  'Review submitted!',
+                  t.reviewSubmitted,
                   style:
                       GoogleFonts.urbanist(fontWeight: FontWeight.w600),
                 ),
@@ -251,7 +253,7 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
             ),
             child: Center(
               child: Text(
-                'Send Review',
+                t.reviewSendReview,
                 style: GoogleFonts.urbanist(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,

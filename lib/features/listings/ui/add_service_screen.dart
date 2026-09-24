@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../core/services/upload_service.dart';
 import '../../../core/responsive/responsive.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/app_icon.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_input.dart';
@@ -34,7 +35,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     final desc = _descController.text.trim();
     if (name.isEmpty || desc.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Service name and description are required')),
+        SnackBar(content: Text(AppLocalizations.of(context).asNameDescRequired)),
       );
       return;
     }
@@ -132,15 +133,6 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   final List<String> _cancellationPolicies = ['Flexible', 'Moderate', 'Strict'];
   final List<String> _durationUnits = ['Days', 'Hours', 'Mins'];
 
-  // Brief explanation of each policy — shown in the picker and below the field.
-  static const _cancellationDescriptions = {
-    'Flexible':
-        'Full refund if the client cancels up to 24 hours before the event.',
-    'Moderate':
-        '50% refund if cancelled at least 7 days before the event; none after.',
-    'Strict': 'No refund once the booking is confirmed.',
-  };
-
   // Categories this vendor registered (their profile tags). The picker is
   // limited to these; they can add more from their profile.
   List<String> _vendorTags = [];
@@ -150,6 +142,52 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       : _apiCategories.where((c) => _vendorTags.contains(c.name)).toList();
 
   void _onFieldChanged() => setState(() {});
+
+  /// Localized display label for a cancellation-policy identifier
+  /// (the identifier itself stays English — it's what we send to the backend).
+  String _policyLabel(BuildContext context, String policy) {
+    final t = AppLocalizations.of(context);
+    switch (policy) {
+      case 'Flexible':
+        return t.policyFlexible;
+      case 'Moderate':
+        return t.policyModerate;
+      case 'Strict':
+        return t.policyStrict;
+      default:
+        return policy;
+    }
+  }
+
+  /// Localized description for a cancellation-policy identifier.
+  String _policyDesc(BuildContext context, String policy) {
+    final t = AppLocalizations.of(context);
+    switch (policy) {
+      case 'Flexible':
+        return t.policyFlexibleDesc;
+      case 'Moderate':
+        return t.policyModerateDesc;
+      case 'Strict':
+        return t.policyStrictDesc;
+      default:
+        return '';
+    }
+  }
+
+  /// Localized display label for a duration-unit identifier.
+  String _durationUnitLabel(BuildContext context, String unit) {
+    final t = AppLocalizations.of(context);
+    switch (unit) {
+      case 'Days':
+        return t.durationDays;
+      case 'Hours':
+        return t.durationHours;
+      case 'Mins':
+        return t.durationMins;
+      default:
+        return unit;
+    }
+  }
 
   /// Submit is enabled only once the mandatory fields are filled.
   bool get _canPublish =>
@@ -241,7 +279,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Got it',
+            child: Text(AppLocalizations.of(ctx).gotIt,
                 style: GoogleFonts.urbanist(
                     fontWeight: FontWeight.w700, color: AppColors.primary)),
           ),
@@ -270,7 +308,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
                   child: Text(
-                    'Select Category',
+                    AppLocalizations.of(context).selectCategory,
                     style: GoogleFonts.urbanist(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
@@ -289,8 +327,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           ? Padding(
                               padding: const EdgeInsets.all(24),
                               child: Text(
-                                "You haven't added any categories to your profile yet. "
-                                'Add them under Profile → Business Details to list services here.',
+                                AppLocalizations.of(context).asNoCategoriesProfile,
                                 style: GoogleFonts.urbanist(
                                   fontSize: 14,
                                   color: context.c.textSecondary,
@@ -335,8 +372,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Only your registered categories are shown. Add more in '
-                          'Profile → Business Details.',
+                          AppLocalizations.of(context).apOnlyRegisteredCategories,
                           style: GoogleFonts.urbanist(
                             fontSize: 12,
                             color: context.c.textSecondary,
@@ -370,7 +406,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
                 child: Text(
-                  'Cancellation Policy',
+                  AppLocalizations.of(context).asCancellationPolicy,
                   style: GoogleFonts.urbanist(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
@@ -382,7 +418,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
               ..._cancellationPolicies.map(
                 (policy) => ListTile(
                   title: Text(
-                    policy,
+                    _policyLabel(context, policy),
                     style: GoogleFonts.urbanist(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -390,7 +426,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     ),
                   ),
                   subtitle: Text(
-                    _cancellationDescriptions[policy] ?? '',
+                    _policyDesc(context, policy),
                     style: GoogleFonts.urbanist(
                       fontSize: 13,
                       color: context.c.textSecondary,
@@ -423,8 +459,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _labelWithInfo('Category',
-              'The service category clients browse by. Only the categories you registered on your profile appear here.'),
+          _labelWithInfo(AppLocalizations.of(context).category,
+              AppLocalizations.of(context).asCategoryInfo),
           const SizedBox(height: 6),
           Container(
             width: double.infinity,
@@ -437,7 +473,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
               children: [
                 Expanded(
                   child: Text(
-                    _selectedCategory ?? 'Select a category',
+                    _selectedCategory ?? AppLocalizations.of(context).apSelectACategory,
                     style: GoogleFonts.urbanist(
                       fontSize: 15,
                       color: _selectedCategory != null
@@ -462,8 +498,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _labelWithInfo('Price Range',
-            'The typical price band for this service. Clients see it as a guide; the final amount is agreed in your quote.'),
+        _labelWithInfo(AppLocalizations.of(context).asPriceRange,
+            AppLocalizations.of(context).asPriceRangeInfo),
         const SizedBox(height: 8),
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
@@ -491,10 +527,13 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         Row(
           children: [
             Expanded(
-              child: _buildPriceDisplay('Min', _priceRange.start.round()),
+              child: _buildPriceDisplay(
+                  AppLocalizations.of(context).asMin, _priceRange.start.round()),
             ),
             const SizedBox(width: 12),
-            Expanded(child: _buildPriceDisplay('Max', _priceRange.end.round())),
+            Expanded(
+                child: _buildPriceDisplay(
+                    AppLocalizations.of(context).asMax, _priceRange.end.round())),
           ],
         ),
       ],
@@ -576,7 +615,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Service Duration',
+          AppLocalizations.of(context).asServiceDuration,
           style: GoogleFonts.urbanist(
             fontSize: 13,
             fontWeight: FontWeight.w600,
@@ -606,7 +645,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     ),
                   ),
                   child: Text(
-                    unit,
+                    _durationUnitLabel(context, unit),
                     style: GoogleFonts.urbanist(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -623,7 +662,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         const SizedBox(height: 10),
         // Duration value input
         AppInput(
-          hint: 'Enter duration value...',
+          hint: AppLocalizations.of(context).asDurationHint,
           controller: _durationValueController,
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -638,8 +677,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _labelWithInfo('Cancellation Policy',
-              'How refunds work if a client cancels. Choose the level that best fits your business.'),
+          _labelWithInfo(AppLocalizations.of(context).asCancellationPolicy,
+              AppLocalizations.of(context).asCancellationPolicyInfo),
           const SizedBox(height: 6),
           Container(
             width: double.infinity,
@@ -653,8 +692,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                 Expanded(
                   child: Text(
                     _selectedCancellationPolicy.isEmpty
-                        ? 'Select a policy'
-                        : _selectedCancellationPolicy,
+                        ? AppLocalizations.of(context).asSelectPolicy
+                        : _policyLabel(context, _selectedCancellationPolicy),
                     style: GoogleFonts.urbanist(
                       fontSize: 15,
                       color: _selectedCancellationPolicy.isNotEmpty
@@ -673,7 +712,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           if (_selectedCancellationPolicy.isNotEmpty) ...[
             const SizedBox(height: 8),
             Text(
-              _cancellationDescriptions[_selectedCancellationPolicy] ?? '',
+              _policyDesc(context, _selectedCancellationPolicy),
               style: GoogleFonts.urbanist(
                 fontSize: 12,
                 color: context.c.textSecondary,
@@ -759,6 +798,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: context.c.surface,
       appBar: PreferredSize(
@@ -796,7 +836,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Add a Service',
+                    AppLocalizations.of(context).asTitle,
                     style: GoogleFonts.urbanist(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
@@ -804,7 +844,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     ),
                   ),
                   Text(
-                    'Add a service for your business',
+                    AppLocalizations.of(context).asSubtitle,
                     style: GoogleFonts.urbanist(
                       fontSize: 12,
                       color: Colors.white70,
@@ -826,22 +866,22 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AppInput(
-                    label: 'Service Name',
-                    hint: 'Enter service name...',
+                    label: t.asServiceName,
+                    hint: t.asServiceNameHint,
                     controller: _nameController,
-                    onInfoTap: () => _showFieldInfo('Service Name',
-                        'A short, clear name clients will see, e.g. "Wedding Photography — Full Day".'),
+                    onInfoTap: () => _showFieldInfo(
+                        t.asServiceName, t.asServiceNameInfo),
                   ),
                   const SizedBox(height: 16),
                   AppInput(
-                    label: 'Service Description',
-                    hint: 'Describe your service...',
+                    label: t.asServiceDescription,
+                    hint: t.asServiceDescriptionHint,
                     controller: _descController,
                     maxLines: 4,
                     keyboardType: TextInputType.multiline,
                     textInputAction: TextInputAction.newline,
-                    onInfoTap: () => _showFieldInfo('Service Description',
-                        "What's included, your experience, and what clients can expect. The more detail, the more trust."),
+                    onInfoTap: () => _showFieldInfo(
+                        t.asServiceDescription, t.asServiceDescriptionInfo),
                   ),
                   const SizedBox(height: 16),
                   _buildCategorySelector(),
@@ -854,12 +894,12 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                   const SizedBox(height: 16),
                   TagInputField(
                     tags: _tags,
-                    label: 'Tags',
-                    hint: 'e.g. Wedding, Photography, Outdoor',
+                    label: t.apTags,
+                    hint: t.asTagsHint,
                     onChanged: (updated) => setState(() => _tags = updated),
                   ),
                   const SizedBox(height: 20),
-                  _buildSectionTitle('Service Photos'),
+                  _buildSectionTitle(t.asServicePhotos),
                   GridView.count(
                     crossAxisCount: 2,
                     shrinkWrap: true,
@@ -868,10 +908,10 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     mainAxisSpacing: 12,
                     childAspectRatio: 2.0,
                     children: [
-                      _buildPhotoBox(0, 'Photo 1'),
-                      _buildPhotoBox(1, 'Photo 2'),
-                      _buildPhotoBox(2, 'Photo 3'),
-                      _buildPhotoBox(3, 'Photo 4'),
+                      _buildPhotoBox(0, t.asPhotoNumber(1)),
+                      _buildPhotoBox(1, t.asPhotoNumber(2)),
+                      _buildPhotoBox(2, t.asPhotoNumber(3)),
+                      _buildPhotoBox(3, t.asPhotoNumber(4)),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -887,7 +927,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
               border: Border(top: BorderSide(color: context.c.border)),
             ),
             child: AppButton.primary(
-              _publishing ? 'Publishing…' : 'Publish Service',
+              _publishing ? t.apPublishing : t.asPublishService,
               loading: _publishing,
               onTap: (_publishing || !_canPublish) ? null : _publish,
             ),

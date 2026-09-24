@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../core/responsive/responsive.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_input.dart';
 import '../bloc/auth_bloc.dart';
@@ -55,6 +56,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: context.c.surface,
       appBar: AppBar(
@@ -65,7 +67,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          'Reset Password',
+          t.resetPasswordTitle,
           style: GoogleFonts.urbanist(
             fontSize: 17,
             fontWeight: FontWeight.w600,
@@ -77,8 +79,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         listener: (context, state) {
           if (state is AuthUnauthenticated) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                  content: Text('Password reset successfully. Please sign in.')),
+              SnackBar(
+                  content: Text(
+                      AppLocalizations.of(context).resetPasswordSuccess)),
             );
             context.go(AppRoutes.login);
           } else if (state is AuthError) {
@@ -104,7 +107,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               ),
               const SizedBox(height: 20),
               Text(
-                'Create a new password',
+                t.resetCreateNewPassword,
                 style: GoogleFonts.urbanist(
                   fontSize: 24,
                   fontWeight: FontWeight.w700,
@@ -114,7 +117,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               const SizedBox(height: 8),
               Text.rich(
                 TextSpan(
-                  text: 'Enter the 6-digit code sent to ',
+                  text: t.resetCodeSentTo,
                   style: GoogleFonts.urbanist(
                     fontSize: 15,
                     color: context.c.textSecondary,
@@ -129,14 +132,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const TextSpan(text: ' and choose a new password.'),
+                    TextSpan(text: t.resetChoosePassword),
                   ],
                 ),
               ),
               const SizedBox(height: 28),
               AppInput(
-                label: 'Verification Code',
-                hint: '6-digit code',
+                label: t.verificationCode,
+                hint: t.sixDigitCode,
                 controller: _otpCtrl,
                 keyboardType: TextInputType.number,
                 maxLength: 6,
@@ -144,8 +147,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               ),
               const SizedBox(height: 12),
               AppInput(
-                label: 'New Password',
-                hint: 'At least 8 characters',
+                label: t.newPassword,
+                hint: t.atLeast8Chars,
                 controller: _passwordCtrl,
                 obscureText: _obscure1,
                 onChanged: (_) => setState(() {}),
@@ -160,13 +163,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   onPressed: () => setState(() => _obscure1 = !_obscure1),
                 ),
                 errorText: _passwordCtrl.text.isNotEmpty && !_lengthOk
-                    ? 'Must be at least 8 characters'
+                    ? t.mustBeAtLeast8Chars
                     : null,
               ),
               const SizedBox(height: 12),
               AppInput(
-                label: 'Confirm Password',
-                hint: 'Re-enter your new password',
+                label: t.confirmPassword,
+                hint: t.confirmPasswordHint,
                 controller: _confirmCtrl,
                 obscureText: _obscure2,
                 textInputAction: TextInputAction.done,
@@ -182,7 +185,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   onPressed: () => setState(() => _obscure2 = !_obscure2),
                 ),
                 errorText: _confirmCtrl.text.isNotEmpty && !_match
-                    ? 'Passwords do not match'
+                    ? t.passwordsDoNotMatch
                     : null,
               ),
               const SizedBox(height: 28),
@@ -190,7 +193,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 builder: (context, state) {
                   final loading = state is AuthLoading;
                   return AppButton.primary(
-                    'Reset Password',
+                    t.resetPasswordTitle,
                     loading: loading,
                     onTap: (_canSubmit && !loading) ? _submit : null,
                   );

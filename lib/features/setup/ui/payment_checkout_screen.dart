@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/app_button.dart';
 
 /// Opens the Paystack checkout in the device browser (reliable for the heavy
@@ -44,6 +45,7 @@ class _PaymentCheckoutScreenState extends State<PaymentCheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: context.c.surface,
       appBar: AppBar(
@@ -54,7 +56,7 @@ class _PaymentCheckoutScreenState extends State<PaymentCheckoutScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          'Complete payment',
+          t.payCompletePayment,
           style: GoogleFonts.urbanist(
             fontSize: 17,
             fontWeight: FontWeight.w700,
@@ -80,7 +82,7 @@ class _PaymentCheckoutScreenState extends State<PaymentCheckoutScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Secure payment',
+              t.paySecurePayment,
               style: GoogleFonts.urbanist(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
@@ -89,9 +91,7 @@ class _PaymentCheckoutScreenState extends State<PaymentCheckoutScreen> {
             ),
             const SizedBox(height: 10),
             Text(
-              _launchFailed
-                  ? "We couldn't open your browser. Tap below to open the secure Paystack checkout."
-                  : "We've opened the secure Paystack checkout in your browser. Finish your payment there, then come back and tap the button below.",
+              _launchFailed ? t.payBrowserFailed : t.payBrowserOpened,
               textAlign: TextAlign.center,
               style: GoogleFonts.urbanist(
                 fontSize: 14,
@@ -104,18 +104,18 @@ class _PaymentCheckoutScreenState extends State<PaymentCheckoutScreen> {
               onPressed: _open,
               icon: const Icon(Icons.open_in_new_rounded, size: 18),
               label: Text(
-                _launchFailed ? 'Open payment page' : 'Reopen payment page',
+                _launchFailed ? t.payOpenPaymentPage : t.payReopenPaymentPage,
                 style: GoogleFonts.urbanist(fontWeight: FontWeight.w600),
               ),
             ),
             const Spacer(),
             AppButton.primary(
-              "I've completed payment",
+              t.payCompletedPayment,
               onTap: () => Navigator.of(context).pop(widget.reference),
             ),
             const SizedBox(height: 10),
             AppButton.ghost(
-              'Cancel',
+              t.cancel,
               onTap: () => Navigator.of(context).pop(),
             ),
           ],

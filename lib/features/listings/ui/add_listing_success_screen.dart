@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../vendor/data/vendor_repository.dart';
 
@@ -41,14 +42,14 @@ class _AddListingSuccessScreenState extends State<AddListingSuccessScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final label = widget.isService ? 'Service' : 'Product';
+    final t = AppLocalizations.of(context);
+    final label = widget.isService ? t.listingTypeService : t.listingTypeProduct;
     final pending = _verified == false;
     final subtitle = pending
-        ? 'Your $label has been saved. It will become visible to clients once '
-            'your account is verified.'
+        ? t.addSuccessPendingSubtitle(label)
         : (widget.isService
-            ? 'Your service has been added successfully and is currently Live'
-            : 'Your product has been added successfully and is currently Live');
+            ? t.addSuccessLiveService
+            : t.addSuccessLiveProduct);
 
     return Scaffold(
       backgroundColor: context.c.background,
@@ -93,7 +94,7 @@ class _AddListingSuccessScreenState extends State<AddListingSuccessScreen> {
                         text: TextSpan(
                           children: [
                             TextSpan(
-                              text: '$label Added ',
+                              text: t.addSuccessAddedTitle(label),
                               style: GoogleFonts.urbanist(
                                 fontSize: 26,
                                 fontWeight: FontWeight.w800,
@@ -101,7 +102,7 @@ class _AddListingSuccessScreenState extends State<AddListingSuccessScreen> {
                               ),
                             ),
                             TextSpan(
-                              text: 'Successfully',
+                              text: t.addSuccessSuccessfully,
                               style: GoogleFonts.urbanist(
                                 fontSize: 26,
                                 fontWeight: FontWeight.w800,
@@ -143,9 +144,7 @@ class _AddListingSuccessScreenState extends State<AddListingSuccessScreen> {
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Text(
-                                  "Pending verification — clients can't see your "
-                                  'listings until an admin verifies your account. '
-                                  "We'll let you know once you're approved.",
+                                  t.addSuccessPendingWarning,
                                   style: GoogleFonts.urbanist(
                                     fontSize: 13,
                                     color: const Color(0xFF9A3412),
@@ -172,20 +171,20 @@ class _AddListingSuccessScreenState extends State<AddListingSuccessScreen> {
                           children: [
                             _buildInfoRow(
                               context,
-                              label: '$label ID',
+                              label: t.addSuccessIdLabel(label),
                               value: widget.productId,
                               isFirst: true,
                             ),
                             Divider(height: 1, color: context.c.border),
                             _buildInfoRow(
                               context,
-                              label: 'SKU',
+                              label: t.addSuccessSku,
                               value: widget.sku,
                             ),
                             Divider(height: 1, color: context.c.border),
                             _buildInfoRow(
                               context,
-                              label: 'Date Created',
+                              label: t.addSuccessDateCreated,
                               value: _formattedDate(),
                               isLast: true,
                             ),
@@ -204,7 +203,7 @@ class _AddListingSuccessScreenState extends State<AddListingSuccessScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 12, 24, 28),
               child: AppButton.primary(
-                'View $label',
+                t.addSuccessViewLabel(label),
                 onTap: () => context.go('/listings'),
               ),
             ),
