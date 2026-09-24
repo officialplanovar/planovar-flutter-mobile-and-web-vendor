@@ -56,7 +56,8 @@ class AuthRemoteDataSource {
   /// consent, the token relay returns to `redirect` with a bearer token: the
   /// web app origin, or the vendor app's deep link on native.
   Future<void> signInWithGoogle() async {
-    final appTarget = kIsWeb ? Uri.base.origin : 'planovarvendor://auth';
+    final appTarget =
+        kIsWeb ? Uri.base.origin : '${AppConstants.oauthScheme}://auth';
     final startUrl =
         '${AppConstants.apiBaseUrl}/oauth/start?intent=vendor&redirect=${Uri.encodeComponent(appTarget)}';
     await launchUrl(

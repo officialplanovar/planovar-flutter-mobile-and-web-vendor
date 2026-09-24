@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/responsive/responsive.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/router/app_routes.dart';
-import '../../../core/mock/mock_data.dart';
 import '../../../shared/models/vendor_model.dart';
 import '../../../shared/widgets/network_image_widget.dart';
 import '../../../shared/widgets/app_button.dart';
@@ -13,6 +12,21 @@ import '../../auth/bloc/auth_bloc.dart';
 import '../../auth/bloc/auth_state.dart';
 import '../../orders/bloc/orders_cubit.dart';
 import '../../vendor/data/vendor_repository.dart';
+
+/// A single item on the vendor's "today" schedule strip.
+class ScheduleItem {
+  final String time;
+  final String title;
+  final String clientName;
+  final Color color;
+
+  const ScheduleItem({
+    required this.time,
+    required this.title,
+    required this.clientName,
+    required this.color,
+  });
+}
 
 /// Neutral placeholder shown only while the real vendor profile is loading.
 const _kEmptyVendor = VendorModel(

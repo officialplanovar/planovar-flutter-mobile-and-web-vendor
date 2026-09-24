@@ -1,0 +1,7 @@
+// Flavor-specific settings for the "prod" environment (vendor app).
+// Referenced by the Debug/Release/Profile-prod configs. Keep bundle IDs in sync
+// with android/app/build.gradle.kts and your Firebase/OAuth/Paystack setup.
+APP_DISPLAY_NAME = Planovar Vendor
+BUNDLE_ID_SUFFIX = 
+FLUTTER_ENV = prod
+OAUTH_SCHEME = planovarvendor

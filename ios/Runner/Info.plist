@@ -9,7 +9,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Planovar Vendor</string>
+	<string>$(APP_DISPLAY_NAME)</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -79,7 +79,7 @@
 			<string>com.planovar.vendor.auth</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>planovarvendor</string>
+				<string>$(OAUTH_SCHEME)</string>
 			</array>
 		</dict>
 	</array>
