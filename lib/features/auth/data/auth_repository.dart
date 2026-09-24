@@ -31,6 +31,12 @@ class AuthRepository {
 
   Future<void> deactivateAccount() => _remote.deactivateAccount();
 
+  Future<Map<String, dynamic>> getNotificationPrefs() =>
+      _remote.getNotificationPrefs();
+
+  Future<void> updateNotificationPrefs(Map<String, dynamic> prefs) =>
+      _remote.updateNotificationPrefs(prefs);
+
   Future<UserModel> signUp({
     required String firstName,
     required String lastName,

@@ -1615,6 +1615,41 @@ class _NotificationSettingsScreenState
   static const _channelLabels = ['None', 'In app', 'Email', 'Both'];
 
   @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final p = await AuthRepository().getNotificationPrefs();
+      if (!mounted) return;
+      setState(() {
+        _channelIndex = (p['channel'] as num?)?.toInt() ?? _channelIndex;
+        _allMessages = p['allMessages'] as bool? ?? _allMessages;
+        _orderDelivery = p['orderDelivery'] as bool? ?? _orderDelivery;
+        _eventTimeline = p['eventTimeline'] as bool? ?? _eventTimeline;
+        _paymentAlerts = p['paymentAlerts'] as bool? ?? _paymentAlerts;
+        _quoteInvoice = p['quoteInvoice'] as bool? ?? _quoteInvoice;
+      });
+    } catch (_) {
+      // Keep defaults if prefs can't be loaded.
+    }
+  }
+
+  /// Persist the current toggles (fire-and-forget; UI already updated optimistically).
+  void _save() {
+    AuthRepository().updateNotificationPrefs({
+      'channel': _channelIndex,
+      'allMessages': _allMessages,
+      'orderDelivery': _orderDelivery,
+      'eventTimeline': _eventTimeline,
+      'paymentAlerts': _paymentAlerts,
+      'quoteInvoice': _quoteInvoice,
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final channelLabels = [
@@ -1730,8 +1765,10 @@ class _NotificationSettingsScreenState
                               final sel = _channelIndex == i;
                               return Expanded(
                                 child: GestureDetector(
-                                  onTap: () =>
-                                      setState(() => _channelIndex = i),
+                                  onTap: () {
+                                    setState(() => _channelIndex = i);
+                                    _save();
+                                  },
                                   child: Container(
                                     decoration: BoxDecoration(
                                       color: sel
@@ -1762,31 +1799,31 @@ class _NotificationSettingsScreenState
                           t.psNotifAllMessages,
                           t.psNotifAllMessagesSub,
                           _allMessages,
-                          (v) => setState(() => _allMessages = v),
+                          (v) { setState(() => _allMessages = v); _save(); },
                         ),
                         _notifToggle(
                           t.psNotifOrderDelivery,
                           t.psNotifOrderDeliverySub,
                           _orderDelivery,
-                          (v) => setState(() => _orderDelivery = v),
+                          (v) { setState(() => _orderDelivery = v); _save(); },
                         ),
                         _notifToggle(
                           t.psNotifEventTimeline,
                           t.psNotifEventTimelineSub,
                           _eventTimeline,
-                          (v) => setState(() => _eventTimeline = v),
+                          (v) { setState(() => _eventTimeline = v); _save(); },
                         ),
                         _notifToggle(
                           t.psNotifPayment,
                           t.psNotifPaymentSub,
                           _paymentAlerts,
-                          (v) => setState(() => _paymentAlerts = v),
+                          (v) { setState(() => _paymentAlerts = v); _save(); },
                         ),
                         _notifToggle(
                           t.psNotifQuoteInvoice,
                           t.psNotifQuoteInvoiceSub,
                           _quoteInvoice,
-                          (v) => setState(() => _quoteInvoice = v),
+                          (v) { setState(() => _quoteInvoice = v); _save(); },
                           isLast: true,
                         ),
                       ],

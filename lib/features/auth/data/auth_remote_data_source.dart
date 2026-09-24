@@ -146,6 +146,20 @@ class AuthRemoteDataSource {
     await _api.tokenStore.clear();
   }
 
+  /// Current notification preferences (free-form JSON stored on the user).
+  Future<Map<String, dynamic>> getNotificationPrefs() async {
+    final res = await _dio.get('/users/me');
+    _ensureOk(res);
+    final data = res.data;
+    final prefs = data is Map ? data['notificationPrefs'] : null;
+    return prefs is Map ? Map<String, dynamic>.from(prefs) : <String, dynamic>{};
+  }
+
+  Future<void> updateNotificationPrefs(Map<String, dynamic> prefs) async {
+    final res = await _dio.patch('/users/me/notification-prefs', data: prefs);
+    _ensureOk(res);
+  }
+
   Future<void> signOut() async {
     try {
       await _dio.post('/api/auth/sign-out');
