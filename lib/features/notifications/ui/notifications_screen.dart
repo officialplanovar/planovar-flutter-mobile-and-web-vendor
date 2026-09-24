@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../core/services/notification_service.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../shared/models/notification_model.dart';
@@ -75,6 +76,34 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return 'Earlier';
   }
 
+  /// Localized display label for an internal filter key.
+  String _filterLabel(String f) {
+    final t = AppLocalizations.of(context);
+    switch (f) {
+      case 'All':
+        return t.notifFilterAll;
+      case 'Orders':
+        return t.notifFilterOrders;
+      case 'Payments':
+        return t.notifFilterPayments;
+      default:
+        return t.notifFilterSystem;
+    }
+  }
+
+  /// Localized display label for an internal date-group key.
+  String _groupHeaderLabel(String key) {
+    final t = AppLocalizations.of(context);
+    switch (key) {
+      case 'Today':
+        return t.notifToday;
+      case 'Yesterday':
+        return t.notifYesterday;
+      default:
+        return t.notifEarlier;
+    }
+  }
+
   void _markAllRead() {
     _service.markAllRead();
     setState(() {
@@ -93,6 +122,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final filtered = _filtered;
 
     // Group notifications
@@ -112,7 +142,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         elevation: 0,
         leading: BackButton(color: context.c.textPrimary),
         title: Text(
-          'Notifications',
+          t.profileNotifications,
           style: GoogleFonts.urbanist(
             fontSize: 18,
             fontWeight: FontWeight.w700,
@@ -123,7 +153,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           TextButton(
             onPressed: _markAllRead,
             child: Text(
-              'Mark all read',
+              t.notifMarkAllRead,
               style: GoogleFonts.urbanist(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -154,7 +184,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        f,
+                        _filterLabel(f),
                         style: GoogleFonts.urbanist(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -179,7 +209,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             size: 56, color: context.c.textHint),
                         const SizedBox(height: 12),
                         Text(
-                          'No notifications',
+                          t.notifEmpty,
                           style: GoogleFonts.urbanist(
                             fontSize: 16,
                             color: context.c.textSecondary,
@@ -201,7 +231,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           Padding(
                             padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
                             child: Text(
-                              groupLabel,
+                              _groupHeaderLabel(groupLabel),
                               style: GoogleFonts.urbanist(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,

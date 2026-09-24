@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/models/vendor_model.dart';
 import '../../listings/bloc/listings_cubit.dart';
 import '../../orders/bloc/orders_cubit.dart';
@@ -31,6 +32,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final listings = context.watch<ListingsCubit>().state.listings;
     final orders = context.watch<OrdersCubit>().state.orders;
 
@@ -64,7 +66,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 onPressed: () => Navigator.pop(context),
               ),
               title: Text(
-                'Analytics',
+                t.analyticsTitle,
                 style: GoogleFonts.urbanist(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -89,29 +91,29 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             children: [
               _StatCard(
                 icon: Icons.storefront_outlined,
-                label: 'Active Listings',
+                label: t.analyticsActiveListings,
                 value: '$activeListings',
-                sub: 'of $totalListings total',
+                sub: t.analyticsOfTotal(totalListings),
               ),
               _StatCard(
                 icon: Icons.mark_email_unread_outlined,
-                label: 'Inquiries',
+                label: t.analyticsInquiries,
                 value: '$totalInquiries',
-                sub: '$pendingInquiries awaiting reply',
+                sub: t.analyticsAwaitingReply(pendingInquiries),
               ),
               _StatCard(
                 icon: Icons.star_outline_rounded,
-                label: 'Rating',
+                label: t.analyticsRating,
                 value: reviewCount > 0 ? rating.toStringAsFixed(1) : '—',
-                sub: '$reviewCount reviews',
+                sub: t.analyticsReviews(reviewCount),
               ),
               _StatCard(
                 icon: Icons.verified_outlined,
-                label: 'Plan',
+                label: t.analyticsPlan,
                 value: (_vendor?.subscriptionTier ?? '—').isEmpty
                     ? '—'
                     : _titleCase(_vendor!.subscriptionTier),
-                sub: _vendor?.isVerified == true ? 'Verified' : 'Unverified',
+                sub: _vendor?.isVerified == true ? t.profileVerified : t.profileUnverified,
               ),
             ],
           ),
@@ -129,7 +131,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     size: 40, color: context.c.textHint),
                 const SizedBox(height: 12),
                 Text(
-                  'Detailed performance analytics',
+                  t.analyticsDetailedTitle,
                   style: GoogleFonts.urbanist(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -138,7 +140,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Trends, profile views and conversion charts are coming soon.',
+                  t.analyticsComingSoon,
                   textAlign: TextAlign.center,
                   style: GoogleFonts.urbanist(
                     fontSize: 13,

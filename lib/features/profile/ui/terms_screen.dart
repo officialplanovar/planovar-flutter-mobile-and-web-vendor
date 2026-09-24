@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 
 // ─── Gradient AppBar helper ───────────────────────────────────────────────────
 
@@ -132,11 +133,12 @@ class TermsAndConditionsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: context.c.background,
       body: Column(
         children: [
-          _buildGradientAppBar(context, title: 'Terms & Conditions'),
+          _buildGradientAppBar(context, title: t.profileTerms),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
@@ -144,15 +146,15 @@ class TermsAndConditionsScreen extends StatelessWidget {
                 children: [
                   _TermsRow(
                     icon: Icons.article_outlined,
-                    title: 'Terms and Conditions',
-                    subtitle: 'Last updated 17th April 2025',
+                    title: t.termsRowTitle,
+                    subtitle: t.termsLastUpdated,
                     onTap: () => context.push('/profile/terms/use'),
                   ),
                   const SizedBox(height: 12),
                   _TermsRow(
                     icon: Icons.description_outlined,
-                    title: 'Privacy Policy',
-                    subtitle: 'Read our privacy agreement',
+                    title: t.termsPrivacyPolicy,
+                    subtitle: t.termsPrivacySubtitle,
                     onTap: () => context.push('/profile/terms/privacy'),
                   ),
                 ],
@@ -186,7 +188,7 @@ class TermsOfUseScreen extends StatelessWidget {
       backgroundColor: context.c.surface,
       body: Column(
         children: [
-          _buildGradientAppBar(context, title: 'Terms of Use'),
+          _buildGradientAppBar(context, title: AppLocalizations.of(context).termsOfUse),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
@@ -240,7 +242,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
       backgroundColor: context.c.surface,
       body: Column(
         children: [
-          _buildGradientAppBar(context, title: 'Privacy Policy'),
+          _buildGradientAppBar(context, title: AppLocalizations.of(context).termsPrivacyPolicy),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),

@@ -6,6 +6,7 @@ import '../../../core/router/app_routes.dart';
 import '../../../core/services/messaging_service.dart';
 import '../../../core/services/chat_socket.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/models/conversation_model.dart';
 import '../../../shared/widgets/network_image_widget.dart';
 
@@ -107,6 +108,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final conversations = _all.where((c) {
       if (_searchQuery.isEmpty) return true;
       return c.participantName
@@ -137,7 +139,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                             size: 56, color: context.c.textHint),
                         const SizedBox(height: 12),
                         Text(
-                          'No conversations found',
+                          t.msgNoConversations,
                           style: GoogleFonts.urbanist(
                             fontSize: 16,
                             color: context.c.textSecondary,
@@ -181,6 +183,7 @@ class _MessagesHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final topPadding = MediaQuery.of(context).padding.top;
 
     return Container(
@@ -205,7 +208,7 @@ class _MessagesHeader extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Messages',
+                      t.msgTitle,
                       style: GoogleFonts.urbanist(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
@@ -214,7 +217,7 @@ class _MessagesHeader extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Stay connected with your clients',
+                      t.msgSubtitle,
                       style: GoogleFonts.urbanist(
                         fontSize: 13,
                         color: Colors.white70,
@@ -285,7 +288,7 @@ class _MessagesHeader extends StatelessWidget {
                 color: Colors.white,
               ),
               decoration: InputDecoration(
-                hintText: 'Search conversations',
+                hintText: t.msgSearchHint,
                 hintStyle: GoogleFonts.urbanist(
                   fontSize: 14,
                   color: Colors.white60,
@@ -327,6 +330,7 @@ class _ConversationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final hasUnread = conv.unreadCount > 0;
     final statusDot = _statusDotColor();
 
@@ -517,7 +521,7 @@ class _ConversationTile extends StatelessWidget {
                       if (conv.isGroup) ...[
                         const SizedBox(height: 3),
                         Text(
-                          '${conv.groupParticipantCount} participants',
+                          t.msgParticipants(conv.groupParticipantCount),
                           style: GoogleFonts.urbanist(
                             fontSize: 11,
                             color: context.c.textHint,

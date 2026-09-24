@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
+import '../../l10n/app_localizations.dart';
 import 'app_button.dart';
 
 class EmptyState extends StatelessWidget {
@@ -86,6 +87,7 @@ class ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -99,7 +101,7 @@ class ErrorState extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Something went wrong',
+              t.errorSomethingWrong,
               style: GoogleFonts.urbanist(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -118,7 +120,7 @@ class ErrorState extends StatelessWidget {
             if (onRetry != null) ...[
               const SizedBox(height: 24),
               AppButton.secondary(
-                'Try Again',
+                t.errorTryAgain,
                 onTap: onRetry,
                 width: 140,
               ),

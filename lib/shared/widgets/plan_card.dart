@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
+import '../../l10n/app_localizations.dart';
 
 /// Visual variants matching the "Choose your plan" design.
 enum PlanStyle { basic, popular, gold }
@@ -111,7 +112,7 @@ class PlanCard extends StatelessWidget {
               if (isCurrent)
                 _badge(currentBadgeLabel)
               else if (_isPopular)
-                _badge('POPULAR'),
+                _badge(AppLocalizations.of(context).planPopular),
             ],
           ),
           const SizedBox(height: 18),
@@ -138,7 +139,7 @@ class PlanCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          _buildCta(onDark),
+          _buildCta(context, onDark),
         ],
       ),
     );
@@ -163,7 +164,7 @@ class PlanCard extends StatelessWidget {
     );
   }
 
-  Widget _buildCta(bool onDark) {
+  Widget _buildCta(BuildContext context, bool onDark) {
     // Current plan → muted, non-actionable.
     if (isCurrent) {
       return Container(
@@ -176,7 +177,7 @@ class PlanCard extends StatelessWidget {
         ),
         alignment: Alignment.center,
         child: Text(
-          'Current plan',
+          AppLocalizations.of(context).planCurrentPlan,
           style: GoogleFonts.urbanist(
             fontSize: 16,
             fontWeight: FontWeight.w700,
@@ -238,8 +239,8 @@ class BillingToggle extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Expanded(child: _segment('Monthly', !yearly, () => onChanged(false))),
-          Expanded(child: _segment('Yearly', yearly, () => onChanged(true))),
+          Expanded(child: _segment(AppLocalizations.of(context).planMonthly, !yearly, () => onChanged(false))),
+          Expanded(child: _segment(AppLocalizations.of(context).planYearly, yearly, () => onChanged(true))),
         ],
       ),
     );

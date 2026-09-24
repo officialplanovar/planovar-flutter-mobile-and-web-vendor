@@ -6,63 +6,26 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../auth/bloc/auth_bloc.dart';
 import '../../auth/bloc/auth_state.dart';
 
-// ─── Mock FAQs ────────────────────────────────────────────────────────────────
-
-const _faqs = [
-  {
-    'q': 'How do I create a listing?',
-    'a':
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et massa mi. Aliquam in hendrerit urna. Pellentesque sit amet sapien fringilla, mattis ligula consectetur, ultrices mauris.',
-  },
-  {
-    'q': 'How do I manage bookings?',
-    'a':
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et massa mi. Aliquam in hendrerit urna. Pellentesque sit amet sapien fringilla, mattis ligula consectetur, ultrices mauris.',
-  },
-  {
-    'q': 'How does escrow payment work?',
-    'a':
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et massa mi. Aliquam in hendrerit urna. Pellentesque sit amet sapien fringilla, mattis ligula consectetur, ultrices mauris.',
-  },
-  {
-    'q': 'How do I withdraw my earnings?',
-    'a':
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et massa mi. Aliquam in hendrerit urna. Pellentesque sit amet sapien fringilla, mattis ligula consectetur, ultrices mauris.',
-  },
-  {
-    'q': 'What fees does Planovar charge?',
-    'a':
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et massa mi. Aliquam in hendrerit urna. Pellentesque sit amet sapien fringilla, mattis ligula consectetur, ultrices mauris.',
-  },
-  {
-    'q': 'How do I verify my account?',
-    'a':
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et massa mi. Aliquam in hendrerit urna. Pellentesque sit amet sapien fringilla, mattis ligula consectetur, ultrices mauris.',
-  },
-  {
-    'q': 'Can I cancel a booking?',
-    'a':
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et massa mi. Aliquam in hendrerit urna. Pellentesque sit amet sapien fringilla, mattis ligula consectetur, ultrices mauris.',
-  },
-  {
-    'q': 'How do reviews work?',
-    'a':
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et massa mi. Aliquam in hendrerit urna. Pellentesque sit amet sapien fringilla, mattis ligula consectetur, ultrices mauris.',
-  },
-  {
-    'q': 'How do I upgrade my subscription?',
-    'a':
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et massa mi. Aliquam in hendrerit urna. Pellentesque sit amet sapien fringilla, mattis ligula consectetur, ultrices mauris.',
-  },
-  {
-    'q': 'How do I contact a client?',
-    'a':
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et massa mi. Aliquam in hendrerit urna. Pellentesque sit amet sapien fringilla, mattis ligula consectetur, ultrices mauris.',
-  },
-];
+/// Localized FAQ question list (answers are rendered as placeholder content).
+List<String> _faqQuestions(BuildContext context) {
+  final t = AppLocalizations.of(context);
+  return [
+    t.supportFaqQ1,
+    t.supportFaqQ2,
+    t.supportFaqQ3,
+    t.supportFaqQ4,
+    t.supportFaqQ5,
+    t.supportFaqQ6,
+    t.supportFaqQ7,
+    t.supportFaqQ8,
+    t.supportFaqQ9,
+    t.supportFaqQ10,
+  ];
+}
 
 // ─── Gradient AppBar helper ───────────────────────────────────────────────────
 
@@ -213,22 +176,24 @@ class SupportScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final faqs = _faqQuestions(context);
     final authState = context.watch<AuthBloc>().state;
     final name = authState is AuthAuthenticated ? authState.user.name : '';
-    final firstName = name.isNotEmpty ? name.split(' ').first : 'there';
+    final firstName = name.isNotEmpty ? name.split(' ').first : t.supportThere;
 
     return Scaffold(
       backgroundColor: context.c.background,
       body: Column(
         children: [
-          _buildGradientAppBar(context, title: 'Support'),
+          _buildGradientAppBar(context, title: t.supportTitle),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 40),
               children: [
                 const SizedBox(height: 20),
                 Text(
-                  'Hey, $firstName 👋',
+                  t.supportGreeting(firstName),
                   style: GoogleFonts.urbanist(
                     fontSize: 24,
                     fontWeight: FontWeight.w800,
@@ -252,7 +217,7 @@ class SupportScreen extends StatelessWidget {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'How can we help you?',
+                          t.supportSearchHint,
                           style: GoogleFonts.urbanist(
                             fontSize: 14,
                             color: context.c.textHint,
@@ -282,7 +247,7 @@ class SupportScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Top-Notch support system',
+                              t.supportPromoTitle,
                               style: GoogleFonts.urbanist(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w700,
@@ -291,7 +256,7 @@ class SupportScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Get quick responses with our online chat',
+                              t.supportPromoSub,
                               style: GoogleFonts.urbanist(
                                 fontSize: 13,
                                 color: Colors.white70,
@@ -328,7 +293,7 @@ class SupportScreen extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.all(16),
                         child: Text(
-                          'Frequently Asked Questions',
+                          t.supportFaqTitle,
                           style: GoogleFonts.urbanist(
                             fontSize: 15,
                             fontWeight: FontWeight.w800,
@@ -350,7 +315,7 @@ class SupportScreen extends StatelessWidget {
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        _faqs[i]['q']!,
+                                        faqs[i],
                                         style: GoogleFonts.urbanist(
                                           fontSize: 14,
                                           color: context.c.textPrimary,
@@ -377,7 +342,7 @@ class SupportScreen extends StatelessWidget {
                           padding: const EdgeInsets.all(12),
                           child: Center(
                             child: Text(
-                              'View More Questions',
+                              t.supportViewMore,
                               style: GoogleFonts.urbanist(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -394,15 +359,15 @@ class SupportScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 _SupportRow(
                   icon: Icons.chat_bubble_outline_rounded,
-                  title: 'Chat',
-                  subtitle: 'Need help? We are here for you',
+                  title: t.supportChat,
+                  subtitle: t.supportChatSub,
                   onTap: () => context.push('/profile/support/live-chat'),
                 ),
                 const SizedBox(height: 8),
                 _SupportRow(
                   icon: Icons.phone_outlined,
-                  title: 'Call Support',
-                  subtitle: 'Available Mon - Fri, 9am - 5pm',
+                  title: t.supportCallSupport,
+                  subtitle: t.supportCallHours,
                   onTap: () => context.push('/profile/support/call'),
                 ),
               ],
@@ -421,6 +386,8 @@ class FaqScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final faqs = _faqQuestions(context);
     final topPadding = MediaQuery.of(context).padding.top;
 
     return Scaffold(
@@ -451,7 +418,7 @@ class FaqScreen extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Frequently Asked Questions',
+                    t.supportFaqTitle,
                     style: GoogleFonts.urbanist(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
@@ -482,7 +449,7 @@ class FaqScreen extends StatelessWidget {
           ),
           Expanded(
             child: ListView.separated(
-              itemCount: _faqs.length,
+              itemCount: faqs.length,
               separatorBuilder: (_, __) =>
                   Divider(height: 1, color: context.c.divider),
               itemBuilder: (context, i) {
@@ -497,7 +464,7 @@ class FaqScreen extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            _faqs[i]['q']!,
+                            faqs[i],
                             style: GoogleFonts.urbanist(
                               fontSize: 14,
                               color: context.c.textPrimary,
@@ -540,7 +507,7 @@ class FaqDetailScreen extends StatelessWidget {
         children: [
           _buildGradientAppBar(
             context,
-            title: 'Question ${index + 1}',
+            title: AppLocalizations.of(context).supportQuestionN(index + 1),
           ),
           Expanded(
             child: SingleChildScrollView(
@@ -576,7 +543,7 @@ class FaqDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 32),
                   Text(
-                    'I need more help',
+                    AppLocalizations.of(context).supportNeedMoreHelp,
                     style: GoogleFonts.urbanist(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
@@ -619,7 +586,7 @@ class FaqDetailScreen extends StatelessWidget {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              'Chat with us',
+                              AppLocalizations.of(context).supportChatWithUs,
                               style: GoogleFonts.urbanist(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
@@ -657,7 +624,7 @@ class CallSupportScreen extends StatelessWidget {
       backgroundColor: context.c.surface,
       body: Column(
         children: [
-          _buildGradientAppBar(context, title: 'Call Us'),
+          _buildGradientAppBar(context, title: AppLocalizations.of(context).supportCallUs),
           Expanded(
             child: Column(
               children: [
@@ -691,7 +658,7 @@ class CallSupportScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Text(
-                    "We're available from Monday- Friday from 9am - 5pm",
+                    AppLocalizations.of(context).supportCallAvailable,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.urbanist(
                       fontSize: 13,
@@ -755,13 +722,14 @@ class _LiveChatScreenState extends State<LiveChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: context.c.background,
       body: Column(
         children: [
           _buildGradientAppBar(context,
-              title: 'Live Support',
-              subtitle: 'We usually reply in a few minutes'),
+              title: t.supportLiveSupport,
+              subtitle: t.supportReplyMinutes),
           Expanded(child: _body(context)),
         ],
       ),
@@ -769,15 +737,14 @@ class _LiveChatScreenState extends State<LiveChatScreen> {
   }
 
   Widget _body(BuildContext context) {
+    final t = AppLocalizations.of(context);
     if (_kCrispWebsiteId.isEmpty) {
       return _placeholder(
         context,
         icon: Icons.support_agent_rounded,
-        title: 'Live chat is being set up',
-        message:
-            "Our live chat isn't connected yet. In the meantime, email us and "
-            "we'll get right back to you.",
-        actionLabel: 'Email support',
+        title: t.supportChatSetup,
+        message: t.supportChatSetupMsg,
+        actionLabel: t.supportEmailSupport,
         onAction: _emailSupport,
       );
     }
@@ -785,9 +752,9 @@ class _LiveChatScreenState extends State<LiveChatScreen> {
       return _placeholder(
         context,
         icon: Icons.chat_bubble_outline_rounded,
-        title: 'Chat with our team',
-        message: 'Open our live chat to talk to a support agent.',
-        actionLabel: 'Open live chat',
+        title: t.supportChatTeam,
+        message: t.supportChatTeamMsg,
+        actionLabel: t.supportOpenChat,
         onAction: _openInBrowser,
       );
     }

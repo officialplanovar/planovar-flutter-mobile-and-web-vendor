@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/utils/formatters.dart';
+import '../../l10n/app_localizations.dart';
 import '../widgets/app_button.dart';
 
 /// A reusable card widget that displays a single quote/request with optional
@@ -25,6 +26,7 @@ class QuoteRequestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tr = AppLocalizations.of(context);
     final clientImage = quote.clientImage as String?;
     final clientName = quote.clientName as String;
     final eventName = quote.eventName as String;
@@ -99,7 +101,7 @@ class QuoteRequestCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    'New',
+                    tr.qrcNew,
                     style: GoogleFonts.urbanist(
                       color: const Color(0xFF16A34A),
                       fontSize: 11,
@@ -124,8 +126,8 @@ class QuoteRequestCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               totalAmount > 0
-                  ? 'Budget: ${Formatters.formatCurrency(totalAmount)}'
-                  : 'Budget: TBD',
+                  ? tr.qrcBudget(Formatters.formatCurrency(totalAmount))
+                  : tr.qrcBudgetTbd,
               style: GoogleFonts.urbanist(
                 fontSize: 13,
                 color: context.c.textSecondary,
@@ -138,7 +140,7 @@ class QuoteRequestCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: AppButton.secondary(
-                      'Open & Respond',
+                      tr.qrcOpenRespond,
                       onTap: onRespond,
                       size: ButtonSize.sm,
                     ),
@@ -150,7 +152,7 @@ class QuoteRequestCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: AppButton.secondary(
-                      'Reject',
+                      tr.qrcReject,
                       onTap: onReject ?? () {},
                       size: ButtonSize.sm,
                     ),
@@ -158,7 +160,7 @@ class QuoteRequestCard extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: AppButton.primary(
-                      'Open & Respond',
+                      tr.qrcOpenRespond,
                       onTap: onRespond,
                       size: ButtonSize.sm,
                     ),

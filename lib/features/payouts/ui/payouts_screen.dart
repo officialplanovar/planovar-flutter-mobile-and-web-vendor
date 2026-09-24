@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 
 /// Under the subscription model Planovar does not hold funds or process payouts —
 /// vendors are paid directly by clients, off-platform. This screen explains that
@@ -10,6 +11,7 @@ class PayoutsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final topPadding = MediaQuery.of(context).padding.top;
 
     return Scaffold(
@@ -34,7 +36,7 @@ class PayoutsScreen extends StatelessWidget {
                   ),
                   Expanded(
                     child: Text(
-                      'Payments',
+                      t.payoutsTitle,
                       textAlign: TextAlign.center,
                       style: GoogleFonts.urbanist(
                         fontSize: 18,
@@ -67,7 +69,7 @@ class PayoutsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      'You keep 100% of what you earn',
+                      t.payoutsHeadline,
                       textAlign: TextAlign.center,
                       style: GoogleFonts.urbanist(
                         fontSize: 20,
@@ -77,8 +79,7 @@ class PayoutsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'Planovar runs on a subscription — we don’t hold your money or take a '
-                      'commission. Clients pay you directly, the way you both agree.',
+                      t.payoutsBody,
                       textAlign: TextAlign.center,
                       style: GoogleFonts.urbanist(
                         fontSize: 14,

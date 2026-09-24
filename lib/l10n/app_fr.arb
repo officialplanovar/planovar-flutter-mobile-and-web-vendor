@@ -604,5 +604,597 @@
   "coUploadImage": "Téléverser une image",
   "coBookingCancelled": "Réservation annulée",
   "coCancelOrder": "Annuler la commande",
-  "coMessageClient": "Contacter le client à la place"
+  "coMessageClient": "Contacter le client à la place",
+  "msgTitle": "Messages",
+  "msgSubtitle": "Restez en contact avec vos clients",
+  "msgSearchHint": "Rechercher des conversations",
+  "msgNoConversations": "Aucune conversation trouvée",
+  "msgParticipants": "{count} participants",
+  "@msgParticipants": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "convConfirmed": "Confirmé",
+  "convDeclined": "Refusé",
+  "convQuoteExpired": "Devis expiré",
+  "convDepositRefundedAmt": "Caution remboursée · ₦{amount}",
+  "@convDepositRefundedAmt": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "convDepositRefunded": "Caution remboursée",
+  "convPaymentReceivedAmt": "Paiement reçu · ₦{amount}",
+  "@convPaymentReceivedAmt": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "convPaymentReceived": "Paiement reçu",
+  "convOrderUpdate": "Mise à jour de la commande",
+  "convReviewRequested": "Avis demandé",
+  "convReviewLeftRating": "Le client a laissé un avis · {rating}★",
+  "@convReviewLeftRating": {
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
+  },
+  "convReviewLeft": "Le client a laissé un avis",
+  "convBankBanner": "Devis accepté — ajoutez votre compte bancaire pour être payé.",
+  "convAdd": "Ajouter",
+  "convConfirmReturn": "Confirmer le retour",
+  "convMarkDelivered": "Marquer comme livré",
+  "convPostUpdate": "Publier une mise à jour",
+  "convConfirmReturnTitle": "Confirmer le retour de la location ?",
+  "convConfirmReturnBody": "Ceci finalise la location et rembourse la caution du client. Renvoyez la caution au client depuis votre banque.",
+  "convRentalCompleted": "Location terminée — caution remboursée 🎉",
+  "convPostUpdateTitle": "Publier une mise à jour",
+  "convPostUpdateHint": "ex. En cours de livraison — arrivée avant 16h",
+  "convPost": "Publier",
+  "convUpdatePosted": "Mise à jour publiée",
+  "convMarkDeliveredTitle": "Marquer comme livré ?",
+  "convMarkDeliveredBody": "Ceci finalise la réservation et invite le client à laisser un avis.",
+  "convMarkedDelivered": "Marqué comme livré 🎉",
+  "convReviseQuote": "Réviser le devis",
+  "convCreateSendQuote": "Créer et envoyer un devis",
+  "convOrderAccepted": "Commande acceptée — facture envoyée 🎉",
+  "convOrderDeclined": "Commande refusée",
+  "convCouldNotIdentifyClient": "Impossible d'identifier le client",
+  "convCouldNotUpdateTask": "Impossible de mettre à jour la tâche",
+  "convCouldNotLoadListings": "Impossible de charger vos annonces",
+  "convAddListingFirst": "Ajoutez d'abord une annonce pour envoyer un devis",
+  "convQuoteForListing": "Devis pour quelle annonce ?",
+  "convTypeMessage": "Écrivez un message",
+  "cqAddLineItem": "Ajoutez au moins une ligne avec un montant",
+  "cqRevisedSent": "Devis révisé envoyé 🎉",
+  "cqQuoteSent": "Devis envoyé au client 🎉",
+  "cqOpenFromChat": "Ouvrez ceci depuis une discussion ou une demande client pour envoyer un devis",
+  "cqValidForTitle": "Devis valable",
+  "cqTitleCreate": "Créer un devis",
+  "cqEvent": "Événement",
+  "cqDescription": "Description",
+  "cqAmount": "Montant",
+  "cqAddItem": "+ Ajouter un article",
+  "cqSubtotal": "Sous-total {amount}",
+  "@cqSubtotal": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "cqMilestone": "Étape {number}",
+  "@cqMilestone": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "cqLineItems": "Articles",
+  "cqSetPaymentTerms": "Définissez vos conditions de paiement",
+  "cqNoteToClient": "Note au client",
+  "cqNoteHint": "Brève description du produit",
+  "cqSending": "Envoi…",
+  "cqSendRevised": "Envoyer le devis révisé",
+  "cqCreateQuote": "Créer un devis",
+  "cqDueOnConfirmation": "À régler à la confirmation de la réservation (immédiatement)",
+  "cqTermPayAtOnce": "Payer en une fois",
+  "cqTermCustom": "Personnalisé",
+  "cqValid1Day": "1 jour",
+  "cqValid3Days": "3 jours",
+  "cqValid7Days": "7 jours",
+  "cqValid14Days": "14 jours",
+  "cqValid30Days": "30 jours",
+  "ciTitle": "Créer une facture",
+  "ciInvoiceItems": "Articles de la facture",
+  "ciPaymentMilestones": "Échéances de paiement",
+  "ciFromQuote": "Du devis",
+  "ciBanner": "Pré-rempli à partir du devis accepté QT-2026-047. Vérifiez les articles et les échéances de paiement, puis envoyez pour confirmer la réservation.",
+  "ciPayoutToAccount": "Versement sur votre compte",
+  "ciAccount": "Compte",
+  "ciYourPayout": "Votre versement",
+  "ciSendInvoiceTo": "Envoyer la facture à {name}",
+  "@ciSendInvoiceTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "ciInvoiceSent": "Facture envoyée avec succès !",
+  "ciPreview": "Aperçu",
+  "profileYourBusiness": "Votre entreprise",
+  "profilePlanLabel": "Forfait {tier}",
+  "@profilePlanLabel": {
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      }
+    }
+  },
+  "profileVerified": "Vérifié",
+  "profileUnverified": "Non vérifié",
+  "profileGeneral": "Général",
+  "profilePreferences": "Préférences",
+  "profileUpdateProfile": "Mettre à jour votre profil",
+  "profileSecurity": "Sécurité",
+  "profileReviews": "Avis",
+  "profileLinkedBanks": "Comptes bancaires liés",
+  "profileGallery": "Galerie",
+  "profileSubscriptionPlans": "Forfaits d'abonnement",
+  "profileLanguagePref": "Préférence de langue",
+  "profileTheme": "Thème",
+  "profileCustomizeStorefront": "Personnaliser votre vitrine",
+  "profileNotifications": "Notifications",
+  "profileHelpSupport": "Aide et assistance",
+  "profileTerms": "Conditions générales",
+  "profileLeavePlanovar": "Quitter Planovar",
+  "profileSignOut": "Se déconnecter",
+  "psUploadLogoFailed": "Impossible de téléverser le logo : {error}",
+  "@psUploadLogoFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "psUploadCoverFailed": "Impossible de téléverser la couverture : {error}",
+  "@psUploadCoverFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "psProfileUpdated": "Profil mis à jour",
+  "psEmailAddress": "Adresse e-mail",
+  "psEmailHint": "Adresse e-mail",
+  "psPhoneNumber": "Numéro de téléphone",
+  "psPhoneHint": "Numéro de téléphone",
+  "psDateOfBirth": "Date de naissance",
+  "psUpdateDetails": "Mettre à jour",
+  "psAddCoverPhoto": "Ajouter une photo de couverture",
+  "psStorefrontHint": "Votre logo et votre couverture sont ce que les clients voient sur votre vitrine.",
+  "psStorefrontImages": "Images de la vitrine",
+  "psBusinessName": "Nom de l'entreprise",
+  "psBusinessNameHint": "Nom de l'entreprise",
+  "psBusinessType": "Type d'entreprise",
+  "psBizLicensed": "Entreprise agréée",
+  "psBizFreelancer": "Indépendant",
+  "psBusinessDescription": "Description de l'entreprise",
+  "psBusinessDescHint": "Brève description de votre entreprise",
+  "psCategoryTags": "Étiquettes de catégorie",
+  "psEditProfile": "Modifier votre profil",
+  "psPersonalDetails": "Détails personnels",
+  "psBusinessDetails": "Détails de l'entreprise",
+  "psMonthJan": "Janvier",
+  "psMonthFeb": "Février",
+  "psMonthMar": "Mars",
+  "psMonthApr": "Avril",
+  "psMonthMay": "Mai",
+  "psMonthJun": "Juin",
+  "psMonthJul": "Juillet",
+  "psMonthAug": "Août",
+  "psMonthSep": "Septembre",
+  "psMonthOct": "Octobre",
+  "psMonthNov": "Novembre",
+  "psMonthDec": "Décembre",
+  "psSecurity": "Sécurité",
+  "psChangePassword": "Changer le mot de passe",
+  "psChangePasswordSub": "Mettez à jour votre mot de passe de connexion.",
+  "ps2faTitle": "Authentification 2FA",
+  "ps2faSub": "Ajoutez une couche de sécurité supplémentaire.",
+  "psNewPassword": "Nouveau mot de passe",
+  "psNewPasswordHint": "Saisir le nouveau mot de passe",
+  "psConfirmPassword": "Confirmer le mot de passe",
+  "psConfirmPasswordHint": "Confirmer le nouveau mot de passe",
+  "psReqCapital": "Doit contenir une lettre majuscule",
+  "psReqNumber": "Doit contenir un chiffre, ex. 1,2,4,etc",
+  "psReqSpecial": "Doit contenir un caractère spécial, ex. @,$,%,etc",
+  "psSavePassword": "Enregistrer le mot de passe",
+  "psPasswordSaved": "Mot de passe enregistré",
+  "psTheme": "Thème",
+  "psSelectDisplay": "Sélectionnez votre affichage préféré",
+  "psThemeLight": "Clair",
+  "psThemeDark": "Sombre",
+  "psThemeSystem": "Système",
+  "psSavePreference": "Enregistrer la préférence",
+  "psThemeSaved": "Préférence de thème enregistrée",
+  "psNotification": "Notification",
+  "psChannelNone": "Aucun",
+  "psChannelInApp": "Dans l'app",
+  "psChannelEmail": "E-mail",
+  "psChannelBoth": "Les deux",
+  "psAllNotifications": "Toutes les notifications",
+  "psChooseWhere": "Choisissez où vous souhaitez recevoir les notifications",
+  "psNotifAllMessages": "Tous les messages",
+  "psNotifAllMessagesSub": "quelqu'un répond à votre message",
+  "psNotifOrderDelivery": "Chronologie commande / livraison",
+  "psNotifOrderDeliverySub": "soyez notifié lorsqu'une commande est reçue / terminée",
+  "psNotifEventTimeline": "Chronologie de l'événement",
+  "psNotifEventTimelineSub": "soyez notifié lorsqu'il y a une nouvelle chronologie d'événement",
+  "psNotifPayment": "Alertes de paiement",
+  "psNotifPaymentSub": "soyez notifié lorsqu'un paiement réussit",
+  "psNotifQuoteInvoice": "Alertes devis / facture",
+  "psNotifQuoteInvoiceSub": "soyez notifié lorsque votre devis est traité",
+  "psLinkedBankAccount": "Compte bancaire lié",
+  "psWhereClientsPay": "Où les clients vous paient directement",
+  "psAddBankAccount": "Ajouter un compte bancaire",
+  "psChangeBankAccount": "Changer de compte bancaire",
+  "psNoBankYet": "Aucun compte bancaire pour le moment",
+  "psNoBankBody": "Ajoutez-en un pour que les clients puissent vous payer directement lorsqu'ils acceptent vos devis.",
+  "psBankFallback": "Banque",
+  "psReadyToReceive": "Prêt à recevoir des paiements",
+  "psSettingUp": "Configuration…",
+  "psReasonNoNeed": "Je n'ai plus besoin du service",
+  "psReasonBetter": "J'ai trouvé une meilleure plateforme",
+  "psReasonTech": "Trop de problèmes techniques",
+  "psReasonPrivacy": "Préoccupations de confidentialité",
+  "psReasonOther": "Autre",
+  "psSelectReason": "Sélectionnez une raison",
+  "psDeleteConfirmTitle": "Êtes-vous sûr de vouloir supprimer",
+  "psDeleteBullet1": "L'accès à vos réservations actives",
+  "psDeleteBullet2": "L'accès à vos données de compte et identifiants",
+  "psDeleteBullet3": "Les informations de connexion",
+  "psDeleteBullet4": "Tous les contacts clients par message et appel",
+  "psYesConfirm": "Oui, confirmer",
+  "psNotYet": "Pas encore",
+  "psSuccessful": "Réussi",
+  "psDeleteSuccessBody": "Votre compte a été supprimé avec succès. Nous sommes désolés de vous voir partir et espérons vous revoir bientôt",
+  "psCloseApp": "Fermer l'application",
+  "psDeleteAccount": "Supprimer le compte",
+  "psYourAccount": "Votre compte",
+  "psTellReason": "Dites-nous la raison de la suppression de votre compte",
+  "psSelectOption": "Sélectionnez une option",
+  "psOtherReasons": "Autres raisons",
+  "psTypeMessage": "Saisissez votre message",
+  "psDeactivateAccount": "Désactiver le compte",
+  "psAccountDeactivated": "Compte désactivé",
+  "psTrialStarted": "Votre essai gratuit {name} a commencé 🎉",
+  "@psTrialStarted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "psNowOnPlan": "Vous êtes maintenant sur le forfait {name}",
+  "@psNowOnPlan": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "psPaymentCancelled": "Paiement annulé — votre forfait est inchangé",
+  "psPaymentConfirmed": "Paiement confirmé — vous êtes maintenant sur le forfait {name}",
+  "@psPaymentConfirmed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "psSubscriptionPlan": "Forfait d'abonnement",
+  "psChoosePlan": "Choisissez le forfait adapté à votre entreprise. Améliorez ou changez à tout moment.",
+  "psOnTrial": "En essai",
+  "psCurrent": "Actuel",
+  "psSwitchTo": "Passer à {name}",
+  "@psSwitchTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "psUpgradeTo": "Améliorer vers {name}",
+  "@psUpgradeTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewsReplyTo": "Répondre à {name}",
+  "@reviewsReplyTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewsReplyHint": "Remerciez-les ou répondez à leurs commentaires…",
+  "reviewsSending": "Envoi…",
+  "reviewsSendReply": "Envoyer la réponse",
+  "reviewsMyReviews": "Mes avis",
+  "reviewsSubtitle": "Les avis que vous avez reçus pour vos travaux passés",
+  "reviewsLoadFailed": "Impossible de charger les avis",
+  "reviewsEmpty": "Aucun avis pour le moment",
+  "reviewsEmptyBody": "Terminez des réservations et les avis de vos clients apparaîtront ici.",
+  "reviewsCount": "({total} avis)",
+  "@reviewsCount": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewsMonthsAgo": "il y a {count} mois",
+  "@reviewsMonthsAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewsDaysAgo": "il y a {count} j",
+  "@reviewsDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewsHoursAgo": "il y a {count} h",
+  "@reviewsHoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewsJustNow": "à l'instant",
+  "reviewsReply": "Répondre",
+  "reviewsYourReply": "Votre réponse",
+  "termsRowTitle": "Conditions générales",
+  "termsLastUpdated": "Dernière mise à jour le 17 avril 2025",
+  "termsPrivacyPolicy": "Politique de confidentialité",
+  "termsPrivacySubtitle": "Lisez notre accord de confidentialité",
+  "termsOfUse": "Conditions d'utilisation",
+  "galleryPhoto1": "Photo principale",
+  "galleryPhoto2": "Deuxième photo",
+  "galleryPhoto3": "Troisième photo",
+  "galleryPhoto4": "Quatrième photo",
+  "galleryUploadFailed": "Impossible de téléverser la photo : {error}",
+  "@galleryUploadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "gallerySaved": "Galerie enregistrée",
+  "gallerySaveFailed": "Impossible d'enregistrer la galerie : {error}",
+  "@gallerySaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "gallerySubtitle": "Mettez en valeur vos meilleurs travaux pour attirer des clients",
+  "gallerySaveButton": "Enregistrer la galerie",
+  "supportTitle": "Assistance",
+  "supportGreeting": "Bonjour, {name} 👋",
+  "@supportGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "supportThere": "vous",
+  "supportSearchHint": "Comment pouvons-nous vous aider ?",
+  "supportPromoTitle": "Système d'assistance de premier ordre",
+  "supportPromoSub": "Obtenez des réponses rapides via notre chat en ligne",
+  "supportFaqTitle": "Foire aux questions",
+  "supportViewMore": "Voir plus de questions",
+  "supportChat": "Chat",
+  "supportChatSub": "Besoin d'aide ? Nous sommes là pour vous",
+  "supportCallSupport": "Appeler l'assistance",
+  "supportCallHours": "Disponible du lun. au ven., 9h - 17h",
+  "supportFaqQ1": "Comment créer une annonce ?",
+  "supportFaqQ2": "Comment gérer les réservations ?",
+  "supportFaqQ3": "Comment fonctionne le paiement en séquestre ?",
+  "supportFaqQ4": "Comment retirer mes revenus ?",
+  "supportFaqQ5": "Quels frais Planovar facture-t-il ?",
+  "supportFaqQ6": "Comment vérifier mon compte ?",
+  "supportFaqQ7": "Puis-je annuler une réservation ?",
+  "supportFaqQ8": "Comment fonctionnent les avis ?",
+  "supportFaqQ9": "Comment améliorer mon abonnement ?",
+  "supportFaqQ10": "Comment contacter un client ?",
+  "supportQuestionN": "Question {number}",
+  "@supportQuestionN": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "supportNeedMoreHelp": "J'ai besoin de plus d'aide",
+  "supportChatWithUs": "Discuter avec nous",
+  "supportCallUs": "Appelez-nous",
+  "supportCallAvailable": "Nous sommes disponibles du lundi au vendredi de 9h à 17h",
+  "supportLiveSupport": "Assistance en direct",
+  "supportReplyMinutes": "Nous répondons généralement en quelques minutes",
+  "supportChatSetup": "Le chat en direct est en cours de configuration",
+  "supportChatSetupMsg": "Notre chat en direct n'est pas encore connecté. En attendant, envoyez-nous un e-mail et nous vous répondrons rapidement.",
+  "supportEmailSupport": "Envoyer un e-mail à l'assistance",
+  "supportChatTeam": "Discutez avec notre équipe",
+  "supportChatTeamMsg": "Ouvrez notre chat en direct pour parler à un agent d'assistance.",
+  "supportOpenChat": "Ouvrir le chat en direct",
+  "twofaIntroTitle": "Activez la 2FA pour plus de sécurité",
+  "twofaGetStarted": "Commencer",
+  "twofaSetupTitle": "Configuration 2FA",
+  "twofaSetUpUsing": "Configurer avec",
+  "twofaAuthenticatorHint": "À l'aide d'une application d'authentification comme (Google Authenticator, Authy, 1Password, LastPass, etc.)",
+  "twofaScanMe": "Scannez-moi",
+  "twofaCantScan": "Si vous ne pouvez pas scanner le code QR ci-dessus, saisissez plutôt ce texte",
+  "twofaConfirmCode": "Confirmer le code",
+  "twofaEnterCode": "Saisissez le code fourni par l'application d'authentification",
+  "twofaConfirm": "Confirmer",
+  "twofaAllPrefix": "Tout est ",
+  "twofaDoneWord": "terminé",
+  "twofaSuccessBody": "Votre 2FA a été activée avec succès",
+  "twofaBackToProfile": "Retour à la configuration du profil",
+  "analyticsTitle": "Analytique",
+  "analyticsActiveListings": "Annonces actives",
+  "analyticsOfTotal": "sur {total} au total",
+  "@analyticsOfTotal": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "analyticsInquiries": "Demandes",
+  "analyticsAwaitingReply": "{count} en attente de réponse",
+  "@analyticsAwaitingReply": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "analyticsRating": "Note",
+  "analyticsReviews": "{count} avis",
+  "@analyticsReviews": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "analyticsPlan": "Forfait",
+  "analyticsDetailedTitle": "Analytique de performance détaillée",
+  "analyticsComingSoon": "Les tendances, les vues de profil et les graphiques de conversion arrivent bientôt.",
+  "payoutsTitle": "Paiements",
+  "payoutsHeadline": "Vous gardez 100 % de ce que vous gagnez",
+  "payoutsBody": "Planovar fonctionne sur abonnement — nous ne détenons pas votre argent et ne prenons pas de commission. Les clients vous paient directement, selon ce que vous convenez ensemble.",
+  "notifMarkAllRead": "Tout marquer comme lu",
+  "notifEmpty": "Aucune notification",
+  "notifFilterAll": "Toutes",
+  "notifFilterOrders": "Commandes",
+  "notifFilterPayments": "Paiements",
+  "notifFilterSystem": "Système",
+  "notifToday": "Aujourd'hui",
+  "notifYesterday": "Hier",
+  "notifEarlier": "Plus tôt",
+  "statusPending": "En attente",
+  "statusConfirmed": "Confirmé",
+  "statusCompleted": "Terminé",
+  "statusCancelled": "Annulé",
+  "statusSent": "Envoyé",
+  "statusAccepted": "Accepté",
+  "statusRejected": "Rejeté",
+  "statusDeclined": "Refusé",
+  "statusPaid": "Payé",
+  "statusFailed": "Échoué",
+  "statusFeatured": "En vedette",
+  "statusPremium": "Premium",
+  "statusBasic": "Basique",
+  "statusExpired": "Expiré",
+  "statusSuperseded": "Remplacé",
+  "statusPartiallyPaid": "Partiellement payé",
+  "ccQuote": "Devis",
+  "ccValidTill": "Valable jusqu'au {date}",
+  "@ccValidTill": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "ccTotal": "Total",
+  "ccInvoiceNumber": "Facture · {number}",
+  "@ccInvoiceNumber": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "ccOrderRequest": "Demande de commande",
+  "ccClientRequesting": "Le client le demande — acceptez pour envoyer une facture",
+  "ccDecline": "Refuser",
+  "ccAccept": "Accepter",
+  "ccDue": "Échéance {date}",
+  "@ccDue": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "ccTaskDone": "Vous avez terminé votre tâche",
+  "ccMarkTaskDone": "Marquer votre tâche comme terminée",
+  "errorSomethingWrong": "Une erreur s'est produite",
+  "errorTryAgain": "Réessayer",
+  "bankAdded": "Compte bancaire ajouté — vous pouvez maintenant recevoir des paiements 🎉",
+  "bankClientsPayDirect": "Les clients vous paient directement sur ce compte.",
+  "bankLoading": "Chargement des banques…",
+  "bankSelect": "Sélectionner une banque",
+  "bankAccountNumberHint": "Numéro de compte à 10 chiffres",
+  "bankVerifying": "Vérification du compte…",
+  "bankSaving": "Enregistrement…",
+  "bankSaveAccount": "Enregistrer le compte",
+  "bankSearch": "Rechercher une banque",
+  "planPopular": "POPULAIRE",
+  "planCurrentPlan": "Forfait actuel",
+  "planMonthly": "Mensuel",
+  "planYearly": "Annuel",
+  "qrcNew": "Nouveau",
+  "qrcBudget": "Budget : {amount}",
+  "@qrcBudget": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "qrcBudgetTbd": "Budget : à définir",
+  "qrcOpenRespond": "Ouvrir et répondre",
+  "qrcReject": "Rejeter",
+  "tagAddMore": "Ajouter un tag...",
+  "tagHelper": "Appuyez sur virgule ou Entrée pour ajouter un tag  ·  {count}/{max}",
+  "@tagHelper": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  }
 }

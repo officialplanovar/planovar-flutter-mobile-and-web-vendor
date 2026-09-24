@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
+import '../../l10n/app_localizations.dart';
 
 /// A chip-based tag input.
 ///
@@ -85,6 +86,7 @@ class _TagInputFieldState extends State<TagInputField> {
 
   @override
   Widget build(BuildContext context) {
+    final tr = AppLocalizations.of(context);
     final borderColor = _isFocused ? AppColors.primary : context.c.border;
 
     return Column(
@@ -135,7 +137,7 @@ class _TagInputFieldState extends State<TagInputField> {
                   _InlineInput(
                     controller: _ctrl,
                     focusNode: _focus,
-                    hint: widget.tags.isEmpty ? widget.hint : 'Add tag...',
+                    hint: widget.tags.isEmpty ? widget.hint : tr.tagAddMore,
                     onCommit: _commitText,
                     onBackspace: _removeLastTag,
                   ),
@@ -146,7 +148,7 @@ class _TagInputFieldState extends State<TagInputField> {
 
         const SizedBox(height: 6),
         Text(
-          'Press comma or Enter to add a tag  ·  ${widget.tags.length}/${widget.maxTags}',
+          tr.tagHelper(widget.tags.length, widget.maxTags),
           style: GoogleFonts.urbanist(
             fontSize: 11,
             color: context.c.textHint,

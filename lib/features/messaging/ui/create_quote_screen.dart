@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/responsive/responsive.dart';
 import '../../../core/services/messaging_service.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/models/chat_card_models.dart';
 import '../../../shared/models/conversation_model.dart';
 import '../../../shared/widgets/app_button.dart';
@@ -71,6 +72,38 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
     return match != null ? int.parse(match.group(0)!) : 7;
   }
 
+  /// Localized display label for an internal payment-term key.
+  String _paymentTermLabel(String term) {
+    final t = AppLocalizations.of(context);
+    switch (term) {
+      case 'Pay at once':
+        return t.cqTermPayAtOnce;
+      case 'Custom':
+        return t.cqTermCustom;
+      default:
+        return term; // '50/50', '30/70' — locale-independent
+    }
+  }
+
+  /// Localized display label for an internal validity-window key.
+  String _validForLabel(String opt) {
+    final t = AppLocalizations.of(context);
+    switch (opt) {
+      case '1 Day':
+        return t.cqValid1Day;
+      case '3 Days':
+        return t.cqValid3Days;
+      case '7 Days':
+        return t.cqValid7Days;
+      case '14 Days':
+        return t.cqValid14Days;
+      case '30 Days':
+        return t.cqValid30Days;
+      default:
+        return opt;
+    }
+  }
+
   /// The payment terms selection → milestone inputs for the API. "Pay at once"
   /// sends no terms (backend uses a single 100% milestone).
   List<QuotePaymentTermInput> _buildPaymentTerms() {
@@ -106,6 +139,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
   }
 
   Future<void> _submit() async {
+    final t = AppLocalizations.of(context);
     final lineItems = _items
         .map((i) => QuoteLineItemInput(
               label: i.desc.text.trim(),
@@ -117,8 +151,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
         .toList();
     if (lineItems.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Add at least one line item with an amount')),
+        SnackBar(content: Text(t.cqAddLineItem)),
       );
       return;
     }
@@ -138,7 +171,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
         if (!mounted) return;
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Revised quote sent 🎉')),
+          SnackBar(content: Text(t.cqRevisedSent)),
         );
       } catch (e) {
         if (!mounted) return;
@@ -167,7 +200,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
         if (!mounted) return;
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Quote sent to the client 🎉')),
+          SnackBar(content: Text(t.cqQuoteSent)),
         );
       } catch (e) {
         if (!mounted) return;
@@ -185,8 +218,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
     if (bookingId == null || bookingId.isEmpty) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Open this from a client chat or inquiry to send a quote')),
+        SnackBar(content: Text(t.cqOpenFromChat)),
       );
       return;
     }
@@ -320,6 +352,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
   }
 
   Future<void> _showValidForSheet() async {
+    final t = AppLocalizations.of(context);
     final options = ['1 Day', '3 Days', '7 Days', '14 Days', '30 Days'];
     await showModalBottomSheet(
       context: context,
@@ -341,7 +374,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Quote valid for',
+            t.cqValidForTitle,
             style: GoogleFonts.urbanist(
               fontSize: 16,
               fontWeight: FontWeight.w700,
@@ -352,7 +385,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
           ...options.map(
             (opt) => ListTile(
               title: Text(
-                opt,
+                _validForLabel(opt),
                 style: GoogleFonts.urbanist(
                   fontSize: 15,
                   fontWeight: _validFor == opt ? FontWeight.w700 : FontWeight.w500,
@@ -380,6 +413,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
   }
 
   Widget _buildGradientAppBar() {
+    final t = AppLocalizations.of(context);
     return PreferredSize(
       preferredSize: const Size.fromHeight(72),
       child: Container(
@@ -401,7 +435,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.reviseQuoteId != null ? 'Revise quote' : 'Create quote',
+                widget.reviseQuoteId != null ? t.convReviseQuote : t.cqTitleCreate,
                 style: GoogleFonts.urbanist(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
@@ -409,7 +443,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
                 ),
               ),
               Text(
-                '${_conv?.participantName ?? 'Client'} · ${_conv?.eventName ?? 'Event'} · ${_formattedEventDate()}',
+                '${_conv?.participantName ?? t.reviewClientFallback} · ${_conv?.eventName ?? t.cqEvent} · ${_formattedEventDate()}',
                 style: GoogleFonts.urbanist(
                   fontSize: 12,
                   color: Colors.white70,
@@ -434,6 +468,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
   }
 
   Widget _buildLineItemRow(int index) {
+    final t = AppLocalizations.of(context);
     final item = _items[index];
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -448,7 +483,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
                 color: context.c.textPrimary,
               ),
               decoration: InputDecoration(
-                hintText: 'Description',
+                hintText: t.cqDescription,
                 hintStyle: GoogleFonts.urbanist(
                   fontSize: 14,
                   color: context.c.textHint,
@@ -485,7 +520,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
                 color: context.c.textPrimary,
               ),
               decoration: InputDecoration(
-                hintText: 'Amount',
+                hintText: t.cqAmount,
                 hintStyle: GoogleFonts.urbanist(
                   fontSize: 14,
                   color: context.c.textHint,
@@ -535,7 +570,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
           height: 44,
           alignment: Alignment.center,
           child: Text(
-            '+ Add Item',
+            AppLocalizations.of(context).cqAddItem,
             style: GoogleFonts.urbanist(
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -551,7 +586,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
     return Align(
       alignment: Alignment.centerRight,
       child: Text(
-        'Subtotal ${Formatters.formatCurrency(_subtotal)}',
+        AppLocalizations.of(context).cqSubtotal(Formatters.formatCurrency(_subtotal)),
         style: GoogleFonts.urbanist(
           fontSize: 14,
           fontWeight: FontWeight.w600,
@@ -582,7 +617,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Text(
-                term,
+                _paymentTermLabel(term),
                 style: GoogleFonts.urbanist(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -618,7 +653,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Milestone $milestoneNumber',
+            AppLocalizations.of(context).cqMilestone(milestoneNumber),
             style: GoogleFonts.urbanist(
               fontSize: 14,
               fontWeight: FontWeight.bold,
@@ -752,7 +787,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
           _buildMilestoneCard(
             milestoneNumber: 1,
             percent: 50,
-            dueLabel: 'Due on booking confirmation (immediately)',
+            dueLabel: AppLocalizations.of(context).cqDueOnConfirmation,
           ),
           _buildMilestoneCard(
             milestoneNumber: 2,
@@ -765,7 +800,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
           _buildMilestoneCard(
             milestoneNumber: 1,
             percent: 30,
-            dueLabel: 'Due on booking confirmation (immediately)',
+            dueLabel: AppLocalizations.of(context).cqDueOnConfirmation,
           ),
           _buildMilestoneCard(
             milestoneNumber: 2,
@@ -778,7 +813,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
           _buildMilestoneCard(
             milestoneNumber: 1,
             percent: int.tryParse(_m1PercentCtrl.text) ?? 50,
-            dueLabel: 'Due on booking confirmation (immediately)',
+            dueLabel: AppLocalizations.of(context).cqDueOnConfirmation,
             editable: true,
             percentCtrl: _m1PercentCtrl,
           ),
@@ -796,7 +831,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
           _buildMilestoneCard(
             milestoneNumber: 1,
             percent: 100,
-            dueLabel: 'Due on booking confirmation (immediately)',
+            dueLabel: AppLocalizations.of(context).cqDueOnConfirmation,
           ),
         ];
     }
@@ -804,6 +839,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: context.c.background,
       appBar: _buildGradientAppBar() as PreferredSizeWidget,
@@ -814,7 +850,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Line Items
-            _buildSectionTitle('Line Items'),
+            _buildSectionTitle(t.cqLineItems),
             const SizedBox(height: 12),
             ...List.generate(_items.length, (i) => _buildLineItemRow(i)),
             const SizedBox(height: 8),
@@ -824,7 +860,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
             const SizedBox(height: 28),
 
             // Payment Terms
-            _buildSectionTitle('Set your Payment Terms'),
+            _buildSectionTitle(t.cqSetPaymentTerms),
             const SizedBox(height: 12),
             _buildPaymentTermSelector(),
             const SizedBox(height: 16),
@@ -832,7 +868,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
             const SizedBox(height: 28),
 
             // Note to client
-            _buildSectionTitle('Note to client'),
+            _buildSectionTitle(t.cqNoteToClient),
             const SizedBox(height: 12),
             TextField(
               controller: _noteController,
@@ -843,7 +879,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
                 color: context.c.textPrimary,
               ),
               decoration: InputDecoration(
-                hintText: 'Short description of the product',
+                hintText: t.cqNoteHint,
                 hintStyle: GoogleFonts.urbanist(
                   fontSize: 15,
                   color: context.c.textHint,
@@ -870,7 +906,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
             const SizedBox(height: 28),
 
             // Quote valid for
-            _buildSectionTitle('Quote valid for'),
+            _buildSectionTitle(t.cqValidForTitle),
             const SizedBox(height: 12),
             GestureDetector(
               onTap: _showValidForSheet,
@@ -884,7 +920,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      _validFor,
+                      _validForLabel(_validFor),
                       style: GoogleFonts.urbanist(
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
@@ -913,8 +949,8 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
         ),
         child: AppButton.primary(
           _sending
-              ? 'Sending…'
-              : (widget.reviseQuoteId != null ? 'Send revised quote' : 'Create Quote'),
+              ? t.cqSending
+              : (widget.reviseQuoteId != null ? t.cqSendRevised : t.cqCreateQuote),
           loading: _sending,
           onTap: _sending ? null : _submit,
         ),

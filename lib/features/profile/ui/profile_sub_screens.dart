@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/services/bank_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../core/theme/theme_cubit.dart';
 import '../../../shared/models/bank_models.dart';
 import '../../../shared/models/subscription_plan_model.dart';
@@ -132,6 +133,40 @@ InputDecoration _filledDecoration(BuildContext context,
       suffixIcon: suffix,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     );
+
+/// Localized display label for an internal English month name (the stored value
+/// stays English so date math keeps working).
+String _monthLabel(BuildContext context, String english) {
+  final t = AppLocalizations.of(context);
+  switch (english) {
+    case 'January':
+      return t.psMonthJan;
+    case 'February':
+      return t.psMonthFeb;
+    case 'March':
+      return t.psMonthMar;
+    case 'April':
+      return t.psMonthApr;
+    case 'May':
+      return t.psMonthMay;
+    case 'June':
+      return t.psMonthJun;
+    case 'July':
+      return t.psMonthJul;
+    case 'August':
+      return t.psMonthAug;
+    case 'September':
+      return t.psMonthSep;
+    case 'October':
+      return t.psMonthOct;
+    case 'November':
+      return t.psMonthNov;
+    case 'December':
+      return t.psMonthDec;
+    default:
+      return english;
+  }
+}
 
 // ─── 1. EditProfileScreen ─────────────────────────────────────────────────────
 
@@ -266,8 +301,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (mounted) setState(() => _logoUrl = url);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Could not upload logo: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(AppLocalizations.of(context).psUploadLogoFailed('$e'))));
       }
     } finally {
       if (mounted) setState(() => _uploadingLogo = false);
@@ -285,8 +320,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (mounted) setState(() => _coverUrl = url);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Could not upload cover: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(AppLocalizations.of(context).psUploadCoverFailed('$e'))));
       }
     } finally {
       if (mounted) setState(() => _uploadingCover = false);
@@ -296,6 +331,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   /// Personal details (phone + date of birth) live on the account/user record.
   /// Email is account-managed by Better Auth, so it's display-only here.
   Future<void> _savePersonal() async {
+    final t = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final phone = _phoneCtrl.text.trim().replaceFirst(RegExp(r'^0+'), '');
     final month = (_months.indexOf(_dobMonth) + 1).toString().padLeft(2, '0');
@@ -310,7 +346,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       messenger.showSnackBar(
         SnackBar(
           content:
-              Text('Profile updated', style: GoogleFonts.urbanist(fontSize: 14)),
+              Text(t.psProfileUpdated, style: GoogleFonts.urbanist(fontSize: 14)),
           behavior: SnackBarBehavior.floating,
           backgroundColor: AppColors.activeText,
         ),
@@ -327,6 +363,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Future<void> _save(Map<String, dynamic> changes) async {
+    final t = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     if (changes.isEmpty) return;
     try {
@@ -334,7 +371,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (!mounted) return;
       messenger.showSnackBar(
         SnackBar(
-          content: Text('Profile updated', style: GoogleFonts.urbanist(fontSize: 14)),
+          content: Text(t.psProfileUpdated, style: GoogleFonts.urbanist(fontSize: 14)),
           behavior: SnackBarBehavior.floating,
           backgroundColor: AppColors.activeText,
         ),
@@ -351,19 +388,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Widget _buildPersonalTab() {
+    final t = AppLocalizations.of(context);
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _fieldLabel(context, 'Email Address'),
+          _fieldLabel(context, t.psEmailAddress),
           TextField(
             controller: _emailCtrl,
             style: GoogleFonts.urbanist(fontSize: 14, color: context.c.textPrimary),
-            decoration: _filledDecoration(context, hint: 'Email address'),
+            decoration: _filledDecoration(context, hint: t.psEmailHint),
           ),
           const SizedBox(height: 16),
-          _fieldLabel(context, 'Phone Number'),
+          _fieldLabel(context, t.psPhoneNumber),
           Row(
             children: [
               GestureDetector(
@@ -400,7 +438,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   style: GoogleFonts.urbanist(fontSize: 14, color: context.c.textPrimary),
                   decoration: _filledDecoration(
                     context,
-                    hint: 'Phone number',
+                    hint: t.psPhoneHint,
                     prefix: Icon(Icons.phone_outlined, size: 18, color: context.c.textHint),
                     suffix: const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 12),
@@ -412,7 +450,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          _fieldLabel(context, 'Date of Birth'),
+          _fieldLabel(context, t.psDateOfBirth),
           Row(
             children: [
               // Day
@@ -455,7 +493,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       isExpanded: true,
                       style: GoogleFonts.urbanist(fontSize: 14, color: context.c.textPrimary),
                       items: _months
-                          .map((m) => DropdownMenuItem(value: m, child: Text(m)))
+                          .map((m) => DropdownMenuItem(
+                              value: m, child: Text(_monthLabel(context, m))))
                           .toList(),
                       onChanged: (v) => setState(() => _dobMonth = v!),
                     ),
@@ -494,7 +533,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           const SizedBox(height: 32),
           _gradientButton(
             context: context,
-            label: 'Update Details',
+            label: t.psUpdateDetails,
             onTap: _savePersonal,
           ),
         ],
@@ -511,6 +550,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
 
   Widget _storefrontImages(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -538,7 +578,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         const Icon(Icons.add_photo_alternate_outlined,
                             color: AppColors.primary, size: 28),
                         const SizedBox(height: 6),
-                        Text('Add cover photo',
+                        Text(t.psAddCoverPhoto,
                             style: GoogleFonts.urbanist(
                                 fontSize: 13, color: AppColors.primary)),
                       ],
@@ -600,7 +640,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                'Your logo and cover are what clients see on your storefront.',
+                t.psStorefrontHint,
                 style: GoogleFonts.urbanist(
                     fontSize: 12.5, color: context.c.textSecondary),
               ),
@@ -612,23 +652,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Widget _buildBusinessTab() {
+    final t = AppLocalizations.of(context);
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _fieldLabel(context, 'Storefront images'),
+          _fieldLabel(context, t.psStorefrontImages),
           const SizedBox(height: 8),
           _storefrontImages(context),
           const SizedBox(height: 24),
-          _fieldLabel(context, 'Business Name'),
+          _fieldLabel(context, t.psBusinessName),
           TextField(
             controller: _businessNameCtrl,
             style: GoogleFonts.urbanist(fontSize: 14, color: context.c.textPrimary),
-            decoration: _filledDecoration(context, hint: 'Business name'),
+            decoration: _filledDecoration(context, hint: t.psBusinessNameHint),
           ),
           const SizedBox(height: 16),
-          _fieldLabel(context, 'Business Type'),
+          _fieldLabel(context, t.psBusinessType),
           Row(
             children: ['Licensed Business', 'Freelancer'].map((type) {
               final selected = _businessType == type;
@@ -649,7 +690,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     child: Center(
                       child: Text(
-                        type,
+                        type == 'Licensed Business'
+                            ? t.psBizLicensed
+                            : t.psBizFreelancer,
                         style: GoogleFonts.urbanist(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -663,15 +706,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             }).toList(),
           ),
           const SizedBox(height: 16),
-          _fieldLabel(context, 'Business Description'),
+          _fieldLabel(context, t.psBusinessDescription),
           TextField(
             controller: _descCtrl,
             maxLines: 4,
             style: GoogleFonts.urbanist(fontSize: 14, color: context.c.textPrimary),
-            decoration: _filledDecoration(context, hint: 'Short description of your business'),
+            decoration: _filledDecoration(context, hint: t.psBusinessDescHint),
           ),
           const SizedBox(height: 16),
-          _fieldLabel(context, 'Category Tags'),
+          _fieldLabel(context, t.psCategoryTags),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -726,7 +769,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           const SizedBox(height: 32),
           _gradientButton(
             context: context,
-            label: 'Update Details',
+            label: t.psUpdateDetails,
             onTap: () {
               final name = _businessNameCtrl.text.trim();
               _save({
@@ -755,7 +798,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             title: Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Edit your Profile',
+                AppLocalizations.of(context).psEditProfile,
                 style: GoogleFonts.urbanist(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
@@ -806,7 +849,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 const SizedBox(height: 8),
                 Text(
                   _businessNameCtrl.text.isEmpty
-                      ? 'Your business'
+                      ? AppLocalizations.of(context).profileYourBusiness
                       : _businessNameCtrl.text,
                   style: GoogleFonts.urbanist(
                     fontSize: 18,
@@ -834,9 +877,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               children: [
-                _buildTab(0, 'Personal Details'),
+                _buildTab(0, AppLocalizations.of(context).psPersonalDetails),
                 const SizedBox(width: 8),
-                _buildTab(1, 'Business Details'),
+                _buildTab(1, AppLocalizations.of(context).psBusinessDetails),
               ],
             ),
           ),
@@ -886,6 +929,7 @@ class SecurityScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: context.c.background,
       body: Column(
@@ -894,7 +938,7 @@ class SecurityScreen extends StatelessWidget {
             context,
             title: Center(
               child: Text(
-                'Security',
+                t.psSecurity,
                 style: GoogleFonts.urbanist(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
@@ -943,8 +987,8 @@ class SecurityScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    title: 'Change Password',
-                    subtitle: 'Update your login password.',
+                    title: t.psChangePassword,
+                    subtitle: t.psChangePasswordSub,
                     onTap: () => context.push('/profile/security/change-password'),
                   ),
                   const SizedBox(height: 12),
@@ -983,8 +1027,8 @@ class SecurityScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    title: '2FA Authentication',
-                    subtitle: 'Add an extra layer of security.',
+                    title: t.ps2faTitle,
+                    subtitle: t.ps2faSub,
                     onTap: () => context.push('/profile/2fa'),
                   ),
                 ],
@@ -1107,6 +1151,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final bottomPad = MediaQuery.of(context).padding.bottom;
     return Scaffold(
       backgroundColor: context.c.background,
@@ -1116,7 +1161,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             context,
             title: Center(
               child: Text(
-                'Change Password',
+                t.psChangePassword,
                 style: GoogleFonts.urbanist(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
@@ -1132,7 +1177,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Spacer(),
-                  _fieldLabel(context, 'New Password'),
+                  _fieldLabel(context, t.psNewPassword),
                   TextField(
                     controller: _newPwCtrl,
                     obscureText: !_showNew,
@@ -1140,7 +1185,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         fontSize: 14, color: context.c.textPrimary),
                     decoration: _filledDecoration(
                       context,
-                      hint: 'Enter new password',
+                      hint: t.psNewPasswordHint,
                       suffix: GestureDetector(
                         onTap: () => setState(() => _showNew = !_showNew),
                         child: Icon(
@@ -1154,7 +1199,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _fieldLabel(context, 'Confirm Password'),
+                  _fieldLabel(context, t.psConfirmPassword),
                   TextField(
                     controller: _confirmPwCtrl,
                     obscureText: !_showConfirm,
@@ -1162,7 +1207,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         fontSize: 14, color: context.c.textPrimary),
                     decoration: _filledDecoration(
                       context,
-                      hint: 'Confirm new password',
+                      hint: t.psConfirmPasswordHint,
                       suffix: GestureDetector(
                         onTap: () =>
                             setState(() => _showConfirm = !_showConfirm),
@@ -1193,14 +1238,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     }),
                   ),
                   const SizedBox(height: 16),
-                  _requirementRow('Should have a Capital Letter', _hasUpper),
+                  _requirementRow(t.psReqCapital, _hasUpper),
                   const SizedBox(height: 8),
-                  _requirementRow(
-                      'Should have a Number e.g 1,2,4,etc', _hasNumber),
+                  _requirementRow(t.psReqNumber, _hasNumber),
                   const SizedBox(height: 8),
-                  _requirementRow(
-                      'Should have a Special Character e.g @,\$,%,etc',
-                      _hasSpecial),
+                  _requirementRow(t.psReqSpecial, _hasSpecial),
                   const Spacer(),
                 ],
               ),
@@ -1208,13 +1250,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           ),
           _gradientButton(
             context: context,
-            label: 'Save Password',
+            label: t.psSavePassword,
             margin: EdgeInsets.fromLTRB(
                 24, 0, 24, bottomPad + 24),
             onTap: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Password saved',
+                  content: Text(t.psPasswordSaved,
                       style: GoogleFonts.urbanist(fontSize: 14)),
                   behavior: SnackBarBehavior.floating,
                   backgroundColor: AppColors.activeText,
@@ -1264,6 +1306,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: context.c.background,
       body: Column(
@@ -1274,7 +1317,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Theme',
+                  t.psTheme,
                   style: GoogleFonts.urbanist(
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
@@ -1282,7 +1325,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
                   ),
                 ),
                 Text(
-                  'Select your preferred display',
+                  t.psSelectDisplay,
                   style: GoogleFonts.urbanist(
                     fontSize: 13,
                     color: Colors.white.withValues(alpha: 0.7),
@@ -1304,9 +1347,9 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
                     padding: const EdgeInsets.all(16),
                     child: Row(
                       children: [
-                        _themeOption('light', 'Light', const Color(0xFFF5F5F5)),
+                        _themeOption('light', t.psThemeLight, const Color(0xFFF5F5F5)),
                         const SizedBox(width: 8),
-                        _themeOption('dark', 'Dark', const Color(0xFF1A1A2E)),
+                        _themeOption('dark', t.psThemeDark, const Color(0xFF1A1A2E)),
                         const SizedBox(width: 8),
                         _systemThemeOption(),
                       ],
@@ -1315,7 +1358,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
                   const SizedBox(height: 32),
                   _gradientButton(
                     context: context,
-                    label: 'Save Preference',
+                    label: t.psSavePreference,
                     onTap: () {
                       final cubit = context.read<ThemeCubit>();
                       if (_selectedTheme == 'light') {
@@ -1327,7 +1370,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
                       }
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('Theme preference saved',
+                          content: Text(t.psThemeSaved,
                               style: GoogleFonts.urbanist(fontSize: 14)),
                           behavior: SnackBarBehavior.floating,
                           backgroundColor: AppColors.activeText,
@@ -1418,6 +1461,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
   }
 
   Widget _systemThemeOption() {
+    final t = AppLocalizations.of(context);
     final selected = _selectedTheme == 'system';
     return Expanded(
       child: GestureDetector(
@@ -1455,7 +1499,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'System',
+              t.psThemeSystem,
               style: GoogleFonts.urbanist(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
@@ -1471,7 +1515,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
-                  'System',
+                  t.psThemeSystem,
                   style: GoogleFonts.urbanist(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
@@ -1518,6 +1562,13 @@ class _NotificationSettingsScreenState
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final channelLabels = [
+      t.psChannelNone,
+      t.psChannelInApp,
+      t.psChannelEmail,
+      t.psChannelBoth,
+    ];
     return Scaffold(
       backgroundColor: context.c.background,
       body: Column(
@@ -1528,7 +1579,7 @@ class _NotificationSettingsScreenState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Notification',
+                  t.psNotification,
                   style: GoogleFonts.urbanist(
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
@@ -1536,7 +1587,7 @@ class _NotificationSettingsScreenState
                   ),
                 ),
                 Text(
-                  'Select your preferred display',
+                  t.psSelectDisplay,
                   style: GoogleFonts.urbanist(
                     fontSize: 13,
                     color: Colors.white.withValues(alpha: 0.7),
@@ -1596,7 +1647,7 @@ class _NotificationSettingsScreenState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'All notifications',
+                          t.psAllNotifications,
                           style: GoogleFonts.urbanist(
                             fontSize: 16,
                             fontWeight: FontWeight.w800,
@@ -1605,7 +1656,7 @@ class _NotificationSettingsScreenState
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Chose where you want to receive notifications',
+                          t.psChooseWhere,
                           style: GoogleFonts.urbanist(
                             fontSize: 13,
                             color: context.c.textSecondary,
@@ -1636,7 +1687,7 @@ class _NotificationSettingsScreenState
                                     ),
                                     child: Center(
                                       child: Text(
-                                        _channelLabels[i],
+                                        channelLabels[i],
                                         style: GoogleFonts.urbanist(
                                           fontSize: 13,
                                           fontWeight: FontWeight.w600,
@@ -1654,32 +1705,32 @@ class _NotificationSettingsScreenState
                         ),
                         const SizedBox(height: 24),
                         _notifToggle(
-                          'All messages',
-                          'someone replies your message',
+                          t.psNotifAllMessages,
+                          t.psNotifAllMessagesSub,
                           _allMessages,
                           (v) => setState(() => _allMessages = v),
                         ),
                         _notifToggle(
-                          'Order/ Delivery Timeline',
-                          'get notified when an order is received / completed',
+                          t.psNotifOrderDelivery,
+                          t.psNotifOrderDeliverySub,
                           _orderDelivery,
                           (v) => setState(() => _orderDelivery = v),
                         ),
                         _notifToggle(
-                          'Event Timeline',
-                          'get notified when there\'s a new event timeline',
+                          t.psNotifEventTimeline,
+                          t.psNotifEventTimelineSub,
                           _eventTimeline,
                           (v) => setState(() => _eventTimeline = v),
                         ),
                         _notifToggle(
-                          'Payment alerts',
-                          'get notified when a payment is successful',
+                          t.psNotifPayment,
+                          t.psNotifPaymentSub,
                           _paymentAlerts,
                           (v) => setState(() => _paymentAlerts = v),
                         ),
                         _notifToggle(
-                          'Quote / Invoice alerts',
-                          'get notified when your quote is acted on',
+                          t.psNotifQuoteInvoice,
+                          t.psNotifQuoteInvoiceSub,
                           _quoteInvoice,
                           (v) => setState(() => _quoteInvoice = v),
                           isLast: true,
@@ -1788,6 +1839,7 @@ class _BankDetailsScreenState extends State<BankDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final bottomPad = MediaQuery.of(context).padding.bottom;
     final a = _account;
     return Scaffold(
@@ -1799,10 +1851,10 @@ class _BankDetailsScreenState extends State<BankDetailsScreen> {
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Linked Bank Account',
+                Text(t.psLinkedBankAccount,
                     style: GoogleFonts.urbanist(
                         fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white)),
-                Text('Where clients pay you directly',
+                Text(t.psWhereClientsPay,
                     style: GoogleFonts.urbanist(fontSize: 12, color: Colors.white70)),
               ],
             ),
@@ -1816,7 +1868,7 @@ class _BankDetailsScreenState extends State<BankDetailsScreen> {
                       if (a == null) _emptyState(context) else _accountCard(context, a),
                       const SizedBox(height: 20),
                       AppButton.primary(
-                        a == null ? 'Add bank account' : 'Change bank account',
+                        a == null ? t.psAddBankAccount : t.psChangeBankAccount,
                         onTap: _addOrChange,
                       ),
                     ],
@@ -1828,6 +1880,7 @@ class _BankDetailsScreenState extends State<BankDetailsScreen> {
   }
 
   Widget _emptyState(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -1839,11 +1892,11 @@ class _BankDetailsScreenState extends State<BankDetailsScreen> {
         children: [
           Icon(Icons.account_balance_rounded, size: 40, color: context.c.textHint),
           const SizedBox(height: 10),
-          Text('No bank account yet',
+          Text(t.psNoBankYet,
               style: GoogleFonts.urbanist(
                   fontSize: 15, fontWeight: FontWeight.w700, color: context.c.textPrimary)),
           const SizedBox(height: 4),
-          Text('Add one so clients can pay you directly when they accept your quotes.',
+          Text(t.psNoBankBody,
               textAlign: TextAlign.center,
               style: GoogleFonts.urbanist(fontSize: 13, color: context.c.textSecondary)),
         ],
@@ -1852,6 +1905,7 @@ class _BankDetailsScreenState extends State<BankDetailsScreen> {
   }
 
   Widget _accountCard(BuildContext context, BankAccount a) {
+    final t = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -1873,7 +1927,7 @@ class _BankDetailsScreenState extends State<BankDetailsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(a.bankName ?? 'Bank',
+                Text(a.bankName ?? t.psBankFallback,
                     style: GoogleFonts.urbanist(
                         fontSize: 15, fontWeight: FontWeight.w800, color: context.c.textPrimary)),
                 const SizedBox(height: 2),
@@ -1884,7 +1938,7 @@ class _BankDetailsScreenState extends State<BankDetailsScreen> {
                   Icon(a.active ? Icons.check_circle_rounded : Icons.schedule_rounded,
                       size: 13, color: a.active ? const Color(0xFF047857) : context.c.textHint),
                   const SizedBox(width: 4),
-                  Text(a.active ? 'Ready to receive payments' : 'Setting up…',
+                  Text(a.active ? t.psReadyToReceive : t.psSettingUp,
                       style: GoogleFonts.urbanist(
                           fontSize: 11.5,
                           fontWeight: FontWeight.w600,
@@ -1912,13 +1966,16 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
   String? _selectedReason;
   final _otherCtrl = TextEditingController();
 
-  static const _reasons = [
-    'I no longer need the service',
-    'I found a better platform',
-    'Too many technical issues',
-    'Privacy concerns',
-    'Other',
-  ];
+  List<String> _reasons(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    return [
+      t.psReasonNoNeed,
+      t.psReasonBetter,
+      t.psReasonTech,
+      t.psReasonPrivacy,
+      t.psReasonOther,
+    ];
+  }
 
   @override
   void dispose() {
@@ -1927,6 +1984,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
   }
 
   void _showReasonPicker() {
+    final t = AppLocalizations.of(context);
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -1947,7 +2005,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
           Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
-              'Select a Reason',
+              t.psSelectReason,
               style: GoogleFonts.urbanist(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -1955,7 +2013,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
               ),
             ),
           ),
-          ..._reasons.map((r) => ListTile(
+          ..._reasons(context).map((r) => ListTile(
                 title: Text(r,
                     style: GoogleFonts.urbanist(
                         fontSize: 14, color: context.c.textPrimary)),
@@ -1971,6 +2029,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
   }
 
   void _showDeleteConfirmDialog() {
+    final t = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -1981,7 +2040,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
             const Text('⚠️', style: TextStyle(fontSize: 32)),
             const SizedBox(height: 8),
             Text(
-              'Are you sure you want delete',
+              t.psDeleteConfirmTitle,
               style: GoogleFonts.urbanist(
                 fontSize: 17,
                 fontWeight: FontWeight.w800,
@@ -2000,10 +2059,10 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  'Access to your active Bookings',
-                  'Access to your account records and credentials',
-                  'Login details',
-                  'All Client contacts via message and call',
+                  t.psDeleteBullet1,
+                  t.psDeleteBullet2,
+                  t.psDeleteBullet3,
+                  t.psDeleteBullet4,
                 ].map((item) {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 6),
@@ -2052,7 +2111,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                       ),
                       child: Center(
                         child: Text(
-                          'Yes, Confirm',
+                          t.psYesConfirm,
                           style: GoogleFonts.urbanist(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
@@ -2075,7 +2134,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                       ),
                       child: Center(
                         child: Text(
-                          'Not Yet',
+                          t.psNotYet,
                           style: GoogleFonts.urbanist(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
@@ -2095,6 +2154,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
   }
 
   void _showDeleteSuccessSheet() {
+    final t = AppLocalizations.of(context);
     showModalBottomSheet(
       context: context,
       isScrollControlled: false,
@@ -2113,7 +2173,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Successful',
+              t.psSuccessful,
               style: GoogleFonts.urbanist(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
@@ -2123,7 +2183,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Your account has been deleted successfully. We\'re sorry to see you go and we hope to see you soon',
+              t.psDeleteSuccessBody,
               style: GoogleFonts.urbanist(
                 fontSize: 14,
                 color: context.c.textSecondary,
@@ -2133,7 +2193,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
             const SizedBox(height: 24),
             _gradientButton(
               context: ctx,
-              label: 'Close App',
+              label: t.psCloseApp,
               onTap: () {
                 Navigator.pop(ctx);
                 SystemNavigator.pop();
@@ -2147,8 +2207,9 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final auth = context.watch<AuthBloc>().state;
-    final accountName = auth is AuthAuthenticated ? auth.user.name : 'Your account';
+    final accountName = auth is AuthAuthenticated ? auth.user.name : t.psYourAccount;
     return Scaffold(
       backgroundColor: context.c.background,
       body: Column(
@@ -2157,7 +2218,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
             context,
             title: Center(
               child: Text(
-                'Delete Account',
+                t.psDeleteAccount,
                 style: GoogleFonts.urbanist(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
@@ -2246,7 +2307,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                   ),
                   const SizedBox(height: 32),
                   Text(
-                    'Tell us the reason for deleting your account',
+                    t.psTellReason,
                     style: GoogleFonts.urbanist(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -2268,7 +2329,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                         children: [
                           Expanded(
                             child: Text(
-                              _selectedReason ?? 'Select an Option',
+                              _selectedReason ?? t.psSelectOption,
                               style: GoogleFonts.urbanist(
                                 fontSize: 14,
                                 color: _selectedReason != null
@@ -2288,7 +2349,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Other Reasons',
+                    t.psOtherReasons,
                     style: GoogleFonts.urbanist(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -2301,16 +2362,16 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                     maxLines: 4,
                     style: GoogleFonts.urbanist(
                         fontSize: 14, color: context.c.textPrimary),
-                    decoration: _filledDecoration(context, hint: 'Type your message'),
+                    decoration: _filledDecoration(context, hint: t.psTypeMessage),
                   ),
                   const SizedBox(height: 32),
                   _gradientButton(
                     context: context,
-                    label: 'Deactivate Account',
+                    label: t.psDeactivateAccount,
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('Account deactivated',
+                          content: Text(t.psAccountDeactivated,
                               style: GoogleFonts.urbanist(fontSize: 14)),
                           behavior: SnackBarBehavior.floating,
                         ),
@@ -2322,7 +2383,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                     child: GestureDetector(
                       onTap: _showDeleteConfirmDialog,
                       child: Text(
-                        'Delete Account',
+                        t.psDeleteAccount,
                         style: GoogleFonts.urbanist(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
@@ -2400,6 +2461,7 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
   }
 
   Future<void> _changeTo(SubscriptionPlanModel plan) async {
+    final t = AppLocalizations.of(context);
     setState(() => _busyTier = plan.tier);
     try {
       final res = await _repo.changePlan(
@@ -2420,8 +2482,8 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(trialing
-                  ? 'Your ${plan.name} free trial has started 🎉'
-                  : 'You are now on the ${plan.name} plan'),
+                  ? t.psTrialStarted(plan.name)
+                  : t.psNowOnPlan(plan.name)),
             ),
           );
         }
@@ -2442,7 +2504,7 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
         // User closed checkout without paying — plan unchanged.
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Payment cancelled — your plan is unchanged')),
+            SnackBar(content: Text(t.psPaymentCancelled)),
           );
         }
         return;
@@ -2454,7 +2516,7 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
       await _load();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Payment confirmed — you are now on the ${plan.name} plan')),
+          SnackBar(content: Text(t.psPaymentConfirmed(plan.name))),
         );
       }
     } catch (e) {
@@ -2470,6 +2532,7 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: context.c.background,
       body: Column(
@@ -2478,7 +2541,7 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
             context,
             title: Center(
               child: Text(
-                'Subscription Plan',
+                t.psSubscriptionPlan,
                 style: GoogleFonts.urbanist(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
@@ -2499,7 +2562,7 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
                                 style: GoogleFonts.urbanist(
                                     color: context.c.textSecondary)),
                             const SizedBox(height: 12),
-                            AppButton.secondary('Retry', onTap: _load, width: 140),
+                            AppButton.secondary(t.retry, onTap: _load, width: 140),
                           ],
                         ),
                       )
@@ -2507,7 +2570,7 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
                         padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
                         children: [
                           Text(
-                            'Choose the plan that fits your business. Upgrade or switch anytime.',
+                            t.psChoosePlan,
                             style: GoogleFonts.urbanist(
                               fontSize: 14,
                               color: context.c.textSecondary,
@@ -2529,6 +2592,7 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
   }
 
   Widget _buildPlanCard(SubscriptionPlanModel plan) {
+    final t = AppLocalizations.of(context);
     final isCurrent = plan.tier == _currentTier;
     final busy = _busyTier == plan.tier;
     final style = plan.tier == 'PREMIUM'
@@ -2547,10 +2611,10 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
         style: style,
         isCurrent: isCurrent,
         currentBadgeLabel:
-            _currentStatus?.toUpperCase() == 'TRIALING' ? 'On trial' : 'Current',
+            _currentStatus?.toUpperCase() == 'TRIALING' ? t.psOnTrial : t.psCurrent,
         loading: busy,
         ctaLabel:
-            plan.isFree ? 'Switch to ${plan.name}' : 'Upgrade to ${plan.name}',
+            plan.isFree ? t.psSwitchTo(plan.name) : t.psUpgradeTo(plan.name),
         onSelect: () => _changeTo(plan),
       ),
     );

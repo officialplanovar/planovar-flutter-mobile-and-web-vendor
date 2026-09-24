@@ -2467,6 +2467,2196 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Message Client Instead'**
   String get coMessageClient;
+
+  /// No description provided for @msgTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages'**
+  String get msgTitle;
+
+  /// No description provided for @msgSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay connected with your clients'**
+  String get msgSubtitle;
+
+  /// No description provided for @msgSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search conversations'**
+  String get msgSearchHint;
+
+  /// No description provided for @msgNoConversations.
+  ///
+  /// In en, this message translates to:
+  /// **'No conversations found'**
+  String get msgNoConversations;
+
+  /// No description provided for @msgParticipants.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} participants'**
+  String msgParticipants(int count);
+
+  /// No description provided for @convConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed'**
+  String get convConfirmed;
+
+  /// No description provided for @convDeclined.
+  ///
+  /// In en, this message translates to:
+  /// **'Declined'**
+  String get convDeclined;
+
+  /// No description provided for @convQuoteExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Quote expired'**
+  String get convQuoteExpired;
+
+  /// No description provided for @convDepositRefundedAmt.
+  ///
+  /// In en, this message translates to:
+  /// **'Deposit refunded · ₦{amount}'**
+  String convDepositRefundedAmt(String amount);
+
+  /// No description provided for @convDepositRefunded.
+  ///
+  /// In en, this message translates to:
+  /// **'Deposit refunded'**
+  String get convDepositRefunded;
+
+  /// No description provided for @convPaymentReceivedAmt.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment received · ₦{amount}'**
+  String convPaymentReceivedAmt(String amount);
+
+  /// No description provided for @convPaymentReceived.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment received'**
+  String get convPaymentReceived;
+
+  /// No description provided for @convOrderUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Order update'**
+  String get convOrderUpdate;
+
+  /// No description provided for @convReviewRequested.
+  ///
+  /// In en, this message translates to:
+  /// **'Review requested'**
+  String get convReviewRequested;
+
+  /// No description provided for @convReviewLeftRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Client left a review · {rating}★'**
+  String convReviewLeftRating(String rating);
+
+  /// No description provided for @convReviewLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Client left a review'**
+  String get convReviewLeft;
+
+  /// No description provided for @convBankBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Quote accepted — add your bank account to get paid.'**
+  String get convBankBanner;
+
+  /// No description provided for @convAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get convAdd;
+
+  /// No description provided for @convConfirmReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm return'**
+  String get convConfirmReturn;
+
+  /// No description provided for @convMarkDelivered.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark delivered'**
+  String get convMarkDelivered;
+
+  /// No description provided for @convPostUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Post update'**
+  String get convPostUpdate;
+
+  /// No description provided for @convConfirmReturnTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm rental return?'**
+  String get convConfirmReturnTitle;
+
+  /// No description provided for @convConfirmReturnBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This completes the rental and refunds the client\'s deposit. Send the deposit back to the client from your bank.'**
+  String get convConfirmReturnBody;
+
+  /// No description provided for @convRentalCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Rental completed — deposit refunded 🎉'**
+  String get convRentalCompleted;
+
+  /// No description provided for @convPostUpdateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Post an update'**
+  String get convPostUpdateTitle;
+
+  /// No description provided for @convPostUpdateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Out for delivery — arriving by 4pm'**
+  String get convPostUpdateHint;
+
+  /// No description provided for @convPost.
+  ///
+  /// In en, this message translates to:
+  /// **'Post'**
+  String get convPost;
+
+  /// No description provided for @convUpdatePosted.
+  ///
+  /// In en, this message translates to:
+  /// **'Update posted'**
+  String get convUpdatePosted;
+
+  /// No description provided for @convMarkDeliveredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as delivered?'**
+  String get convMarkDeliveredTitle;
+
+  /// No description provided for @convMarkDeliveredBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This completes the booking and asks the client to leave a review.'**
+  String get convMarkDeliveredBody;
+
+  /// No description provided for @convMarkedDelivered.
+  ///
+  /// In en, this message translates to:
+  /// **'Marked as delivered 🎉'**
+  String get convMarkedDelivered;
+
+  /// No description provided for @convReviseQuote.
+  ///
+  /// In en, this message translates to:
+  /// **'Revise quote'**
+  String get convReviseQuote;
+
+  /// No description provided for @convCreateSendQuote.
+  ///
+  /// In en, this message translates to:
+  /// **'Create & send quote'**
+  String get convCreateSendQuote;
+
+  /// No description provided for @convOrderAccepted.
+  ///
+  /// In en, this message translates to:
+  /// **'Order accepted — invoice sent 🎉'**
+  String get convOrderAccepted;
+
+  /// No description provided for @convOrderDeclined.
+  ///
+  /// In en, this message translates to:
+  /// **'Order declined'**
+  String get convOrderDeclined;
+
+  /// No description provided for @convCouldNotIdentifyClient.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not identify the client'**
+  String get convCouldNotIdentifyClient;
+
+  /// No description provided for @convCouldNotUpdateTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t update the task'**
+  String get convCouldNotUpdateTask;
+
+  /// No description provided for @convCouldNotLoadListings.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load your listings'**
+  String get convCouldNotLoadListings;
+
+  /// No description provided for @convAddListingFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a listing first to send a quote'**
+  String get convAddListingFirst;
+
+  /// No description provided for @convQuoteForListing.
+  ///
+  /// In en, this message translates to:
+  /// **'Quote for which listing?'**
+  String get convQuoteForListing;
+
+  /// No description provided for @convTypeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a message'**
+  String get convTypeMessage;
+
+  /// No description provided for @cqAddLineItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Add at least one line item with an amount'**
+  String get cqAddLineItem;
+
+  /// No description provided for @cqRevisedSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Revised quote sent 🎉'**
+  String get cqRevisedSent;
+
+  /// No description provided for @cqQuoteSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Quote sent to the client 🎉'**
+  String get cqQuoteSent;
+
+  /// No description provided for @cqOpenFromChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Open this from a client chat or inquiry to send a quote'**
+  String get cqOpenFromChat;
+
+  /// No description provided for @cqValidForTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quote valid for'**
+  String get cqValidForTitle;
+
+  /// No description provided for @cqTitleCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create quote'**
+  String get cqTitleCreate;
+
+  /// No description provided for @cqEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Event'**
+  String get cqEvent;
+
+  /// No description provided for @cqDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get cqDescription;
+
+  /// No description provided for @cqAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get cqAmount;
+
+  /// No description provided for @cqAddItem.
+  ///
+  /// In en, this message translates to:
+  /// **'+ Add Item'**
+  String get cqAddItem;
+
+  /// No description provided for @cqSubtotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Subtotal {amount}'**
+  String cqSubtotal(String amount);
+
+  /// No description provided for @cqMilestone.
+  ///
+  /// In en, this message translates to:
+  /// **'Milestone {number}'**
+  String cqMilestone(int number);
+
+  /// No description provided for @cqLineItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Line Items'**
+  String get cqLineItems;
+
+  /// No description provided for @cqSetPaymentTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'Set your Payment Terms'**
+  String get cqSetPaymentTerms;
+
+  /// No description provided for @cqNoteToClient.
+  ///
+  /// In en, this message translates to:
+  /// **'Note to client'**
+  String get cqNoteToClient;
+
+  /// No description provided for @cqNoteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Short description of the product'**
+  String get cqNoteHint;
+
+  /// No description provided for @cqSending.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending…'**
+  String get cqSending;
+
+  /// No description provided for @cqSendRevised.
+  ///
+  /// In en, this message translates to:
+  /// **'Send revised quote'**
+  String get cqSendRevised;
+
+  /// No description provided for @cqCreateQuote.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Quote'**
+  String get cqCreateQuote;
+
+  /// No description provided for @cqDueOnConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Due on booking confirmation (immediately)'**
+  String get cqDueOnConfirmation;
+
+  /// No description provided for @cqTermPayAtOnce.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay at once'**
+  String get cqTermPayAtOnce;
+
+  /// No description provided for @cqTermCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get cqTermCustom;
+
+  /// No description provided for @cqValid1Day.
+  ///
+  /// In en, this message translates to:
+  /// **'1 Day'**
+  String get cqValid1Day;
+
+  /// No description provided for @cqValid3Days.
+  ///
+  /// In en, this message translates to:
+  /// **'3 Days'**
+  String get cqValid3Days;
+
+  /// No description provided for @cqValid7Days.
+  ///
+  /// In en, this message translates to:
+  /// **'7 Days'**
+  String get cqValid7Days;
+
+  /// No description provided for @cqValid14Days.
+  ///
+  /// In en, this message translates to:
+  /// **'14 Days'**
+  String get cqValid14Days;
+
+  /// No description provided for @cqValid30Days.
+  ///
+  /// In en, this message translates to:
+  /// **'30 Days'**
+  String get cqValid30Days;
+
+  /// No description provided for @ciTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create invoice'**
+  String get ciTitle;
+
+  /// No description provided for @ciInvoiceItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice Items'**
+  String get ciInvoiceItems;
+
+  /// No description provided for @ciPaymentMilestones.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Milestones'**
+  String get ciPaymentMilestones;
+
+  /// No description provided for @ciFromQuote.
+  ///
+  /// In en, this message translates to:
+  /// **'From Quote'**
+  String get ciFromQuote;
+
+  /// No description provided for @ciBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Pre-filled from accepted quote QT-2026-047. Review items and payment milestones, then send to confirm the booking.'**
+  String get ciBanner;
+
+  /// No description provided for @ciPayoutToAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Payout to your account'**
+  String get ciPayoutToAccount;
+
+  /// No description provided for @ciAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get ciAccount;
+
+  /// No description provided for @ciYourPayout.
+  ///
+  /// In en, this message translates to:
+  /// **'Your payout'**
+  String get ciYourPayout;
+
+  /// No description provided for @ciSendInvoiceTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Invoice to {name}'**
+  String ciSendInvoiceTo(String name);
+
+  /// No description provided for @ciInvoiceSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice sent successfully!'**
+  String get ciInvoiceSent;
+
+  /// No description provided for @ciPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get ciPreview;
+
+  /// No description provided for @profileYourBusiness.
+  ///
+  /// In en, this message translates to:
+  /// **'Your business'**
+  String get profileYourBusiness;
+
+  /// No description provided for @profilePlanLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{tier} Plan'**
+  String profilePlanLabel(String tier);
+
+  /// No description provided for @profileVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified'**
+  String get profileVerified;
+
+  /// No description provided for @profileUnverified.
+  ///
+  /// In en, this message translates to:
+  /// **'Unverified'**
+  String get profileUnverified;
+
+  /// No description provided for @profileGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get profileGeneral;
+
+  /// No description provided for @profilePreferences.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferences'**
+  String get profilePreferences;
+
+  /// No description provided for @profileUpdateProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Update your Profile'**
+  String get profileUpdateProfile;
+
+  /// No description provided for @profileSecurity.
+  ///
+  /// In en, this message translates to:
+  /// **'Security'**
+  String get profileSecurity;
+
+  /// No description provided for @profileReviews.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews'**
+  String get profileReviews;
+
+  /// No description provided for @profileLinkedBanks.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked Bank accounts'**
+  String get profileLinkedBanks;
+
+  /// No description provided for @profileGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get profileGallery;
+
+  /// No description provided for @profileSubscriptionPlans.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription Plans'**
+  String get profileSubscriptionPlans;
+
+  /// No description provided for @profileLanguagePref.
+  ///
+  /// In en, this message translates to:
+  /// **'Language Preference'**
+  String get profileLanguagePref;
+
+  /// No description provided for @profileTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get profileTheme;
+
+  /// No description provided for @profileCustomizeStorefront.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize your Storefront'**
+  String get profileCustomizeStorefront;
+
+  /// No description provided for @profileNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get profileNotifications;
+
+  /// No description provided for @profileHelpSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Help and Support'**
+  String get profileHelpSupport;
+
+  /// No description provided for @profileTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms & Conditions'**
+  String get profileTerms;
+
+  /// No description provided for @profileLeavePlanovar.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave Planovar'**
+  String get profileLeavePlanovar;
+
+  /// No description provided for @profileSignOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get profileSignOut;
+
+  /// No description provided for @psUploadLogoFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not upload logo: {error}'**
+  String psUploadLogoFailed(String error);
+
+  /// No description provided for @psUploadCoverFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not upload cover: {error}'**
+  String psUploadCoverFailed(String error);
+
+  /// No description provided for @psProfileUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated'**
+  String get psProfileUpdated;
+
+  /// No description provided for @psEmailAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Email Address'**
+  String get psEmailAddress;
+
+  /// No description provided for @psEmailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Email address'**
+  String get psEmailHint;
+
+  /// No description provided for @psPhoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone Number'**
+  String get psPhoneNumber;
+
+  /// No description provided for @psPhoneHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number'**
+  String get psPhoneHint;
+
+  /// No description provided for @psDateOfBirth.
+  ///
+  /// In en, this message translates to:
+  /// **'Date of Birth'**
+  String get psDateOfBirth;
+
+  /// No description provided for @psUpdateDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Details'**
+  String get psUpdateDetails;
+
+  /// No description provided for @psAddCoverPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Add cover photo'**
+  String get psAddCoverPhoto;
+
+  /// No description provided for @psStorefrontHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your logo and cover are what clients see on your storefront.'**
+  String get psStorefrontHint;
+
+  /// No description provided for @psStorefrontImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Storefront images'**
+  String get psStorefrontImages;
+
+  /// No description provided for @psBusinessName.
+  ///
+  /// In en, this message translates to:
+  /// **'Business Name'**
+  String get psBusinessName;
+
+  /// No description provided for @psBusinessNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Business name'**
+  String get psBusinessNameHint;
+
+  /// No description provided for @psBusinessType.
+  ///
+  /// In en, this message translates to:
+  /// **'Business Type'**
+  String get psBusinessType;
+
+  /// No description provided for @psBizLicensed.
+  ///
+  /// In en, this message translates to:
+  /// **'Licensed Business'**
+  String get psBizLicensed;
+
+  /// No description provided for @psBizFreelancer.
+  ///
+  /// In en, this message translates to:
+  /// **'Freelancer'**
+  String get psBizFreelancer;
+
+  /// No description provided for @psBusinessDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Business Description'**
+  String get psBusinessDescription;
+
+  /// No description provided for @psBusinessDescHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Short description of your business'**
+  String get psBusinessDescHint;
+
+  /// No description provided for @psCategoryTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Category Tags'**
+  String get psCategoryTags;
+
+  /// No description provided for @psEditProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit your Profile'**
+  String get psEditProfile;
+
+  /// No description provided for @psPersonalDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Details'**
+  String get psPersonalDetails;
+
+  /// No description provided for @psBusinessDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Business Details'**
+  String get psBusinessDetails;
+
+  /// No description provided for @psMonthJan.
+  ///
+  /// In en, this message translates to:
+  /// **'January'**
+  String get psMonthJan;
+
+  /// No description provided for @psMonthFeb.
+  ///
+  /// In en, this message translates to:
+  /// **'February'**
+  String get psMonthFeb;
+
+  /// No description provided for @psMonthMar.
+  ///
+  /// In en, this message translates to:
+  /// **'March'**
+  String get psMonthMar;
+
+  /// No description provided for @psMonthApr.
+  ///
+  /// In en, this message translates to:
+  /// **'April'**
+  String get psMonthApr;
+
+  /// No description provided for @psMonthMay.
+  ///
+  /// In en, this message translates to:
+  /// **'May'**
+  String get psMonthMay;
+
+  /// No description provided for @psMonthJun.
+  ///
+  /// In en, this message translates to:
+  /// **'June'**
+  String get psMonthJun;
+
+  /// No description provided for @psMonthJul.
+  ///
+  /// In en, this message translates to:
+  /// **'July'**
+  String get psMonthJul;
+
+  /// No description provided for @psMonthAug.
+  ///
+  /// In en, this message translates to:
+  /// **'August'**
+  String get psMonthAug;
+
+  /// No description provided for @psMonthSep.
+  ///
+  /// In en, this message translates to:
+  /// **'September'**
+  String get psMonthSep;
+
+  /// No description provided for @psMonthOct.
+  ///
+  /// In en, this message translates to:
+  /// **'October'**
+  String get psMonthOct;
+
+  /// No description provided for @psMonthNov.
+  ///
+  /// In en, this message translates to:
+  /// **'November'**
+  String get psMonthNov;
+
+  /// No description provided for @psMonthDec.
+  ///
+  /// In en, this message translates to:
+  /// **'December'**
+  String get psMonthDec;
+
+  /// No description provided for @psSecurity.
+  ///
+  /// In en, this message translates to:
+  /// **'Security'**
+  String get psSecurity;
+
+  /// No description provided for @psChangePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Password'**
+  String get psChangePassword;
+
+  /// No description provided for @psChangePasswordSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Update your login password.'**
+  String get psChangePasswordSub;
+
+  /// No description provided for @ps2faTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'2FA Authentication'**
+  String get ps2faTitle;
+
+  /// No description provided for @ps2faSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Add an extra layer of security.'**
+  String get ps2faSub;
+
+  /// No description provided for @psNewPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'New Password'**
+  String get psNewPassword;
+
+  /// No description provided for @psNewPasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter new password'**
+  String get psNewPasswordHint;
+
+  /// No description provided for @psConfirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get psConfirmPassword;
+
+  /// No description provided for @psConfirmPasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm new password'**
+  String get psConfirmPasswordHint;
+
+  /// No description provided for @psReqCapital.
+  ///
+  /// In en, this message translates to:
+  /// **'Should have a Capital Letter'**
+  String get psReqCapital;
+
+  /// No description provided for @psReqNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Should have a Number e.g 1,2,4,etc'**
+  String get psReqNumber;
+
+  /// No description provided for @psReqSpecial.
+  ///
+  /// In en, this message translates to:
+  /// **'Should have a Special Character e.g @,\$,%,etc'**
+  String get psReqSpecial;
+
+  /// No description provided for @psSavePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Password'**
+  String get psSavePassword;
+
+  /// No description provided for @psPasswordSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Password saved'**
+  String get psPasswordSaved;
+
+  /// No description provided for @psTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get psTheme;
+
+  /// No description provided for @psSelectDisplay.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your preferred display'**
+  String get psSelectDisplay;
+
+  /// No description provided for @psThemeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get psThemeLight;
+
+  /// No description provided for @psThemeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get psThemeDark;
+
+  /// No description provided for @psThemeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get psThemeSystem;
+
+  /// No description provided for @psSavePreference.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Preference'**
+  String get psSavePreference;
+
+  /// No description provided for @psThemeSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme preference saved'**
+  String get psThemeSaved;
+
+  /// No description provided for @psNotification.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification'**
+  String get psNotification;
+
+  /// No description provided for @psChannelNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get psChannelNone;
+
+  /// No description provided for @psChannelInApp.
+  ///
+  /// In en, this message translates to:
+  /// **'In app'**
+  String get psChannelInApp;
+
+  /// No description provided for @psChannelEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get psChannelEmail;
+
+  /// No description provided for @psChannelBoth.
+  ///
+  /// In en, this message translates to:
+  /// **'Both'**
+  String get psChannelBoth;
+
+  /// No description provided for @psAllNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'All notifications'**
+  String get psAllNotifications;
+
+  /// No description provided for @psChooseWhere.
+  ///
+  /// In en, this message translates to:
+  /// **'Chose where you want to receive notifications'**
+  String get psChooseWhere;
+
+  /// No description provided for @psNotifAllMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'All messages'**
+  String get psNotifAllMessages;
+
+  /// No description provided for @psNotifAllMessagesSub.
+  ///
+  /// In en, this message translates to:
+  /// **'someone replies your message'**
+  String get psNotifAllMessagesSub;
+
+  /// No description provided for @psNotifOrderDelivery.
+  ///
+  /// In en, this message translates to:
+  /// **'Order/ Delivery Timeline'**
+  String get psNotifOrderDelivery;
+
+  /// No description provided for @psNotifOrderDeliverySub.
+  ///
+  /// In en, this message translates to:
+  /// **'get notified when an order is received / completed'**
+  String get psNotifOrderDeliverySub;
+
+  /// No description provided for @psNotifEventTimeline.
+  ///
+  /// In en, this message translates to:
+  /// **'Event Timeline'**
+  String get psNotifEventTimeline;
+
+  /// No description provided for @psNotifEventTimelineSub.
+  ///
+  /// In en, this message translates to:
+  /// **'get notified when there\'s a new event timeline'**
+  String get psNotifEventTimelineSub;
+
+  /// No description provided for @psNotifPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment alerts'**
+  String get psNotifPayment;
+
+  /// No description provided for @psNotifPaymentSub.
+  ///
+  /// In en, this message translates to:
+  /// **'get notified when a payment is successful'**
+  String get psNotifPaymentSub;
+
+  /// No description provided for @psNotifQuoteInvoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Quote / Invoice alerts'**
+  String get psNotifQuoteInvoice;
+
+  /// No description provided for @psNotifQuoteInvoiceSub.
+  ///
+  /// In en, this message translates to:
+  /// **'get notified when your quote is acted on'**
+  String get psNotifQuoteInvoiceSub;
+
+  /// No description provided for @psLinkedBankAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked Bank Account'**
+  String get psLinkedBankAccount;
+
+  /// No description provided for @psWhereClientsPay.
+  ///
+  /// In en, this message translates to:
+  /// **'Where clients pay you directly'**
+  String get psWhereClientsPay;
+
+  /// No description provided for @psAddBankAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Add bank account'**
+  String get psAddBankAccount;
+
+  /// No description provided for @psChangeBankAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Change bank account'**
+  String get psChangeBankAccount;
+
+  /// No description provided for @psNoBankYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No bank account yet'**
+  String get psNoBankYet;
+
+  /// No description provided for @psNoBankBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Add one so clients can pay you directly when they accept your quotes.'**
+  String get psNoBankBody;
+
+  /// No description provided for @psBankFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank'**
+  String get psBankFallback;
+
+  /// No description provided for @psReadyToReceive.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to receive payments'**
+  String get psReadyToReceive;
+
+  /// No description provided for @psSettingUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Setting up…'**
+  String get psSettingUp;
+
+  /// No description provided for @psReasonNoNeed.
+  ///
+  /// In en, this message translates to:
+  /// **'I no longer need the service'**
+  String get psReasonNoNeed;
+
+  /// No description provided for @psReasonBetter.
+  ///
+  /// In en, this message translates to:
+  /// **'I found a better platform'**
+  String get psReasonBetter;
+
+  /// No description provided for @psReasonTech.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many technical issues'**
+  String get psReasonTech;
+
+  /// No description provided for @psReasonPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy concerns'**
+  String get psReasonPrivacy;
+
+  /// No description provided for @psReasonOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get psReasonOther;
+
+  /// No description provided for @psSelectReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a Reason'**
+  String get psSelectReason;
+
+  /// No description provided for @psDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want delete'**
+  String get psDeleteConfirmTitle;
+
+  /// No description provided for @psDeleteBullet1.
+  ///
+  /// In en, this message translates to:
+  /// **'Access to your active Bookings'**
+  String get psDeleteBullet1;
+
+  /// No description provided for @psDeleteBullet2.
+  ///
+  /// In en, this message translates to:
+  /// **'Access to your account records and credentials'**
+  String get psDeleteBullet2;
+
+  /// No description provided for @psDeleteBullet3.
+  ///
+  /// In en, this message translates to:
+  /// **'Login details'**
+  String get psDeleteBullet3;
+
+  /// No description provided for @psDeleteBullet4.
+  ///
+  /// In en, this message translates to:
+  /// **'All Client contacts via message and call'**
+  String get psDeleteBullet4;
+
+  /// No description provided for @psYesConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, Confirm'**
+  String get psYesConfirm;
+
+  /// No description provided for @psNotYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Yet'**
+  String get psNotYet;
+
+  /// No description provided for @psSuccessful.
+  ///
+  /// In en, this message translates to:
+  /// **'Successful'**
+  String get psSuccessful;
+
+  /// No description provided for @psDeleteSuccessBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account has been deleted successfully. We\'re sorry to see you go and we hope to see you soon'**
+  String get psDeleteSuccessBody;
+
+  /// No description provided for @psCloseApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Close App'**
+  String get psCloseApp;
+
+  /// No description provided for @psDeleteAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get psDeleteAccount;
+
+  /// No description provided for @psYourAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account'**
+  String get psYourAccount;
+
+  /// No description provided for @psTellReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell us the reason for deleting your account'**
+  String get psTellReason;
+
+  /// No description provided for @psSelectOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an Option'**
+  String get psSelectOption;
+
+  /// No description provided for @psOtherReasons.
+  ///
+  /// In en, this message translates to:
+  /// **'Other Reasons'**
+  String get psOtherReasons;
+
+  /// No description provided for @psTypeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Type your message'**
+  String get psTypeMessage;
+
+  /// No description provided for @psDeactivateAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivate Account'**
+  String get psDeactivateAccount;
+
+  /// No description provided for @psAccountDeactivated.
+  ///
+  /// In en, this message translates to:
+  /// **'Account deactivated'**
+  String get psAccountDeactivated;
+
+  /// No description provided for @psTrialStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Your {name} free trial has started 🎉'**
+  String psTrialStarted(String name);
+
+  /// No description provided for @psNowOnPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'You are now on the {name} plan'**
+  String psNowOnPlan(String name);
+
+  /// No description provided for @psPaymentCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment cancelled — your plan is unchanged'**
+  String get psPaymentCancelled;
+
+  /// No description provided for @psPaymentConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment confirmed — you are now on the {name} plan'**
+  String psPaymentConfirmed(String name);
+
+  /// No description provided for @psSubscriptionPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription Plan'**
+  String get psSubscriptionPlan;
+
+  /// No description provided for @psChoosePlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the plan that fits your business. Upgrade or switch anytime.'**
+  String get psChoosePlan;
+
+  /// No description provided for @psOnTrial.
+  ///
+  /// In en, this message translates to:
+  /// **'On trial'**
+  String get psOnTrial;
+
+  /// No description provided for @psCurrent.
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get psCurrent;
+
+  /// No description provided for @psSwitchTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to {name}'**
+  String psSwitchTo(String name);
+
+  /// No description provided for @psUpgradeTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to {name}'**
+  String psUpgradeTo(String name);
+
+  /// No description provided for @reviewsReplyTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Reply to {name}'**
+  String reviewsReplyTo(String name);
+
+  /// No description provided for @reviewsReplyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank them, or address their feedback…'**
+  String get reviewsReplyHint;
+
+  /// No description provided for @reviewsSending.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending…'**
+  String get reviewsSending;
+
+  /// No description provided for @reviewsSendReply.
+  ///
+  /// In en, this message translates to:
+  /// **'Send reply'**
+  String get reviewsSendReply;
+
+  /// No description provided for @reviewsMyReviews.
+  ///
+  /// In en, this message translates to:
+  /// **'My Reviews'**
+  String get reviewsMyReviews;
+
+  /// No description provided for @reviewsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews you\'ve received from your past work'**
+  String get reviewsSubtitle;
+
+  /// No description provided for @reviewsLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load reviews'**
+  String get reviewsLoadFailed;
+
+  /// No description provided for @reviewsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No reviews yet'**
+  String get reviewsEmpty;
+
+  /// No description provided for @reviewsEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete bookings and your client reviews will appear here.'**
+  String get reviewsEmptyBody;
+
+  /// No description provided for @reviewsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'({total} Reviews)'**
+  String reviewsCount(int total);
+
+  /// No description provided for @reviewsMonthsAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}mo ago'**
+  String reviewsMonthsAgo(int count);
+
+  /// No description provided for @reviewsDaysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}d ago'**
+  String reviewsDaysAgo(int count);
+
+  /// No description provided for @reviewsHoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}h ago'**
+  String reviewsHoursAgo(int count);
+
+  /// No description provided for @reviewsJustNow.
+  ///
+  /// In en, this message translates to:
+  /// **'just now'**
+  String get reviewsJustNow;
+
+  /// No description provided for @reviewsReply.
+  ///
+  /// In en, this message translates to:
+  /// **'Reply'**
+  String get reviewsReply;
+
+  /// No description provided for @reviewsYourReply.
+  ///
+  /// In en, this message translates to:
+  /// **'Your reply'**
+  String get reviewsYourReply;
+
+  /// No description provided for @termsRowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms and Conditions'**
+  String get termsRowTitle;
+
+  /// No description provided for @termsLastUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Last updated 17th April 2025'**
+  String get termsLastUpdated;
+
+  /// No description provided for @termsPrivacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get termsPrivacyPolicy;
+
+  /// No description provided for @termsPrivacySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Read our privacy agreement'**
+  String get termsPrivacySubtitle;
+
+  /// No description provided for @termsOfUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Use'**
+  String get termsOfUse;
+
+  /// No description provided for @galleryPhoto1.
+  ///
+  /// In en, this message translates to:
+  /// **'Front Photo'**
+  String get galleryPhoto1;
+
+  /// No description provided for @galleryPhoto2.
+  ///
+  /// In en, this message translates to:
+  /// **'Second Photo'**
+  String get galleryPhoto2;
+
+  /// No description provided for @galleryPhoto3.
+  ///
+  /// In en, this message translates to:
+  /// **'Third Photo'**
+  String get galleryPhoto3;
+
+  /// No description provided for @galleryPhoto4.
+  ///
+  /// In en, this message translates to:
+  /// **'Fourth Photo'**
+  String get galleryPhoto4;
+
+  /// No description provided for @galleryUploadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not upload photo: {error}'**
+  String galleryUploadFailed(String error);
+
+  /// No description provided for @gallerySaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery saved'**
+  String get gallerySaved;
+
+  /// No description provided for @gallerySaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save gallery: {error}'**
+  String gallerySaveFailed(String error);
+
+  /// No description provided for @gallerySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Showcase your best work to attract clients'**
+  String get gallerySubtitle;
+
+  /// No description provided for @gallerySaveButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Gallery'**
+  String get gallerySaveButton;
+
+  /// No description provided for @supportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Support'**
+  String get supportTitle;
+
+  /// No description provided for @supportGreeting.
+  ///
+  /// In en, this message translates to:
+  /// **'Hey, {name} 👋'**
+  String supportGreeting(String name);
+
+  /// No description provided for @supportThere.
+  ///
+  /// In en, this message translates to:
+  /// **'there'**
+  String get supportThere;
+
+  /// No description provided for @supportSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'How can we help you?'**
+  String get supportSearchHint;
+
+  /// No description provided for @supportPromoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Top-Notch support system'**
+  String get supportPromoTitle;
+
+  /// No description provided for @supportPromoSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Get quick responses with our online chat'**
+  String get supportPromoSub;
+
+  /// No description provided for @supportFaqTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequently Asked Questions'**
+  String get supportFaqTitle;
+
+  /// No description provided for @supportViewMore.
+  ///
+  /// In en, this message translates to:
+  /// **'View More Questions'**
+  String get supportViewMore;
+
+  /// No description provided for @supportChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat'**
+  String get supportChat;
+
+  /// No description provided for @supportChatSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Need help? We are here for you'**
+  String get supportChatSub;
+
+  /// No description provided for @supportCallSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Call Support'**
+  String get supportCallSupport;
+
+  /// No description provided for @supportCallHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Available Mon - Fri, 9am - 5pm'**
+  String get supportCallHours;
+
+  /// No description provided for @supportFaqQ1.
+  ///
+  /// In en, this message translates to:
+  /// **'How do I create a listing?'**
+  String get supportFaqQ1;
+
+  /// No description provided for @supportFaqQ2.
+  ///
+  /// In en, this message translates to:
+  /// **'How do I manage bookings?'**
+  String get supportFaqQ2;
+
+  /// No description provided for @supportFaqQ3.
+  ///
+  /// In en, this message translates to:
+  /// **'How does escrow payment work?'**
+  String get supportFaqQ3;
+
+  /// No description provided for @supportFaqQ4.
+  ///
+  /// In en, this message translates to:
+  /// **'How do I withdraw my earnings?'**
+  String get supportFaqQ4;
+
+  /// No description provided for @supportFaqQ5.
+  ///
+  /// In en, this message translates to:
+  /// **'What fees does Planovar charge?'**
+  String get supportFaqQ5;
+
+  /// No description provided for @supportFaqQ6.
+  ///
+  /// In en, this message translates to:
+  /// **'How do I verify my account?'**
+  String get supportFaqQ6;
+
+  /// No description provided for @supportFaqQ7.
+  ///
+  /// In en, this message translates to:
+  /// **'Can I cancel a booking?'**
+  String get supportFaqQ7;
+
+  /// No description provided for @supportFaqQ8.
+  ///
+  /// In en, this message translates to:
+  /// **'How do reviews work?'**
+  String get supportFaqQ8;
+
+  /// No description provided for @supportFaqQ9.
+  ///
+  /// In en, this message translates to:
+  /// **'How do I upgrade my subscription?'**
+  String get supportFaqQ9;
+
+  /// No description provided for @supportFaqQ10.
+  ///
+  /// In en, this message translates to:
+  /// **'How do I contact a client?'**
+  String get supportFaqQ10;
+
+  /// No description provided for @supportQuestionN.
+  ///
+  /// In en, this message translates to:
+  /// **'Question {number}'**
+  String supportQuestionN(int number);
+
+  /// No description provided for @supportNeedMoreHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'I need more help'**
+  String get supportNeedMoreHelp;
+
+  /// No description provided for @supportChatWithUs.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat with us'**
+  String get supportChatWithUs;
+
+  /// No description provided for @supportCallUs.
+  ///
+  /// In en, this message translates to:
+  /// **'Call Us'**
+  String get supportCallUs;
+
+  /// No description provided for @supportCallAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'re available from Monday- Friday from 9am - 5pm'**
+  String get supportCallAvailable;
+
+  /// No description provided for @supportLiveSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Support'**
+  String get supportLiveSupport;
+
+  /// No description provided for @supportReplyMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'We usually reply in a few minutes'**
+  String get supportReplyMinutes;
+
+  /// No description provided for @supportChatSetup.
+  ///
+  /// In en, this message translates to:
+  /// **'Live chat is being set up'**
+  String get supportChatSetup;
+
+  /// No description provided for @supportChatSetupMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Our live chat isn\'t connected yet. In the meantime, email us and we\'ll get right back to you.'**
+  String get supportChatSetupMsg;
+
+  /// No description provided for @supportEmailSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Email support'**
+  String get supportEmailSupport;
+
+  /// No description provided for @supportChatTeam.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat with our team'**
+  String get supportChatTeam;
+
+  /// No description provided for @supportChatTeamMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Open our live chat to talk to a support agent.'**
+  String get supportChatTeamMsg;
+
+  /// No description provided for @supportOpenChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Open live chat'**
+  String get supportOpenChat;
+
+  /// No description provided for @twofaIntroTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable 2FA for additional security'**
+  String get twofaIntroTitle;
+
+  /// No description provided for @twofaGetStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get twofaGetStarted;
+
+  /// No description provided for @twofaSetupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'2FA Setup'**
+  String get twofaSetupTitle;
+
+  /// No description provided for @twofaSetUpUsing.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up using'**
+  String get twofaSetUpUsing;
+
+  /// No description provided for @twofaAuthenticatorHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Using the authenticator app such as (Google Authenticator, Authy, 1Password, Last pass etc'**
+  String get twofaAuthenticatorHint;
+
+  /// No description provided for @twofaScanMe.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Me'**
+  String get twofaScanMe;
+
+  /// No description provided for @twofaCantScan.
+  ///
+  /// In en, this message translates to:
+  /// **'If you can\'t scan the QR code above, enter this text instead'**
+  String get twofaCantScan;
+
+  /// No description provided for @twofaConfirmCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Code'**
+  String get twofaConfirmCode;
+
+  /// No description provided for @twofaEnterCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the code provided by the authenticator app'**
+  String get twofaEnterCode;
+
+  /// No description provided for @twofaConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get twofaConfirm;
+
+  /// No description provided for @twofaAllPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'All '**
+  String get twofaAllPrefix;
+
+  /// No description provided for @twofaDoneWord.
+  ///
+  /// In en, this message translates to:
+  /// **'done'**
+  String get twofaDoneWord;
+
+  /// No description provided for @twofaSuccessBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your 2FA has been successfully enabled'**
+  String get twofaSuccessBody;
+
+  /// No description provided for @twofaBackToProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to profile setup'**
+  String get twofaBackToProfile;
+
+  /// No description provided for @analyticsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Analytics'**
+  String get analyticsTitle;
+
+  /// No description provided for @analyticsActiveListings.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Listings'**
+  String get analyticsActiveListings;
+
+  /// No description provided for @analyticsOfTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'of {total} total'**
+  String analyticsOfTotal(int total);
+
+  /// No description provided for @analyticsInquiries.
+  ///
+  /// In en, this message translates to:
+  /// **'Inquiries'**
+  String get analyticsInquiries;
+
+  /// No description provided for @analyticsAwaitingReply.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} awaiting reply'**
+  String analyticsAwaitingReply(int count);
+
+  /// No description provided for @analyticsRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get analyticsRating;
+
+  /// No description provided for @analyticsReviews.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} reviews'**
+  String analyticsReviews(int count);
+
+  /// No description provided for @analyticsPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan'**
+  String get analyticsPlan;
+
+  /// No description provided for @analyticsDetailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Detailed performance analytics'**
+  String get analyticsDetailedTitle;
+
+  /// No description provided for @analyticsComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Trends, profile views and conversion charts are coming soon.'**
+  String get analyticsComingSoon;
+
+  /// No description provided for @payoutsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payments'**
+  String get payoutsTitle;
+
+  /// No description provided for @payoutsHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'You keep 100% of what you earn'**
+  String get payoutsHeadline;
+
+  /// No description provided for @payoutsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Planovar runs on a subscription — we don’t hold your money or take a commission. Clients pay you directly, the way you both agree.'**
+  String get payoutsBody;
+
+  /// No description provided for @notifMarkAllRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all read'**
+  String get notifMarkAllRead;
+
+  /// No description provided for @notifEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications'**
+  String get notifEmpty;
+
+  /// No description provided for @notifFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get notifFilterAll;
+
+  /// No description provided for @notifFilterOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Orders'**
+  String get notifFilterOrders;
+
+  /// No description provided for @notifFilterPayments.
+  ///
+  /// In en, this message translates to:
+  /// **'Payments'**
+  String get notifFilterPayments;
+
+  /// No description provided for @notifFilterSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get notifFilterSystem;
+
+  /// No description provided for @notifToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get notifToday;
+
+  /// No description provided for @notifYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get notifYesterday;
+
+  /// No description provided for @notifEarlier.
+  ///
+  /// In en, this message translates to:
+  /// **'Earlier'**
+  String get notifEarlier;
+
+  /// No description provided for @statusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get statusPending;
+
+  /// No description provided for @statusConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed'**
+  String get statusConfirmed;
+
+  /// No description provided for @statusCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get statusCompleted;
+
+  /// No description provided for @statusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get statusCancelled;
+
+  /// No description provided for @statusSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent'**
+  String get statusSent;
+
+  /// No description provided for @statusAccepted.
+  ///
+  /// In en, this message translates to:
+  /// **'Accepted'**
+  String get statusAccepted;
+
+  /// No description provided for @statusRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get statusRejected;
+
+  /// No description provided for @statusDeclined.
+  ///
+  /// In en, this message translates to:
+  /// **'Declined'**
+  String get statusDeclined;
+
+  /// No description provided for @statusPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get statusPaid;
+
+  /// No description provided for @statusFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get statusFailed;
+
+  /// No description provided for @statusFeatured.
+  ///
+  /// In en, this message translates to:
+  /// **'Featured'**
+  String get statusFeatured;
+
+  /// No description provided for @statusPremium.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium'**
+  String get statusPremium;
+
+  /// No description provided for @statusBasic.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic'**
+  String get statusBasic;
+
+  /// No description provided for @statusExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get statusExpired;
+
+  /// No description provided for @statusSuperseded.
+  ///
+  /// In en, this message translates to:
+  /// **'Superseded'**
+  String get statusSuperseded;
+
+  /// No description provided for @statusPartiallyPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Partially paid'**
+  String get statusPartiallyPaid;
+
+  /// No description provided for @ccQuote.
+  ///
+  /// In en, this message translates to:
+  /// **'Quote'**
+  String get ccQuote;
+
+  /// No description provided for @ccValidTill.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid till {date}'**
+  String ccValidTill(String date);
+
+  /// No description provided for @ccTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get ccTotal;
+
+  /// No description provided for @ccInvoiceNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice · {number}'**
+  String ccInvoiceNumber(String number);
+
+  /// No description provided for @ccOrderRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Order request'**
+  String get ccOrderRequest;
+
+  /// No description provided for @ccClientRequesting.
+  ///
+  /// In en, this message translates to:
+  /// **'Client is requesting this — accept to send an invoice'**
+  String get ccClientRequesting;
+
+  /// No description provided for @ccDecline.
+  ///
+  /// In en, this message translates to:
+  /// **'Decline'**
+  String get ccDecline;
+
+  /// No description provided for @ccAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get ccAccept;
+
+  /// No description provided for @ccDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Due {date}'**
+  String ccDue(String date);
+
+  /// No description provided for @ccTaskDone.
+  ///
+  /// In en, this message translates to:
+  /// **'You completed your task'**
+  String get ccTaskDone;
+
+  /// No description provided for @ccMarkTaskDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark your task done'**
+  String get ccMarkTaskDone;
+
+  /// No description provided for @errorSomethingWrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong'**
+  String get errorSomethingWrong;
+
+  /// No description provided for @errorTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get errorTryAgain;
+
+  /// No description provided for @bankAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank account added — you can now receive payments 🎉'**
+  String get bankAdded;
+
+  /// No description provided for @bankClientsPayDirect.
+  ///
+  /// In en, this message translates to:
+  /// **'Clients pay you directly to this account.'**
+  String get bankClientsPayDirect;
+
+  /// No description provided for @bankLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading banks…'**
+  String get bankLoading;
+
+  /// No description provided for @bankSelect.
+  ///
+  /// In en, this message translates to:
+  /// **'Select bank'**
+  String get bankSelect;
+
+  /// No description provided for @bankAccountNumberHint.
+  ///
+  /// In en, this message translates to:
+  /// **'10-digit account number'**
+  String get bankAccountNumberHint;
+
+  /// No description provided for @bankVerifying.
+  ///
+  /// In en, this message translates to:
+  /// **'Verifying account…'**
+  String get bankVerifying;
+
+  /// No description provided for @bankSaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving…'**
+  String get bankSaving;
+
+  /// No description provided for @bankSaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Save account'**
+  String get bankSaveAccount;
+
+  /// No description provided for @bankSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search bank'**
+  String get bankSearch;
+
+  /// No description provided for @planPopular.
+  ///
+  /// In en, this message translates to:
+  /// **'POPULAR'**
+  String get planPopular;
+
+  /// No description provided for @planCurrentPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Current plan'**
+  String get planCurrentPlan;
+
+  /// No description provided for @planMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get planMonthly;
+
+  /// No description provided for @planYearly.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly'**
+  String get planYearly;
+
+  /// No description provided for @qrcNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get qrcNew;
+
+  /// No description provided for @qrcBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget: {amount}'**
+  String qrcBudget(String amount);
+
+  /// No description provided for @qrcBudgetTbd.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget: TBD'**
+  String get qrcBudgetTbd;
+
+  /// No description provided for @qrcOpenRespond.
+  ///
+  /// In en, this message translates to:
+  /// **'Open & Respond'**
+  String get qrcOpenRespond;
+
+  /// No description provided for @qrcReject.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get qrcReject;
+
+  /// No description provided for @tagAddMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Add tag...'**
+  String get tagAddMore;
+
+  /// No description provided for @tagHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Press comma or Enter to add a tag  ·  {count}/{max}'**
+  String tagHelper(int count, int max);
 }
 
 class _AppLocalizationsDelegate

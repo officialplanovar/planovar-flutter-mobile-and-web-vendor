@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
+import '../../l10n/app_localizations.dart';
 import '../models/chat_card_models.dart';
 
 String _money(double v) {
@@ -19,27 +20,28 @@ const _months = [
 ];
 String _date(DateTime d) => '${d.day} ${_months[d.month - 1]} ${d.year}';
 
-String _statusLabel(String s) {
+String _statusLabel(BuildContext context, String s) {
+  final t = AppLocalizations.of(context);
   switch (s) {
     case 'accepted':
-      return 'Accepted';
+      return t.statusAccepted;
     case 'rejected':
     case 'declined':
-      return 'Declined';
+      return t.statusDeclined;
     case 'expired':
-      return 'Expired';
+      return t.statusExpired;
     case 'superseded':
-      return 'Superseded';
+      return t.statusSuperseded;
     case 'paid':
-      return 'Paid';
+      return t.statusPaid;
     case 'partially_paid':
-      return 'Partially paid';
+      return t.statusPartiallyPaid;
     case 'cancelled':
-      return 'Cancelled';
+      return t.statusCancelled;
     case 'confirmed':
-      return 'Confirmed';
+      return t.statusConfirmed;
     case 'sent':
-      return 'Sent';
+      return t.statusSent;
     default:
       return s.isEmpty ? '' : s[0].toUpperCase() + s.substring(1);
   }
@@ -108,6 +110,7 @@ class QuoteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     const amber = Color(0xFFB45309);
     final canRevise =
         onRevise != null && quote.isActive && quote.status == 'pending' && !quote.isExpired;
@@ -119,7 +122,7 @@ class QuoteCard extends StatelessWidget {
           const Icon(Icons.description_rounded, size: 20, color: amber),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(quote.quoteNumber ?? 'Quote',
+            child: Text(quote.quoteNumber ?? t.ccQuote,
                 style: GoogleFonts.urbanist(
                     fontSize: 15, fontWeight: FontWeight.w800, color: context.c.textPrimary)),
           ),
@@ -137,8 +140,8 @@ class QuoteCard extends StatelessWidget {
         const SizedBox(height: 2),
         Text(
           quote.status == 'pending'
-              ? 'Valid till ${_date(quote.validUntil)}'
-              : _statusLabel(quote.status),
+              ? t.ccValidTill(_date(quote.validUntil))
+              : _statusLabel(context, quote.status),
           style: GoogleFonts.urbanist(fontSize: 12, fontWeight: FontWeight.w600, color: amber),
         ),
         const SizedBox(height: 10),
@@ -156,7 +159,7 @@ class QuoteCard extends StatelessWidget {
             )),
         const Divider(height: 16),
         Row(children: [
-          Text('Total', style: GoogleFonts.urbanist(fontSize: 13, color: context.c.textSecondary)),
+          Text(t.ccTotal, style: GoogleFonts.urbanist(fontSize: 13, color: context.c.textSecondary)),
           const Spacer(),
           Text(_money(quote.amount),
               style: GoogleFonts.urbanist(fontSize: 17, fontWeight: FontWeight.w800, color: amber)),
@@ -172,7 +175,7 @@ class QuoteCard extends StatelessWidget {
                 side: const BorderSide(color: amber),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
-              child: const Text('Revise quote'),
+              child: Text(t.convReviseQuote),
             ),
           ),
         ],
@@ -187,6 +190,7 @@ class InvoiceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     const green = Color(0xFF047857);
     return _Shell(
       accent: green,
@@ -196,16 +200,16 @@ class InvoiceCard extends StatelessWidget {
           const Icon(Icons.receipt_long_rounded, size: 20, color: green),
           const SizedBox(width: 8),
           Expanded(
-            child: Text('Invoice · ${invoice.invoiceNumber}',
+            child: Text(t.ccInvoiceNumber(invoice.invoiceNumber),
                 style: GoogleFonts.urbanist(
                     fontSize: 15, fontWeight: FontWeight.w800, color: context.c.textPrimary)),
           ),
-          Text(_statusLabel(invoice.status),
+          Text(_statusLabel(context, invoice.status),
               style: GoogleFonts.urbanist(fontSize: 12, fontWeight: FontWeight.w700, color: green)),
         ]),
         const SizedBox(height: 10),
         Row(children: [
-          Text('Total', style: GoogleFonts.urbanist(fontSize: 13, color: context.c.textSecondary)),
+          Text(t.ccTotal, style: GoogleFonts.urbanist(fontSize: 13, color: context.c.textSecondary)),
           const Spacer(),
           Text(_money(invoice.total),
               style: GoogleFonts.urbanist(fontSize: 17, fontWeight: FontWeight.w800, color: green)),
@@ -261,6 +265,7 @@ class _OrderRequestCardState extends State<OrderRequestCard> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final b = widget.booking;
     final pending = b.status == 'pending';
     return _Shell(
@@ -271,7 +276,7 @@ class _OrderRequestCardState extends State<OrderRequestCard> {
           const Icon(Icons.shopping_bag_rounded, size: 18, color: AppColors.primary),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(b.listingTitle ?? 'Order request',
+            child: Text(b.listingTitle ?? t.ccOrderRequest,
                 style: GoogleFonts.urbanist(
                     fontSize: 14, fontWeight: FontWeight.w800, color: context.c.textPrimary)),
           ),
@@ -281,7 +286,7 @@ class _OrderRequestCardState extends State<OrderRequestCard> {
                     fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.primary)),
         ]),
         const SizedBox(height: 4),
-        Text(pending ? 'Client is requesting this — accept to send an invoice' : _statusLabel(b.status),
+        Text(pending ? t.ccClientRequesting : _statusLabel(context, b.status),
             style: GoogleFonts.urbanist(fontSize: 12, color: context.c.textSecondary)),
         if (pending && (widget.onAccept != null || widget.onDecline != null)) ...[
           const SizedBox(height: 12),
@@ -295,7 +300,7 @@ class _OrderRequestCardState extends State<OrderRequestCard> {
                     side: const BorderSide(color: Color(0xFFFECACA)),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
-                  child: const Text('Decline'),
+                  child: Text(t.ccDecline),
                 ),
               ),
             if (widget.onDecline != null && widget.onAccept != null) const SizedBox(width: 10),
@@ -311,7 +316,7 @@ class _OrderRequestCardState extends State<OrderRequestCard> {
                       ? const SizedBox(
                           width: 16, height: 16,
                           child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                      : const Text('Accept'),
+                      : Text(t.ccAccept),
                 ),
               ),
           ]),
@@ -344,6 +349,7 @@ class _TodoCardState extends State<TodoCard> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     final t = widget.todo;
     final mine = t.mine(widget.currentUserId);
     return _Shell(
@@ -380,7 +386,7 @@ class _TodoCardState extends State<TodoCard> {
             Row(mainAxisSize: MainAxisSize.min, children: [
               Icon(Icons.schedule_rounded, size: 13, color: context.c.textHint),
               const SizedBox(width: 4),
-              Text('Due ${_date(t.dueAt!)}',
+              Text(loc.ccDue(_date(t.dueAt!)),
                   style: GoogleFonts.urbanist(
                       fontSize: 11.5, color: context.c.textHint)),
             ]),
@@ -409,8 +415,8 @@ class _TodoCardState extends State<TodoCard> {
                 const SizedBox(width: 8),
                 Text(
                     mine.isDone
-                        ? 'You completed your task'
-                        : 'Mark your task done',
+                        ? loc.ccTaskDone
+                        : loc.ccMarkTaskDone,
                     style: GoogleFonts.urbanist(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,

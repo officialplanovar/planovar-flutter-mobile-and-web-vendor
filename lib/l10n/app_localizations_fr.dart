@@ -1309,4 +1309,1203 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get coMessageClient => 'Contacter le client à la place';
+
+  @override
+  String get msgTitle => 'Messages';
+
+  @override
+  String get msgSubtitle => 'Restez en contact avec vos clients';
+
+  @override
+  String get msgSearchHint => 'Rechercher des conversations';
+
+  @override
+  String get msgNoConversations => 'Aucune conversation trouvée';
+
+  @override
+  String msgParticipants(int count) {
+    return '$count participants';
+  }
+
+  @override
+  String get convConfirmed => 'Confirmé';
+
+  @override
+  String get convDeclined => 'Refusé';
+
+  @override
+  String get convQuoteExpired => 'Devis expiré';
+
+  @override
+  String convDepositRefundedAmt(String amount) {
+    return 'Caution remboursée · ₦$amount';
+  }
+
+  @override
+  String get convDepositRefunded => 'Caution remboursée';
+
+  @override
+  String convPaymentReceivedAmt(String amount) {
+    return 'Paiement reçu · ₦$amount';
+  }
+
+  @override
+  String get convPaymentReceived => 'Paiement reçu';
+
+  @override
+  String get convOrderUpdate => 'Mise à jour de la commande';
+
+  @override
+  String get convReviewRequested => 'Avis demandé';
+
+  @override
+  String convReviewLeftRating(String rating) {
+    return 'Le client a laissé un avis · $rating★';
+  }
+
+  @override
+  String get convReviewLeft => 'Le client a laissé un avis';
+
+  @override
+  String get convBankBanner =>
+      'Devis accepté — ajoutez votre compte bancaire pour être payé.';
+
+  @override
+  String get convAdd => 'Ajouter';
+
+  @override
+  String get convConfirmReturn => 'Confirmer le retour';
+
+  @override
+  String get convMarkDelivered => 'Marquer comme livré';
+
+  @override
+  String get convPostUpdate => 'Publier une mise à jour';
+
+  @override
+  String get convConfirmReturnTitle => 'Confirmer le retour de la location ?';
+
+  @override
+  String get convConfirmReturnBody =>
+      'Ceci finalise la location et rembourse la caution du client. Renvoyez la caution au client depuis votre banque.';
+
+  @override
+  String get convRentalCompleted => 'Location terminée — caution remboursée 🎉';
+
+  @override
+  String get convPostUpdateTitle => 'Publier une mise à jour';
+
+  @override
+  String get convPostUpdateHint =>
+      'ex. En cours de livraison — arrivée avant 16h';
+
+  @override
+  String get convPost => 'Publier';
+
+  @override
+  String get convUpdatePosted => 'Mise à jour publiée';
+
+  @override
+  String get convMarkDeliveredTitle => 'Marquer comme livré ?';
+
+  @override
+  String get convMarkDeliveredBody =>
+      'Ceci finalise la réservation et invite le client à laisser un avis.';
+
+  @override
+  String get convMarkedDelivered => 'Marqué comme livré 🎉';
+
+  @override
+  String get convReviseQuote => 'Réviser le devis';
+
+  @override
+  String get convCreateSendQuote => 'Créer et envoyer un devis';
+
+  @override
+  String get convOrderAccepted => 'Commande acceptée — facture envoyée 🎉';
+
+  @override
+  String get convOrderDeclined => 'Commande refusée';
+
+  @override
+  String get convCouldNotIdentifyClient => 'Impossible d\'identifier le client';
+
+  @override
+  String get convCouldNotUpdateTask => 'Impossible de mettre à jour la tâche';
+
+  @override
+  String get convCouldNotLoadListings => 'Impossible de charger vos annonces';
+
+  @override
+  String get convAddListingFirst =>
+      'Ajoutez d\'abord une annonce pour envoyer un devis';
+
+  @override
+  String get convQuoteForListing => 'Devis pour quelle annonce ?';
+
+  @override
+  String get convTypeMessage => 'Écrivez un message';
+
+  @override
+  String get cqAddLineItem => 'Ajoutez au moins une ligne avec un montant';
+
+  @override
+  String get cqRevisedSent => 'Devis révisé envoyé 🎉';
+
+  @override
+  String get cqQuoteSent => 'Devis envoyé au client 🎉';
+
+  @override
+  String get cqOpenFromChat =>
+      'Ouvrez ceci depuis une discussion ou une demande client pour envoyer un devis';
+
+  @override
+  String get cqValidForTitle => 'Devis valable';
+
+  @override
+  String get cqTitleCreate => 'Créer un devis';
+
+  @override
+  String get cqEvent => 'Événement';
+
+  @override
+  String get cqDescription => 'Description';
+
+  @override
+  String get cqAmount => 'Montant';
+
+  @override
+  String get cqAddItem => '+ Ajouter un article';
+
+  @override
+  String cqSubtotal(String amount) {
+    return 'Sous-total $amount';
+  }
+
+  @override
+  String cqMilestone(int number) {
+    return 'Étape $number';
+  }
+
+  @override
+  String get cqLineItems => 'Articles';
+
+  @override
+  String get cqSetPaymentTerms => 'Définissez vos conditions de paiement';
+
+  @override
+  String get cqNoteToClient => 'Note au client';
+
+  @override
+  String get cqNoteHint => 'Brève description du produit';
+
+  @override
+  String get cqSending => 'Envoi…';
+
+  @override
+  String get cqSendRevised => 'Envoyer le devis révisé';
+
+  @override
+  String get cqCreateQuote => 'Créer un devis';
+
+  @override
+  String get cqDueOnConfirmation =>
+      'À régler à la confirmation de la réservation (immédiatement)';
+
+  @override
+  String get cqTermPayAtOnce => 'Payer en une fois';
+
+  @override
+  String get cqTermCustom => 'Personnalisé';
+
+  @override
+  String get cqValid1Day => '1 jour';
+
+  @override
+  String get cqValid3Days => '3 jours';
+
+  @override
+  String get cqValid7Days => '7 jours';
+
+  @override
+  String get cqValid14Days => '14 jours';
+
+  @override
+  String get cqValid30Days => '30 jours';
+
+  @override
+  String get ciTitle => 'Créer une facture';
+
+  @override
+  String get ciInvoiceItems => 'Articles de la facture';
+
+  @override
+  String get ciPaymentMilestones => 'Échéances de paiement';
+
+  @override
+  String get ciFromQuote => 'Du devis';
+
+  @override
+  String get ciBanner =>
+      'Pré-rempli à partir du devis accepté QT-2026-047. Vérifiez les articles et les échéances de paiement, puis envoyez pour confirmer la réservation.';
+
+  @override
+  String get ciPayoutToAccount => 'Versement sur votre compte';
+
+  @override
+  String get ciAccount => 'Compte';
+
+  @override
+  String get ciYourPayout => 'Votre versement';
+
+  @override
+  String ciSendInvoiceTo(String name) {
+    return 'Envoyer la facture à $name';
+  }
+
+  @override
+  String get ciInvoiceSent => 'Facture envoyée avec succès !';
+
+  @override
+  String get ciPreview => 'Aperçu';
+
+  @override
+  String get profileYourBusiness => 'Votre entreprise';
+
+  @override
+  String profilePlanLabel(String tier) {
+    return 'Forfait $tier';
+  }
+
+  @override
+  String get profileVerified => 'Vérifié';
+
+  @override
+  String get profileUnverified => 'Non vérifié';
+
+  @override
+  String get profileGeneral => 'Général';
+
+  @override
+  String get profilePreferences => 'Préférences';
+
+  @override
+  String get profileUpdateProfile => 'Mettre à jour votre profil';
+
+  @override
+  String get profileSecurity => 'Sécurité';
+
+  @override
+  String get profileReviews => 'Avis';
+
+  @override
+  String get profileLinkedBanks => 'Comptes bancaires liés';
+
+  @override
+  String get profileGallery => 'Galerie';
+
+  @override
+  String get profileSubscriptionPlans => 'Forfaits d\'abonnement';
+
+  @override
+  String get profileLanguagePref => 'Préférence de langue';
+
+  @override
+  String get profileTheme => 'Thème';
+
+  @override
+  String get profileCustomizeStorefront => 'Personnaliser votre vitrine';
+
+  @override
+  String get profileNotifications => 'Notifications';
+
+  @override
+  String get profileHelpSupport => 'Aide et assistance';
+
+  @override
+  String get profileTerms => 'Conditions générales';
+
+  @override
+  String get profileLeavePlanovar => 'Quitter Planovar';
+
+  @override
+  String get profileSignOut => 'Se déconnecter';
+
+  @override
+  String psUploadLogoFailed(String error) {
+    return 'Impossible de téléverser le logo : $error';
+  }
+
+  @override
+  String psUploadCoverFailed(String error) {
+    return 'Impossible de téléverser la couverture : $error';
+  }
+
+  @override
+  String get psProfileUpdated => 'Profil mis à jour';
+
+  @override
+  String get psEmailAddress => 'Adresse e-mail';
+
+  @override
+  String get psEmailHint => 'Adresse e-mail';
+
+  @override
+  String get psPhoneNumber => 'Numéro de téléphone';
+
+  @override
+  String get psPhoneHint => 'Numéro de téléphone';
+
+  @override
+  String get psDateOfBirth => 'Date de naissance';
+
+  @override
+  String get psUpdateDetails => 'Mettre à jour';
+
+  @override
+  String get psAddCoverPhoto => 'Ajouter une photo de couverture';
+
+  @override
+  String get psStorefrontHint =>
+      'Votre logo et votre couverture sont ce que les clients voient sur votre vitrine.';
+
+  @override
+  String get psStorefrontImages => 'Images de la vitrine';
+
+  @override
+  String get psBusinessName => 'Nom de l\'entreprise';
+
+  @override
+  String get psBusinessNameHint => 'Nom de l\'entreprise';
+
+  @override
+  String get psBusinessType => 'Type d\'entreprise';
+
+  @override
+  String get psBizLicensed => 'Entreprise agréée';
+
+  @override
+  String get psBizFreelancer => 'Indépendant';
+
+  @override
+  String get psBusinessDescription => 'Description de l\'entreprise';
+
+  @override
+  String get psBusinessDescHint => 'Brève description de votre entreprise';
+
+  @override
+  String get psCategoryTags => 'Étiquettes de catégorie';
+
+  @override
+  String get psEditProfile => 'Modifier votre profil';
+
+  @override
+  String get psPersonalDetails => 'Détails personnels';
+
+  @override
+  String get psBusinessDetails => 'Détails de l\'entreprise';
+
+  @override
+  String get psMonthJan => 'Janvier';
+
+  @override
+  String get psMonthFeb => 'Février';
+
+  @override
+  String get psMonthMar => 'Mars';
+
+  @override
+  String get psMonthApr => 'Avril';
+
+  @override
+  String get psMonthMay => 'Mai';
+
+  @override
+  String get psMonthJun => 'Juin';
+
+  @override
+  String get psMonthJul => 'Juillet';
+
+  @override
+  String get psMonthAug => 'Août';
+
+  @override
+  String get psMonthSep => 'Septembre';
+
+  @override
+  String get psMonthOct => 'Octobre';
+
+  @override
+  String get psMonthNov => 'Novembre';
+
+  @override
+  String get psMonthDec => 'Décembre';
+
+  @override
+  String get psSecurity => 'Sécurité';
+
+  @override
+  String get psChangePassword => 'Changer le mot de passe';
+
+  @override
+  String get psChangePasswordSub =>
+      'Mettez à jour votre mot de passe de connexion.';
+
+  @override
+  String get ps2faTitle => 'Authentification 2FA';
+
+  @override
+  String get ps2faSub => 'Ajoutez une couche de sécurité supplémentaire.';
+
+  @override
+  String get psNewPassword => 'Nouveau mot de passe';
+
+  @override
+  String get psNewPasswordHint => 'Saisir le nouveau mot de passe';
+
+  @override
+  String get psConfirmPassword => 'Confirmer le mot de passe';
+
+  @override
+  String get psConfirmPasswordHint => 'Confirmer le nouveau mot de passe';
+
+  @override
+  String get psReqCapital => 'Doit contenir une lettre majuscule';
+
+  @override
+  String get psReqNumber => 'Doit contenir un chiffre, ex. 1,2,4,etc';
+
+  @override
+  String get psReqSpecial =>
+      'Doit contenir un caractère spécial, ex. @,\$,%,etc';
+
+  @override
+  String get psSavePassword => 'Enregistrer le mot de passe';
+
+  @override
+  String get psPasswordSaved => 'Mot de passe enregistré';
+
+  @override
+  String get psTheme => 'Thème';
+
+  @override
+  String get psSelectDisplay => 'Sélectionnez votre affichage préféré';
+
+  @override
+  String get psThemeLight => 'Clair';
+
+  @override
+  String get psThemeDark => 'Sombre';
+
+  @override
+  String get psThemeSystem => 'Système';
+
+  @override
+  String get psSavePreference => 'Enregistrer la préférence';
+
+  @override
+  String get psThemeSaved => 'Préférence de thème enregistrée';
+
+  @override
+  String get psNotification => 'Notification';
+
+  @override
+  String get psChannelNone => 'Aucun';
+
+  @override
+  String get psChannelInApp => 'Dans l\'app';
+
+  @override
+  String get psChannelEmail => 'E-mail';
+
+  @override
+  String get psChannelBoth => 'Les deux';
+
+  @override
+  String get psAllNotifications => 'Toutes les notifications';
+
+  @override
+  String get psChooseWhere =>
+      'Choisissez où vous souhaitez recevoir les notifications';
+
+  @override
+  String get psNotifAllMessages => 'Tous les messages';
+
+  @override
+  String get psNotifAllMessagesSub => 'quelqu\'un répond à votre message';
+
+  @override
+  String get psNotifOrderDelivery => 'Chronologie commande / livraison';
+
+  @override
+  String get psNotifOrderDeliverySub =>
+      'soyez notifié lorsqu\'une commande est reçue / terminée';
+
+  @override
+  String get psNotifEventTimeline => 'Chronologie de l\'événement';
+
+  @override
+  String get psNotifEventTimelineSub =>
+      'soyez notifié lorsqu\'il y a une nouvelle chronologie d\'événement';
+
+  @override
+  String get psNotifPayment => 'Alertes de paiement';
+
+  @override
+  String get psNotifPaymentSub => 'soyez notifié lorsqu\'un paiement réussit';
+
+  @override
+  String get psNotifQuoteInvoice => 'Alertes devis / facture';
+
+  @override
+  String get psNotifQuoteInvoiceSub =>
+      'soyez notifié lorsque votre devis est traité';
+
+  @override
+  String get psLinkedBankAccount => 'Compte bancaire lié';
+
+  @override
+  String get psWhereClientsPay => 'Où les clients vous paient directement';
+
+  @override
+  String get psAddBankAccount => 'Ajouter un compte bancaire';
+
+  @override
+  String get psChangeBankAccount => 'Changer de compte bancaire';
+
+  @override
+  String get psNoBankYet => 'Aucun compte bancaire pour le moment';
+
+  @override
+  String get psNoBankBody =>
+      'Ajoutez-en un pour que les clients puissent vous payer directement lorsqu\'ils acceptent vos devis.';
+
+  @override
+  String get psBankFallback => 'Banque';
+
+  @override
+  String get psReadyToReceive => 'Prêt à recevoir des paiements';
+
+  @override
+  String get psSettingUp => 'Configuration…';
+
+  @override
+  String get psReasonNoNeed => 'Je n\'ai plus besoin du service';
+
+  @override
+  String get psReasonBetter => 'J\'ai trouvé une meilleure plateforme';
+
+  @override
+  String get psReasonTech => 'Trop de problèmes techniques';
+
+  @override
+  String get psReasonPrivacy => 'Préoccupations de confidentialité';
+
+  @override
+  String get psReasonOther => 'Autre';
+
+  @override
+  String get psSelectReason => 'Sélectionnez une raison';
+
+  @override
+  String get psDeleteConfirmTitle => 'Êtes-vous sûr de vouloir supprimer';
+
+  @override
+  String get psDeleteBullet1 => 'L\'accès à vos réservations actives';
+
+  @override
+  String get psDeleteBullet2 =>
+      'L\'accès à vos données de compte et identifiants';
+
+  @override
+  String get psDeleteBullet3 => 'Les informations de connexion';
+
+  @override
+  String get psDeleteBullet4 =>
+      'Tous les contacts clients par message et appel';
+
+  @override
+  String get psYesConfirm => 'Oui, confirmer';
+
+  @override
+  String get psNotYet => 'Pas encore';
+
+  @override
+  String get psSuccessful => 'Réussi';
+
+  @override
+  String get psDeleteSuccessBody =>
+      'Votre compte a été supprimé avec succès. Nous sommes désolés de vous voir partir et espérons vous revoir bientôt';
+
+  @override
+  String get psCloseApp => 'Fermer l\'application';
+
+  @override
+  String get psDeleteAccount => 'Supprimer le compte';
+
+  @override
+  String get psYourAccount => 'Votre compte';
+
+  @override
+  String get psTellReason =>
+      'Dites-nous la raison de la suppression de votre compte';
+
+  @override
+  String get psSelectOption => 'Sélectionnez une option';
+
+  @override
+  String get psOtherReasons => 'Autres raisons';
+
+  @override
+  String get psTypeMessage => 'Saisissez votre message';
+
+  @override
+  String get psDeactivateAccount => 'Désactiver le compte';
+
+  @override
+  String get psAccountDeactivated => 'Compte désactivé';
+
+  @override
+  String psTrialStarted(String name) {
+    return 'Votre essai gratuit $name a commencé 🎉';
+  }
+
+  @override
+  String psNowOnPlan(String name) {
+    return 'Vous êtes maintenant sur le forfait $name';
+  }
+
+  @override
+  String get psPaymentCancelled =>
+      'Paiement annulé — votre forfait est inchangé';
+
+  @override
+  String psPaymentConfirmed(String name) {
+    return 'Paiement confirmé — vous êtes maintenant sur le forfait $name';
+  }
+
+  @override
+  String get psSubscriptionPlan => 'Forfait d\'abonnement';
+
+  @override
+  String get psChoosePlan =>
+      'Choisissez le forfait adapté à votre entreprise. Améliorez ou changez à tout moment.';
+
+  @override
+  String get psOnTrial => 'En essai';
+
+  @override
+  String get psCurrent => 'Actuel';
+
+  @override
+  String psSwitchTo(String name) {
+    return 'Passer à $name';
+  }
+
+  @override
+  String psUpgradeTo(String name) {
+    return 'Améliorer vers $name';
+  }
+
+  @override
+  String reviewsReplyTo(String name) {
+    return 'Répondre à $name';
+  }
+
+  @override
+  String get reviewsReplyHint =>
+      'Remerciez-les ou répondez à leurs commentaires…';
+
+  @override
+  String get reviewsSending => 'Envoi…';
+
+  @override
+  String get reviewsSendReply => 'Envoyer la réponse';
+
+  @override
+  String get reviewsMyReviews => 'Mes avis';
+
+  @override
+  String get reviewsSubtitle =>
+      'Les avis que vous avez reçus pour vos travaux passés';
+
+  @override
+  String get reviewsLoadFailed => 'Impossible de charger les avis';
+
+  @override
+  String get reviewsEmpty => 'Aucun avis pour le moment';
+
+  @override
+  String get reviewsEmptyBody =>
+      'Terminez des réservations et les avis de vos clients apparaîtront ici.';
+
+  @override
+  String reviewsCount(int total) {
+    return '($total avis)';
+  }
+
+  @override
+  String reviewsMonthsAgo(int count) {
+    return 'il y a $count mois';
+  }
+
+  @override
+  String reviewsDaysAgo(int count) {
+    return 'il y a $count j';
+  }
+
+  @override
+  String reviewsHoursAgo(int count) {
+    return 'il y a $count h';
+  }
+
+  @override
+  String get reviewsJustNow => 'à l\'instant';
+
+  @override
+  String get reviewsReply => 'Répondre';
+
+  @override
+  String get reviewsYourReply => 'Votre réponse';
+
+  @override
+  String get termsRowTitle => 'Conditions générales';
+
+  @override
+  String get termsLastUpdated => 'Dernière mise à jour le 17 avril 2025';
+
+  @override
+  String get termsPrivacyPolicy => 'Politique de confidentialité';
+
+  @override
+  String get termsPrivacySubtitle => 'Lisez notre accord de confidentialité';
+
+  @override
+  String get termsOfUse => 'Conditions d\'utilisation';
+
+  @override
+  String get galleryPhoto1 => 'Photo principale';
+
+  @override
+  String get galleryPhoto2 => 'Deuxième photo';
+
+  @override
+  String get galleryPhoto3 => 'Troisième photo';
+
+  @override
+  String get galleryPhoto4 => 'Quatrième photo';
+
+  @override
+  String galleryUploadFailed(String error) {
+    return 'Impossible de téléverser la photo : $error';
+  }
+
+  @override
+  String get gallerySaved => 'Galerie enregistrée';
+
+  @override
+  String gallerySaveFailed(String error) {
+    return 'Impossible d\'enregistrer la galerie : $error';
+  }
+
+  @override
+  String get gallerySubtitle =>
+      'Mettez en valeur vos meilleurs travaux pour attirer des clients';
+
+  @override
+  String get gallerySaveButton => 'Enregistrer la galerie';
+
+  @override
+  String get supportTitle => 'Assistance';
+
+  @override
+  String supportGreeting(String name) {
+    return 'Bonjour, $name 👋';
+  }
+
+  @override
+  String get supportThere => 'vous';
+
+  @override
+  String get supportSearchHint => 'Comment pouvons-nous vous aider ?';
+
+  @override
+  String get supportPromoTitle => 'Système d\'assistance de premier ordre';
+
+  @override
+  String get supportPromoSub =>
+      'Obtenez des réponses rapides via notre chat en ligne';
+
+  @override
+  String get supportFaqTitle => 'Foire aux questions';
+
+  @override
+  String get supportViewMore => 'Voir plus de questions';
+
+  @override
+  String get supportChat => 'Chat';
+
+  @override
+  String get supportChatSub => 'Besoin d\'aide ? Nous sommes là pour vous';
+
+  @override
+  String get supportCallSupport => 'Appeler l\'assistance';
+
+  @override
+  String get supportCallHours => 'Disponible du lun. au ven., 9h - 17h';
+
+  @override
+  String get supportFaqQ1 => 'Comment créer une annonce ?';
+
+  @override
+  String get supportFaqQ2 => 'Comment gérer les réservations ?';
+
+  @override
+  String get supportFaqQ3 => 'Comment fonctionne le paiement en séquestre ?';
+
+  @override
+  String get supportFaqQ4 => 'Comment retirer mes revenus ?';
+
+  @override
+  String get supportFaqQ5 => 'Quels frais Planovar facture-t-il ?';
+
+  @override
+  String get supportFaqQ6 => 'Comment vérifier mon compte ?';
+
+  @override
+  String get supportFaqQ7 => 'Puis-je annuler une réservation ?';
+
+  @override
+  String get supportFaqQ8 => 'Comment fonctionnent les avis ?';
+
+  @override
+  String get supportFaqQ9 => 'Comment améliorer mon abonnement ?';
+
+  @override
+  String get supportFaqQ10 => 'Comment contacter un client ?';
+
+  @override
+  String supportQuestionN(int number) {
+    return 'Question $number';
+  }
+
+  @override
+  String get supportNeedMoreHelp => 'J\'ai besoin de plus d\'aide';
+
+  @override
+  String get supportChatWithUs => 'Discuter avec nous';
+
+  @override
+  String get supportCallUs => 'Appelez-nous';
+
+  @override
+  String get supportCallAvailable =>
+      'Nous sommes disponibles du lundi au vendredi de 9h à 17h';
+
+  @override
+  String get supportLiveSupport => 'Assistance en direct';
+
+  @override
+  String get supportReplyMinutes =>
+      'Nous répondons généralement en quelques minutes';
+
+  @override
+  String get supportChatSetup =>
+      'Le chat en direct est en cours de configuration';
+
+  @override
+  String get supportChatSetupMsg =>
+      'Notre chat en direct n\'est pas encore connecté. En attendant, envoyez-nous un e-mail et nous vous répondrons rapidement.';
+
+  @override
+  String get supportEmailSupport => 'Envoyer un e-mail à l\'assistance';
+
+  @override
+  String get supportChatTeam => 'Discutez avec notre équipe';
+
+  @override
+  String get supportChatTeamMsg =>
+      'Ouvrez notre chat en direct pour parler à un agent d\'assistance.';
+
+  @override
+  String get supportOpenChat => 'Ouvrir le chat en direct';
+
+  @override
+  String get twofaIntroTitle => 'Activez la 2FA pour plus de sécurité';
+
+  @override
+  String get twofaGetStarted => 'Commencer';
+
+  @override
+  String get twofaSetupTitle => 'Configuration 2FA';
+
+  @override
+  String get twofaSetUpUsing => 'Configurer avec';
+
+  @override
+  String get twofaAuthenticatorHint =>
+      'À l\'aide d\'une application d\'authentification comme (Google Authenticator, Authy, 1Password, LastPass, etc.)';
+
+  @override
+  String get twofaScanMe => 'Scannez-moi';
+
+  @override
+  String get twofaCantScan =>
+      'Si vous ne pouvez pas scanner le code QR ci-dessus, saisissez plutôt ce texte';
+
+  @override
+  String get twofaConfirmCode => 'Confirmer le code';
+
+  @override
+  String get twofaEnterCode =>
+      'Saisissez le code fourni par l\'application d\'authentification';
+
+  @override
+  String get twofaConfirm => 'Confirmer';
+
+  @override
+  String get twofaAllPrefix => 'Tout est ';
+
+  @override
+  String get twofaDoneWord => 'terminé';
+
+  @override
+  String get twofaSuccessBody => 'Votre 2FA a été activée avec succès';
+
+  @override
+  String get twofaBackToProfile => 'Retour à la configuration du profil';
+
+  @override
+  String get analyticsTitle => 'Analytique';
+
+  @override
+  String get analyticsActiveListings => 'Annonces actives';
+
+  @override
+  String analyticsOfTotal(int total) {
+    return 'sur $total au total';
+  }
+
+  @override
+  String get analyticsInquiries => 'Demandes';
+
+  @override
+  String analyticsAwaitingReply(int count) {
+    return '$count en attente de réponse';
+  }
+
+  @override
+  String get analyticsRating => 'Note';
+
+  @override
+  String analyticsReviews(int count) {
+    return '$count avis';
+  }
+
+  @override
+  String get analyticsPlan => 'Forfait';
+
+  @override
+  String get analyticsDetailedTitle => 'Analytique de performance détaillée';
+
+  @override
+  String get analyticsComingSoon =>
+      'Les tendances, les vues de profil et les graphiques de conversion arrivent bientôt.';
+
+  @override
+  String get payoutsTitle => 'Paiements';
+
+  @override
+  String get payoutsHeadline => 'Vous gardez 100 % de ce que vous gagnez';
+
+  @override
+  String get payoutsBody =>
+      'Planovar fonctionne sur abonnement — nous ne détenons pas votre argent et ne prenons pas de commission. Les clients vous paient directement, selon ce que vous convenez ensemble.';
+
+  @override
+  String get notifMarkAllRead => 'Tout marquer comme lu';
+
+  @override
+  String get notifEmpty => 'Aucune notification';
+
+  @override
+  String get notifFilterAll => 'Toutes';
+
+  @override
+  String get notifFilterOrders => 'Commandes';
+
+  @override
+  String get notifFilterPayments => 'Paiements';
+
+  @override
+  String get notifFilterSystem => 'Système';
+
+  @override
+  String get notifToday => 'Aujourd\'hui';
+
+  @override
+  String get notifYesterday => 'Hier';
+
+  @override
+  String get notifEarlier => 'Plus tôt';
+
+  @override
+  String get statusPending => 'En attente';
+
+  @override
+  String get statusConfirmed => 'Confirmé';
+
+  @override
+  String get statusCompleted => 'Terminé';
+
+  @override
+  String get statusCancelled => 'Annulé';
+
+  @override
+  String get statusSent => 'Envoyé';
+
+  @override
+  String get statusAccepted => 'Accepté';
+
+  @override
+  String get statusRejected => 'Rejeté';
+
+  @override
+  String get statusDeclined => 'Refusé';
+
+  @override
+  String get statusPaid => 'Payé';
+
+  @override
+  String get statusFailed => 'Échoué';
+
+  @override
+  String get statusFeatured => 'En vedette';
+
+  @override
+  String get statusPremium => 'Premium';
+
+  @override
+  String get statusBasic => 'Basique';
+
+  @override
+  String get statusExpired => 'Expiré';
+
+  @override
+  String get statusSuperseded => 'Remplacé';
+
+  @override
+  String get statusPartiallyPaid => 'Partiellement payé';
+
+  @override
+  String get ccQuote => 'Devis';
+
+  @override
+  String ccValidTill(String date) {
+    return 'Valable jusqu\'au $date';
+  }
+
+  @override
+  String get ccTotal => 'Total';
+
+  @override
+  String ccInvoiceNumber(String number) {
+    return 'Facture · $number';
+  }
+
+  @override
+  String get ccOrderRequest => 'Demande de commande';
+
+  @override
+  String get ccClientRequesting =>
+      'Le client le demande — acceptez pour envoyer une facture';
+
+  @override
+  String get ccDecline => 'Refuser';
+
+  @override
+  String get ccAccept => 'Accepter';
+
+  @override
+  String ccDue(String date) {
+    return 'Échéance $date';
+  }
+
+  @override
+  String get ccTaskDone => 'Vous avez terminé votre tâche';
+
+  @override
+  String get ccMarkTaskDone => 'Marquer votre tâche comme terminée';
+
+  @override
+  String get errorSomethingWrong => 'Une erreur s\'est produite';
+
+  @override
+  String get errorTryAgain => 'Réessayer';
+
+  @override
+  String get bankAdded =>
+      'Compte bancaire ajouté — vous pouvez maintenant recevoir des paiements 🎉';
+
+  @override
+  String get bankClientsPayDirect =>
+      'Les clients vous paient directement sur ce compte.';
+
+  @override
+  String get bankLoading => 'Chargement des banques…';
+
+  @override
+  String get bankSelect => 'Sélectionner une banque';
+
+  @override
+  String get bankAccountNumberHint => 'Numéro de compte à 10 chiffres';
+
+  @override
+  String get bankVerifying => 'Vérification du compte…';
+
+  @override
+  String get bankSaving => 'Enregistrement…';
+
+  @override
+  String get bankSaveAccount => 'Enregistrer le compte';
+
+  @override
+  String get bankSearch => 'Rechercher une banque';
+
+  @override
+  String get planPopular => 'POPULAIRE';
+
+  @override
+  String get planCurrentPlan => 'Forfait actuel';
+
+  @override
+  String get planMonthly => 'Mensuel';
+
+  @override
+  String get planYearly => 'Annuel';
+
+  @override
+  String get qrcNew => 'Nouveau';
+
+  @override
+  String qrcBudget(String amount) {
+    return 'Budget : $amount';
+  }
+
+  @override
+  String get qrcBudgetTbd => 'Budget : à définir';
+
+  @override
+  String get qrcOpenRespond => 'Ouvrir et répondre';
+
+  @override
+  String get qrcReject => 'Rejeter';
+
+  @override
+  String get tagAddMore => 'Ajouter un tag...';
+
+  @override
+  String tagHelper(int count, int max) {
+    return 'Appuyez sur virgule ou Entrée pour ajouter un tag  ·  $count/$max';
+  }
 }

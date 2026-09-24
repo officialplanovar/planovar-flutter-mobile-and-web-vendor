@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/app_icon.dart';
 import '../../../core/services/chat_socket.dart';
 import '../../../core/services/messaging_service.dart';
@@ -224,6 +225,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
   }
 
   Widget _buildMessage(MessageModel msg) {
+    final loc = AppLocalizations.of(context);
     final t = msg.typeLower;
     if (t == 'todo' && msg.todo != null) {
       return TodoCard(
@@ -256,15 +258,15 @@ class _ConversationScreenState extends State<ConversationScreen> {
         t == 'invoice_accepted' ||
         t == 'order_accepted' ||
         t == 'booking_confirmed') {
-      return const ChatSystemBanner(
-          label: 'Confirmed', color: Color(0xFF047857), bg: Color(0xFFF0FDF4));
+      return ChatSystemBanner(
+          label: loc.convConfirmed, color: const Color(0xFF047857), bg: const Color(0xFFF0FDF4));
     }
     if (t == 'quote_declined' ||
         t == 'quote_expired' ||
         t == 'order_declined' ||
         t == 'invoice_declined') {
       return ChatSystemBanner(
-        label: t == 'quote_expired' ? 'Quote expired' : 'Declined',
+        label: t == 'quote_expired' ? loc.convQuoteExpired : loc.convDeclined,
         color: const Color(0xFFDC2626),
         bg: const Color(0xFFFEF2F2),
         icon: Icons.cancel_rounded,
@@ -275,8 +277,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
       final refund = t == 'deposit_refunded';
       return ChatSystemBanner(
         label: refund
-            ? (amt != null ? 'Deposit refunded · ₦$amt' : 'Deposit refunded')
-            : (amt != null ? 'Payment received · ₦$amt' : 'Payment received'),
+            ? (amt != null ? loc.convDepositRefundedAmt('$amt') : loc.convDepositRefunded)
+            : (amt != null ? loc.convPaymentReceivedAmt('$amt') : loc.convPaymentReceived),
         color: const Color(0xFF047857),
         bg: const Color(0xFFF0FDF4),
         icon: Icons.payments_rounded,
@@ -284,24 +286,24 @@ class _ConversationScreenState extends State<ConversationScreen> {
     }
     if (t == 'timeline_update') {
       return ChatSystemBanner(
-        label: msg.content ?? 'Order update',
+        label: msg.content ?? loc.convOrderUpdate,
         color: AppColors.primary,
         bg: context.c.primaryLight,
         icon: Icons.local_shipping_rounded,
       );
     }
     if (t == 'review_requested') {
-      return const ChatSystemBanner(
-        label: 'Review requested',
-        color: Color(0xFFB45309),
-        bg: Color(0xFFFFFBEB),
+      return ChatSystemBanner(
+        label: loc.convReviewRequested,
+        color: const Color(0xFFB45309),
+        bg: const Color(0xFFFFFBEB),
         icon: Icons.star_rounded,
       );
     }
     if (t == 'review_submitted') {
       final r = msg.metadata['rating'];
       return ChatSystemBanner(
-        label: r != null ? 'Client left a review · $r★' : 'Client left a review',
+        label: r != null ? loc.convReviewLeftRating('$r') : loc.convReviewLeft,
         color: const Color(0xFFB45309),
         bg: const Color(0xFFFFFBEB),
         icon: Icons.star_rounded,
@@ -337,6 +339,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
           (m) => m.typeLower == 'invoice' || m.typeLower == 'quote_accepted');
 
   Widget _buildBankBanner() {
+    final t = AppLocalizations.of(context);
     return Container(
       color: const Color(0xFFFEF3C7),
       padding: const EdgeInsets.fromLTRB(16, 10, 12, 10),
@@ -346,7 +349,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Quote accepted — add your bank account to get paid.',
+              t.convBankBanner,
               style: GoogleFonts.urbanist(
                   fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF92400E)),
             ),
@@ -365,7 +368,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
-            child: Text('Add', style: GoogleFonts.urbanist(fontWeight: FontWeight.w700)),
+            child: Text(t.convAdd, style: GoogleFonts.urbanist(fontWeight: FontWeight.w700)),
           ),
         ],
       ),
@@ -393,8 +396,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
   }
 
   Widget _buildFulfilmentBar(ChatBookingRef booking) {
+    final t = AppLocalizations.of(context);
     final isRental = booking.fulfilmentType == 'rental';
-    final label = isRental ? 'Confirm return' : 'Mark delivered';
+    final label = isRental ? t.convConfirmReturn : t.convMarkDelivered;
     return Container(
       color: context.c.surface,
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
@@ -409,7 +413,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 minimumSize: const Size(double.infinity, 48),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
-              child: Text('Post update',
+              child: Text(t.convPostUpdate,
                   style: GoogleFonts.urbanist(fontWeight: FontWeight.w700)),
             ),
           ),
@@ -437,23 +441,23 @@ class _ConversationScreenState extends State<ConversationScreen> {
   }
 
   Future<void> _confirmReturn(String bookingId) async {
+    final t = AppLocalizations.of(context);
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: ctx.c.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Confirm rental return?',
+        title: Text(t.convConfirmReturnTitle,
             style: GoogleFonts.urbanist(fontWeight: FontWeight.w800, color: ctx.c.textPrimary)),
         content: Text(
-          'This completes the rental and refunds the client\'s deposit. '
-          'Send the deposit back to the client from your bank.',
+          t.convConfirmReturnBody,
           style: GoogleFonts.urbanist(color: ctx.c.textSecondary),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(t.cancel)),
           TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: Text('Confirm return',
+              child: Text(t.convConfirmReturn,
                   style: GoogleFonts.urbanist(fontWeight: FontWeight.w700, color: AppColors.primary))),
         ],
       ),
@@ -462,20 +466,21 @@ class _ConversationScreenState extends State<ConversationScreen> {
     try {
       await BookingsRepository().confirmReturn(bookingId);
       await _load();
-      _snack('Rental completed — deposit refunded 🎉');
+      _snack(t.convRentalCompleted);
     } catch (e) {
       _snack(e.toString().replaceFirst('Exception: ', ''));
     }
   }
 
   Future<void> _postUpdate(String bookingId) async {
+    final t = AppLocalizations.of(context);
     final ctrl = TextEditingController();
     final message = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: ctx.c.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Post an update',
+        title: Text(t.convPostUpdateTitle,
             style: GoogleFonts.urbanist(fontWeight: FontWeight.w800, color: ctx.c.textPrimary)),
         content: TextField(
           controller: ctrl,
@@ -483,15 +488,15 @@ class _ConversationScreenState extends State<ConversationScreen> {
           maxLines: 2,
           style: GoogleFonts.urbanist(color: ctx.c.textPrimary),
           decoration: InputDecoration(
-            hintText: 'e.g. Out for delivery — arriving by 4pm',
+            hintText: t.convPostUpdateHint,
             hintStyle: GoogleFonts.urbanist(color: ctx.c.textHint),
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(t.cancel)),
           TextButton(
               onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
-              child: const Text('Post')),
+              child: Text(t.convPost)),
         ],
       ),
     );
@@ -499,29 +504,30 @@ class _ConversationScreenState extends State<ConversationScreen> {
     try {
       await BookingsRepository().postUpdate(bookingId, message);
       await _load();
-      _snack('Update posted');
+      _snack(t.convUpdatePosted);
     } catch (e) {
       _snack(e.toString().replaceFirst('Exception: ', ''));
     }
   }
 
   Future<void> _markDelivered(String bookingId) async {
+    final t = AppLocalizations.of(context);
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: ctx.c.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Mark as delivered?',
+        title: Text(t.convMarkDeliveredTitle,
             style: GoogleFonts.urbanist(fontWeight: FontWeight.w800, color: ctx.c.textPrimary)),
         content: Text(
-          'This completes the booking and asks the client to leave a review.',
+          t.convMarkDeliveredBody,
           style: GoogleFonts.urbanist(color: ctx.c.textSecondary),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(t.cancel)),
           TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: Text('Mark delivered',
+              child: Text(t.convMarkDelivered,
                   style: GoogleFonts.urbanist(fontWeight: FontWeight.w700, color: AppColors.primary))),
         ],
       ),
@@ -530,7 +536,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     try {
       await BookingsRepository().markDelivered(bookingId);
       await _load();
-      _snack('Marked as delivered 🎉');
+      _snack(t.convMarkedDelivered);
     } catch (e) {
       _snack(e.toString().replaceFirst('Exception: ', ''));
     }
@@ -538,6 +544,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   Widget _buildQuoteActionBar() {
     // Once a quote exists (active), the vendor revises it instead of creating new.
+    final t = AppLocalizations.of(context);
     final active = _activeQuote();
     final revising = active != null;
     return Container(
@@ -547,7 +554,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
         onPressed: revising ? () => _reviseQuote(active) : _openCreateQuote,
         icon: Icon(revising ? Icons.edit_rounded : Icons.description_outlined,
             size: 18, color: AppColors.primary),
-        label: Text(revising ? 'Revise quote' : 'Create & send quote',
+        label: Text(revising ? t.convReviseQuote : t.convCreateSendQuote,
             style: GoogleFonts.urbanist(
                 fontWeight: FontWeight.w700, color: AppColors.primary)),
         style: OutlinedButton.styleFrom(
@@ -566,29 +573,32 @@ class _ConversationScreenState extends State<ConversationScreen> {
   }
 
   Future<void> _acceptOrder(String bookingId) async {
+    final t = AppLocalizations.of(context);
     try {
       await BookingsRepository().acceptOrder(bookingId);
       await _load();
-      _snack('Order accepted — invoice sent 🎉');
+      _snack(t.convOrderAccepted);
     } catch (e) {
       _snack(e.toString().replaceFirst('Exception: ', ''));
     }
   }
 
   Future<void> _declineOrder(String bookingId) async {
+    final t = AppLocalizations.of(context);
     try {
       await BookingsRepository().declineOrder(bookingId);
       await _load();
-      _snack('Order declined');
+      _snack(t.convOrderDeclined);
     } catch (e) {
       _snack(e.toString().replaceFirst('Exception: ', ''));
     }
   }
 
   Future<void> _openCreateQuote() async {
+    final t = AppLocalizations.of(context);
     final clientId = _conv.clientId;
     if (clientId == null) {
-      _snack('Could not identify the client');
+      _snack(t.convCouldNotIdentifyClient);
       return;
     }
     final listingId = await _pickListing();
@@ -622,7 +632,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Couldn't update the task")),
+          SnackBar(content: Text(AppLocalizations.of(context).convCouldNotUpdateTask)),
         );
       }
     }
@@ -630,16 +640,17 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   /// Bottom-sheet picker of the vendor's own listings to quote against.
   Future<String?> _pickListing() async {
+    final t = AppLocalizations.of(context);
     List<ListingModel> listings;
     try {
       listings = await ListingsRepository().listMine();
     } catch (_) {
-      _snack('Could not load your listings');
+      _snack(t.convCouldNotLoadListings);
       return null;
     }
     if (!mounted) return null;
     if (listings.isEmpty) {
-      _snack('Add a listing first to send a quote');
+      _snack(t.convAddListingFirst);
       return null;
     }
     return showModalBottomSheet<String>(
@@ -652,7 +663,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: 14),
-            Text('Quote for which listing?',
+            Text(t.convQuoteForListing,
                 style: GoogleFonts.urbanist(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
@@ -690,6 +701,7 @@ class _ConversationAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final topPadding = MediaQuery.of(context).padding.top;
 
     return Container(
@@ -776,7 +788,7 @@ class _ConversationAppBar extends StatelessWidget {
                 const SizedBox(height: 1),
                 if (conv.isGroup)
                   Text(
-                    '${conv.groupParticipantCount} participants',
+                    t.msgParticipants(conv.groupParticipantCount),
                     style: GoogleFonts.urbanist(
                       fontSize: 12,
                       color: Colors.white70,
@@ -952,6 +964,7 @@ class _InputBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Container(
@@ -992,7 +1005,7 @@ class _InputBar extends StatelessWidget {
                   color: context.c.textPrimary,
                 ),
                 decoration: InputDecoration(
-                  hintText: 'Type a message',
+                  hintText: t.convTypeMessage,
                   hintStyle: GoogleFonts.urbanist(
                     fontSize: 15,
                     color: context.c.textHint,

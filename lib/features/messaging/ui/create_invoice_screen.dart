@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/responsive/responsive.dart';
 import '../../../core/services/messaging_service.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/models/conversation_model.dart';
 import '../../../shared/widgets/app_button.dart';
 
@@ -86,6 +87,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
   }
 
   Widget _buildGradientAppBar() {
+    final t = AppLocalizations.of(context);
     return PreferredSize(
       preferredSize: const Size.fromHeight(72),
       child: Container(
@@ -109,7 +111,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               Row(
                 children: [
                   Text(
-                    'Create invoice',
+                    t.ciTitle,
                     style: GoogleFonts.urbanist(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
@@ -136,7 +138,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 ],
               ),
               Text(
-                '${_conv?.participantName ?? 'Client'} · ${_conv?.eventName ?? 'Event'} · ${_formattedEventDate()}',
+                '${_conv?.participantName ?? t.reviewClientFallback} · ${_conv?.eventName ?? t.cqEvent} · ${_formattedEventDate()}',
                 style: GoogleFonts.urbanist(
                   fontSize: 12,
                   color: Colors.white70,
@@ -193,6 +195,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
   }
 
   Widget _buildLineItemRow(int index) {
+    final t = AppLocalizations.of(context);
     final item = _items[index];
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -207,7 +210,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 color: context.c.textPrimary,
               ),
               decoration: InputDecoration(
-                hintText: 'Description',
+                hintText: t.cqDescription,
                 hintStyle: GoogleFonts.urbanist(
                   fontSize: 14,
                   color: context.c.textHint,
@@ -244,7 +247,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 color: context.c.textPrimary,
               ),
               decoration: InputDecoration(
-                hintText: 'Amount',
+                hintText: t.cqAmount,
                 hintStyle: GoogleFonts.urbanist(
                   fontSize: 14,
                   color: context.c.textHint,
@@ -294,7 +297,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
           height: 44,
           alignment: Alignment.center,
           child: Text(
-            '+ Add Item',
+            AppLocalizations.of(context).cqAddItem,
             style: GoogleFonts.urbanist(
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -323,7 +326,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Milestone $milestoneNumber',
+            AppLocalizations.of(context).cqMilestone(milestoneNumber),
             style: GoogleFonts.urbanist(
               fontSize: 14,
               fontWeight: FontWeight.bold,
@@ -402,6 +405,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: context.c.background,
       appBar: _buildGradientAppBar() as PreferredSizeWidget,
@@ -428,10 +432,10 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'Pre-filled from accepted quote QT-2026-047. Review items and payment milestones, then send to confirm the booking.',
+                      t.ciBanner,
                       style: GoogleFonts.urbanist(
                         fontSize: 13,
-                        color: Color(0xFF27AE60),
+                        color: const Color(0xFF27AE60),
                       ),
                     ),
                   ),
@@ -450,7 +454,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             const SizedBox(height: 28),
 
             // Invoice Items
-            _buildSectionTitle('Invoice Items'),
+            _buildSectionTitle(t.ciInvoiceItems),
             const SizedBox(height: 12),
             ...List.generate(_items.length, (i) => _buildLineItemRow(i)),
             const SizedBox(height: 8),
@@ -459,7 +463,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             Align(
               alignment: Alignment.centerRight,
               child: Text(
-                'Subtotal ${Formatters.formatCurrency(_subtotal)}',
+                t.cqSubtotal(Formatters.formatCurrency(_subtotal)),
                 style: GoogleFonts.urbanist(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -470,12 +474,12 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             const SizedBox(height: 28),
 
             // Payment Milestones
-            _buildSectionTitle('Payment Milestones', rightLabel: 'From Quote'),
+            _buildSectionTitle(t.ciPaymentMilestones, rightLabel: t.ciFromQuote),
             const SizedBox(height: 12),
             _buildMilestoneCard(
               milestoneNumber: 1,
               amount: 150000,
-              dueLabel: 'Due on booking confirmation (immediately)',
+              dueLabel: t.cqDueOnConfirmation,
             ),
             _buildMilestoneCard(
               milestoneNumber: 2,
@@ -486,7 +490,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
 
             // Payout to your account
             Text(
-              'Payout to your account',
+              t.ciPayoutToAccount,
               style: GoogleFonts.urbanist(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -519,7 +523,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Account',
+                  t.ciAccount,
                   style: GoogleFonts.urbanist(
                     fontSize: 13,
                     color: context.c.textSecondary,
@@ -543,7 +547,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Your payout',
+                  t.ciYourPayout,
                   style: GoogleFonts.urbanist(
                     fontSize: 13,
                     color: context.c.textSecondary,
@@ -577,11 +581,11 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             AppButton.primary(
-              'Send Invoice to ${_conv?.participantName ?? 'Client'}',
+              t.ciSendInvoiceTo(_conv?.participantName ?? t.reviewClientFallback),
               onTap: () {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Invoice sent successfully!')),
+                  SnackBar(content: Text(t.ciInvoiceSent)),
                 );
               },
               icon: const Icon(Icons.send_rounded),
@@ -604,7 +608,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                         color: AppColors.primary, size: 18),
                     const SizedBox(width: 8),
                     Text(
-                      'Preview',
+                      t.ciPreview,
                       style: GoogleFonts.urbanist(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,

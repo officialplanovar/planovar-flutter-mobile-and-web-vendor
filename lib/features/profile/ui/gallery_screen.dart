@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/services/upload_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../features/vendor/data/vendor_repository.dart';
 import '../../../shared/widgets/network_image_widget.dart';
 
@@ -54,12 +55,15 @@ class _GalleryScreenState extends State<GalleryScreen> {
   int? _uploadingIndex;
   bool _saving = false;
 
-  static const _labels = [
-    'Front Photo',
-    'Second Photo',
-    'Third Photo',
-    'Fourth Photo',
-  ];
+  List<String> _labels(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    return [
+      t.galleryPhoto1,
+      t.galleryPhoto2,
+      t.galleryPhoto3,
+      t.galleryPhoto4,
+    ];
+  }
 
   @override
   void initState() {
@@ -95,7 +99,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not upload photo: $e')),
+          SnackBar(content: Text(AppLocalizations.of(context).galleryUploadFailed('$e'))),
         );
       }
     } finally {
@@ -111,13 +115,13 @@ class _GalleryScreenState extends State<GalleryScreen> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Gallery saved')),
+          SnackBar(content: Text(AppLocalizations.of(context).gallerySaved)),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not save gallery: $e')),
+          SnackBar(content: Text(AppLocalizations.of(context).gallerySaveFailed('$e'))),
         );
       }
     } finally {
@@ -127,6 +131,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final labels = _labels(context);
     final topPadding = MediaQuery.of(context).padding.top;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
@@ -162,7 +168,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Gallery',
+                      t.profileGallery,
                       style: GoogleFonts.urbanist(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
@@ -171,7 +177,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Showcase your best work to attract clients',
+                      t.gallerySubtitle,
                       style: GoogleFonts.urbanist(
                         fontSize: 13,
                         color: Colors.white70,
@@ -237,7 +243,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
-                                      _labels[i],
+                                      labels[i],
                                       style: GoogleFonts.urbanist(
                                         fontSize: 13,
                                         color: AppColors.primary,
@@ -272,7 +278,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 ),
                 child: Center(
                   child: Text(
-                    'Save Gallery',
+                    t.gallerySaveButton,
                     style: GoogleFonts.urbanist(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 
 // ─── Gradient button helper ───────────────────────────────────────────────────
 
@@ -240,7 +241,7 @@ class TwoFAIntroScreen extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 40),
                           child: Text(
-                            'Enable 2FA for additional security',
+                            AppLocalizations.of(context).twofaIntroTitle,
                             textAlign: TextAlign.center,
                             style: GoogleFonts.urbanist(
                               fontSize: 20,
@@ -262,7 +263,7 @@ class TwoFAIntroScreen extends StatelessWidget {
                     bottom: bottomPadding + 24,
                   ),
                   child: _GradientButton(
-                    label: 'Get Started',
+                    label: AppLocalizations.of(context).twofaGetStarted,
                     onTap: () => context.push('/profile/2fa/setup'),
                   ),
                 ),
@@ -282,20 +283,21 @@ class TwoFASetupScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: context.c.background,
       body: Column(
         children: [
           _buildGradientAppBar(
             context,
-            title: '2FA Setup',
+            title: t.twofaSetupTitle,
           ),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
               children: [
                 Text(
-                  'Set up using',
+                  t.twofaSetUpUsing,
                   style: GoogleFonts.urbanist(
                     fontSize: 24,
                     fontWeight: FontWeight.w800,
@@ -304,7 +306,7 @@ class TwoFASetupScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Using the authenticator app such as (Google Authenticator, Authy, 1Password, Last pass etc',
+                  t.twofaAuthenticatorHint,
                   style: GoogleFonts.urbanist(
                     fontSize: 14,
                     color: context.c.textSecondary,
@@ -328,12 +330,12 @@ class TwoFASetupScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 _GradientButton(
-                  label: 'Scan Me',
+                  label: t.twofaScanMe,
                   onTap: () => context.push('/profile/2fa/confirm'),
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  "If you can't scan the QR code above, enter this text instead",
+                  t.twofaCantScan,
                   style: GoogleFonts.urbanist(
                     fontSize: 13,
                     color: context.c.textSecondary,
@@ -412,13 +414,14 @@ class _TwoFAConfirmScreenState extends State<TwoFAConfirmScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final code = _controller.text;
 
     return Scaffold(
       backgroundColor: context.c.surface,
       body: Column(
         children: [
-          _buildGradientAppBar(context, title: 'Confirm Code'),
+          _buildGradientAppBar(context, title: t.twofaConfirmCode),
           Expanded(
             child: GestureDetector(
               onTap: () => _focusNode.requestFocus(),
@@ -428,7 +431,7 @@ class _TwoFAConfirmScreenState extends State<TwoFAConfirmScreen> {
                   children: [
                     const SizedBox(height: 40),
                     Text(
-                      'Confirm Code',
+                      t.twofaConfirmCode,
                       textAlign: TextAlign.center,
                       style: GoogleFonts.urbanist(
                         fontSize: 22,
@@ -438,7 +441,7 @@ class _TwoFAConfirmScreenState extends State<TwoFAConfirmScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Enter the code provided by the authenticator app',
+                      t.twofaEnterCode,
                       textAlign: TextAlign.center,
                       style: GoogleFonts.urbanist(
                         fontSize: 14,
@@ -506,7 +509,7 @@ class _TwoFAConfirmScreenState extends State<TwoFAConfirmScreen> {
 
                     const SizedBox(height: 40),
                     _GradientButton(
-                      label: 'Confirm',
+                      label: t.twofaConfirm,
                       onTap: () => context.push('/profile/2fa/success'),
                     ),
                   ],
@@ -527,6 +530,7 @@ class TwoFASuccessScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
@@ -552,9 +556,9 @@ class TwoFASuccessScreen extends StatelessWidget {
                         color: context.c.textPrimary,
                       ),
                       children: [
-                        const TextSpan(text: 'All '),
+                        TextSpan(text: t.twofaAllPrefix),
                         TextSpan(
-                          text: 'done',
+                          text: t.twofaDoneWord,
                           style: GoogleFonts.urbanist(
                             fontSize: 22,
                             fontWeight: FontWeight.w800,
@@ -568,7 +572,7 @@ class TwoFASuccessScreen extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: Text(
-                      'Your 2FA has been successfully enabled',
+                      t.twofaSuccessBody,
                       textAlign: TextAlign.center,
                       style: GoogleFonts.urbanist(
                         fontSize: 14,
@@ -586,7 +590,7 @@ class TwoFASuccessScreen extends StatelessWidget {
                 bottom: bottomPadding + 24,
               ),
               child: _GradientButton(
-                label: 'Back to profile setup',
+                label: t.twofaBackToProfile,
                 onTap: () => context.go('/profile'),
               ),
             ),

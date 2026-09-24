@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/network_image_widget.dart';
 import '../../reviews/data/reviews_repository.dart';
@@ -38,14 +39,16 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
   }
 
   String _timeAgo(DateTime d) {
+    final t = AppLocalizations.of(context);
     final diff = DateTime.now().difference(d);
-    if (diff.inDays >= 30) return '${(diff.inDays / 30).floor()}mo ago';
-    if (diff.inDays >= 1) return '${diff.inDays}d ago';
-    if (diff.inHours >= 1) return '${diff.inHours}h ago';
-    return 'just now';
+    if (diff.inDays >= 30) return t.reviewsMonthsAgo((diff.inDays / 30).floor());
+    if (diff.inDays >= 1) return t.reviewsDaysAgo(diff.inDays);
+    if (diff.inHours >= 1) return t.reviewsHoursAgo(diff.inHours);
+    return t.reviewsJustNow;
   }
 
   Future<void> _showReplySheet(VendorReview review) async {
+    final t = AppLocalizations.of(context);
     final ctrl = TextEditingController();
     var sending = false;
     await showModalBottomSheet<void>(
@@ -63,7 +66,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Reply to ${review.reviewerName}',
+              Text(t.reviewsReplyTo(review.reviewerName),
                   style: GoogleFonts.urbanist(
                       fontSize: 17, fontWeight: FontWeight.w700)),
               const SizedBox(height: 12),
@@ -71,13 +74,13 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                 controller: ctrl,
                 maxLines: 4,
                 maxLength: 2000,
-                decoration: const InputDecoration(
-                  hintText: 'Thank them, or address their feedback…',
+                decoration: InputDecoration(
+                  hintText: t.reviewsReplyHint,
                 ),
               ),
               const SizedBox(height: 12),
               AppButton.primary(
-                sending ? 'Sending…' : 'Send reply',
+                sending ? t.reviewsSending : t.reviewsSendReply,
                 loading: sending,
                 onTap: sending
                     ? null
@@ -109,6 +112,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final topPadding = MediaQuery.of(context).padding.top;
 
     return Scaffold(
@@ -138,13 +142,13 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('My Reviews',
+                    Text(t.reviewsMyReviews,
                         style: GoogleFonts.urbanist(
                             fontSize: 18,
                             fontWeight: FontWeight.w800,
                             color: Colors.white)),
                     const SizedBox(height: 2),
-                    Text("Reviews you've received from your past work",
+                    Text(t.reviewsSubtitle,
                         style: GoogleFonts.urbanist(
                             fontSize: 13, color: Colors.white70)),
                   ],
@@ -166,12 +170,12 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('Could not load reviews',
+                        Text(t.reviewsLoadFailed,
                             style: GoogleFonts.urbanist(
                                 fontSize: 14,
                                 color: context.c.textSecondary)),
                         const SizedBox(height: 12),
-                        AppButton.secondary('Retry', onTap: _reload),
+                        AppButton.secondary(t.retry, onTap: _reload),
                       ],
                     ),
                   );
@@ -185,14 +189,14 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                         Icon(Icons.reviews_outlined,
                             size: 44, color: context.c.textHint),
                         const SizedBox(height: 12),
-                        Text('No reviews yet',
+                        Text(t.reviewsEmpty,
                             style: GoogleFonts.urbanist(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
                                 color: context.c.textPrimary)),
                         const SizedBox(height: 4),
                         Text(
-                            'Complete bookings and your client reviews will appear here.',
+                            t.reviewsEmptyBody,
                             style: GoogleFonts.urbanist(
                                 fontSize: 13,
                                 color: context.c.textSecondary)),
@@ -298,7 +302,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                 ),
               ),
               const SizedBox(height: 4),
-              Text('(${page.total} Reviews)',
+              Text(AppLocalizations.of(context).reviewsCount(page.total),
                   style: GoogleFonts.urbanist(
                       fontSize: 12, color: context.c.textSecondary)),
             ],
@@ -372,7 +376,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                 TextButton.icon(
                   onPressed: () => _showReplySheet(review),
                   icon: const Icon(Icons.reply_rounded, size: 16),
-                  label: Text('Reply',
+                  label: Text(AppLocalizations.of(context).reviewsReply,
                       style: GoogleFonts.urbanist(
                           fontSize: 13, fontWeight: FontWeight.w700)),
                 ),
@@ -413,7 +417,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Your reply',
+                        Text(AppLocalizations.of(context).reviewsYourReply,
                             style: GoogleFonts.urbanist(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,

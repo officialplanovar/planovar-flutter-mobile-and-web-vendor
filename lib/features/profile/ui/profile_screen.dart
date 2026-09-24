@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/router/app_routes.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/models/vendor_model.dart';
 import '../../../shared/widgets/network_image_widget.dart';
 import '../../auth/bloc/auth_bloc.dart';
@@ -43,12 +44,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final vendor = _vendor;
     final authState = context.watch<AuthBloc>().state;
     final user = authState is AuthAuthenticated ? authState.user : null;
     final topPadding = MediaQuery.of(context).padding.top;
 
-    final businessName = vendor?.businessName ?? user?.name ?? 'Your business';
+    final businessName = vendor?.businessName ?? user?.name ?? t.profileYourBusiness;
     final tag = (vendor?.tags.isNotEmpty ?? false) ? vendor!.tags.first : null;
     final subtitle = [_locationLabel(vendor), tag]
         .where((e) => e != null && e.isNotEmpty)
@@ -56,7 +58,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final tier = (vendor?.subscriptionTier ?? '').toUpperCase();
     final tierLabel = tier.isEmpty
         ? null
-        : '${tier[0]}${tier.substring(1).toLowerCase()} Plan';
+        : t.profilePlanLabel('${tier[0]}${tier.substring(1).toLowerCase()}');
 
     return Scaffold(
       backgroundColor: context.c.background,
@@ -200,7 +202,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              'Verified',
+                              t.profileVerified,
                               style: GoogleFonts.urbanist(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
@@ -219,7 +221,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 size: 13, color: Colors.white),
                             const SizedBox(width: 4),
                             Text(
-                              'Unverified',
+                              t.profileUnverified,
                               style: GoogleFonts.urbanist(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
@@ -236,79 +238,79 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
 
           // ── General section ──────────────────────────────────────────────────
-          _SectionLabel(label: 'General'),
+          _SectionLabel(label: t.profileGeneral),
           _MenuSection(
             items: [
               _MenuItem(
                 asset: 'assets/icons/update-profile.svg',
-                label: 'Update your Profile',
+                label: t.profileUpdateProfile,
                 onTap: () => context.push(AppRoutes.editProfile),
               ),
               _MenuItem(
                 asset: 'assets/icons/security.svg',
-                label: 'Security',
+                label: t.profileSecurity,
                 onTap: () => context.push(AppRoutes.security),
               ),
               _MenuItem(
                 asset: 'assets/icons/reviews.svg',
-                label: 'Reviews',
+                label: t.profileReviews,
                 onTap: () => context.push(AppRoutes.reviews),
               ),
               _MenuItem(
                 asset: 'assets/icons/hugeicons_bank.svg',
-                label: 'Linked Bank accounts',
+                label: t.profileLinkedBanks,
                 onTap: () => context.push(AppRoutes.bankDetails),
               ),
               _MenuItem(
                 asset: 'assets/icons/gallery.svg',
-                label: 'Gallery',
+                label: t.profileGallery,
                 onTap: () => context.push(AppRoutes.gallery),
               ),
               _MenuItem(
                 asset: 'assets/icons/subscriptions.svg',
-                label: 'Subscription Plans',
+                label: t.profileSubscriptionPlans,
                 onTap: () => context.push(AppRoutes.subscriptionPlan),
               ),
               _MenuItem(
                 asset: 'assets/icons/language.svg',
-                label: 'Language Preference',
+                label: t.profileLanguagePref,
                 onTap: () => context.push(AppRoutes.language),
               ),
             ],
           ),
 
           // ── Preferences section ──────────────────────────────────────────────
-          _SectionLabel(label: 'Preferences'),
+          _SectionLabel(label: t.profilePreferences),
           _MenuSection(
             items: [
               _MenuItem(
                 asset: 'assets/icons/theme.svg',
-                label: 'Theme',
+                label: t.profileTheme,
                 onTap: () => context.push(AppRoutes.themeSettings),
               ),
               _MenuItem(
                 asset: 'assets/icons/customize-storefront.svg',
-                label: 'Customize your Storefront',
+                label: t.profileCustomizeStorefront,
                 onTap: () => context.push(AppRoutes.editProfile),
               ),
               _MenuItem(
                 asset: 'assets/icons/notifications.svg',
-                label: 'Notifications',
+                label: t.profileNotifications,
                 onTap: () => context.push(AppRoutes.notificationSettings),
               ),
               _MenuItem(
                 asset: 'assets/icons/help-and-support.svg',
-                label: 'Help and Support',
+                label: t.profileHelpSupport,
                 onTap: () => context.push(AppRoutes.help),
               ),
               _MenuItem(
                 asset: 'assets/icons/terms-and-conditions.svg',
-                label: 'Terms & Conditions',
+                label: t.profileTerms,
                 onTap: () => context.push(AppRoutes.termsAndConditions),
               ),
               _MenuItem(
                 asset: 'assets/icons/leave-planovar.svg',
-                label: 'Leave Planovar',
+                label: t.profileLeavePlanovar,
                 onTap: () => context.push(AppRoutes.deleteAccount),
               ),
             ],
@@ -510,7 +512,7 @@ class _SignOutButton extends StatelessWidget {
             ),
             const SizedBox(width: 6),
             Text(
-              'Sign out',
+              AppLocalizations.of(context).profileSignOut,
               style: GoogleFonts.urbanist(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,

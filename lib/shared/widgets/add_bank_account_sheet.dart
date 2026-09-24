@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/services/bank_service.dart';
 import '../../core/theme/app_colors.dart';
+import '../../l10n/app_localizations.dart';
 import '../models/bank_models.dart';
 import 'app_button.dart';
 
@@ -95,6 +96,7 @@ class _AddBankAccountSheetState extends State<AddBankAccountSheet> {
   Future<void> _save() async {
     if (_bank == null || _accountName == null) return;
     setState(() => _saving = true);
+    final t = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
     try {
@@ -107,7 +109,7 @@ class _AddBankAccountSheetState extends State<AddBankAccountSheet> {
       navigator.pop();
       widget.onSaved?.call(saved);
       messenger.showSnackBar(
-        const SnackBar(content: Text('Bank account added — you can now receive payments 🎉')),
+        SnackBar(content: Text(t.bankAdded)),
       );
     } catch (e) {
       if (mounted) setState(() => _saving = false);
@@ -134,6 +136,7 @@ class _AddBankAccountSheetState extends State<AddBankAccountSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       child: Container(
@@ -155,11 +158,11 @@ class _AddBankAccountSheetState extends State<AddBankAccountSheet> {
                         borderRadius: BorderRadius.circular(2)),
                   ),
                 ),
-                Text('Add bank account',
+                Text(t.psAddBankAccount,
                     style: GoogleFonts.urbanist(
                         fontSize: 18, fontWeight: FontWeight.w800, color: context.c.textPrimary)),
                 const SizedBox(height: 2),
-                Text('Clients pay you directly to this account.',
+                Text(t.bankClientsPayDirect,
                     style: GoogleFonts.urbanist(fontSize: 13, color: context.c.textSecondary)),
                 const SizedBox(height: 16),
                 // Bank picker
@@ -176,8 +179,8 @@ class _AddBankAccountSheetState extends State<AddBankAccountSheet> {
                       Expanded(
                         child: Text(
                           _loadingBanks
-                              ? 'Loading banks…'
-                              : (_bank?.name ?? 'Select bank'),
+                              ? t.bankLoading
+                              : (_bank?.name ?? t.bankSelect),
                           style: GoogleFonts.urbanist(
                               fontSize: 14,
                               color: _bank == null ? context.c.textHint : context.c.textPrimary),
@@ -198,7 +201,7 @@ class _AddBankAccountSheetState extends State<AddBankAccountSheet> {
                   ],
                   style: GoogleFonts.urbanist(color: context.c.textPrimary),
                   decoration: InputDecoration(
-                    hintText: '10-digit account number',
+                    hintText: t.bankAccountNumberHint,
                     hintStyle: GoogleFonts.urbanist(color: context.c.textHint),
                     filled: true,
                     fillColor: context.c.surfaceElevated,
@@ -213,7 +216,7 @@ class _AddBankAccountSheetState extends State<AddBankAccountSheet> {
                   Row(children: [
                     const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2)),
                     const SizedBox(width: 8),
-                    Text('Verifying account…',
+                    Text(t.bankVerifying,
                         style: GoogleFonts.urbanist(fontSize: 13, color: context.c.textSecondary)),
                   ])
                 else if (_accountName != null)
@@ -231,7 +234,7 @@ class _AddBankAccountSheetState extends State<AddBankAccountSheet> {
                       style: GoogleFonts.urbanist(fontSize: 12.5, color: AppColors.error)),
                 const SizedBox(height: 18),
                 AppButton.primary(
-                  _saving ? 'Saving…' : 'Save account',
+                  _saving ? t.bankSaving : t.bankSaveAccount,
                   loading: _saving,
                   onTap: (_accountName != null && !_saving) ? _save : null,
                 ),
@@ -279,7 +282,7 @@ class _BankPickerState extends State<_BankPicker> {
                 onChanged: (v) => setState(() => _q = v),
                 style: GoogleFonts.urbanist(color: context.c.textPrimary),
                 decoration: InputDecoration(
-                  hintText: 'Search bank',
+                  hintText: AppLocalizations.of(context).bankSearch,
                   hintStyle: GoogleFonts.urbanist(color: context.c.textHint),
                   prefixIcon: Icon(Icons.search_rounded, color: context.c.textHint),
                   filled: true,
