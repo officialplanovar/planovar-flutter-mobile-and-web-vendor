@@ -18,6 +18,15 @@ class AuthRepository {
   /// Launches the Google OAuth flow (redirects the browser to Google).
   Future<void> signInWithGoogle() => _remote.signInWithGoogle();
 
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) =>
+      _remote.changePassword(
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+      );
+
   Future<UserModel> signUp({
     required String firstName,
     required String lastName,

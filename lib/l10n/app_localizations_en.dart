@@ -2475,4 +2475,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String tagHelper(int count, int max) {
     return 'Press comma or Enter to add a tag  ·  $count/$max';
   }
+
+  @override
+  String get psCurrentPassword => 'Current Password';
+
+  @override
+  String get psCurrentPasswordHint => 'Enter your current password';
+
+  @override
+  String get psCurrentPasswordRequired => 'Please enter your current password';
+
+  @override
+  String get psPasswordTooWeak =>
+      'Your new password must be at least 8 characters and include an uppercase letter, a number, and a special character';
+
+  @override
+  String get psPasswordsDontMatch => 'The new passwords don\'t match';
 }

@@ -1199,5 +1199,10 @@
         "type": "int"
       }
     }
-  }
+  },
+  "psCurrentPassword": "Current Password",
+  "psCurrentPasswordHint": "Enter your current password",
+  "psCurrentPasswordRequired": "Please enter your current password",
+  "psPasswordTooWeak": "Your new password must be at least 8 characters and include an uppercase letter, a number, and a special character",
+  "psPasswordsDontMatch": "The new passwords don't match"
 }

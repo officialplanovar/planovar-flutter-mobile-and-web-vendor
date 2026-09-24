@@ -2508,4 +2508,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String tagHelper(int count, int max) {
     return 'Appuyez sur virgule ou Entrée pour ajouter un tag  ·  $count/$max';
   }
+
+  @override
+  String get psCurrentPassword => 'Mot de passe actuel';
+
+  @override
+  String get psCurrentPasswordHint => 'Saisissez votre mot de passe actuel';
+
+  @override
+  String get psCurrentPasswordRequired =>
+      'Veuillez saisir votre mot de passe actuel';
+
+  @override
+  String get psPasswordTooWeak =>
+      'Votre nouveau mot de passe doit contenir au moins 8 caractères, dont une majuscule, un chiffre et un caractère spécial';
+
+  @override
+  String get psPasswordsDontMatch =>
+      'Les nouveaux mots de passe ne correspondent pas';
 }

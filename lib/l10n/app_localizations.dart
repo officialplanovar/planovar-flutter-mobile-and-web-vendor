@@ -4657,6 +4657,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Press comma or Enter to add a tag  ·  {count}/{max}'**
   String tagHelper(int count, int max);
+
+  /// No description provided for @psCurrentPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Password'**
+  String get psCurrentPassword;
+
+  /// No description provided for @psCurrentPasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your current password'**
+  String get psCurrentPasswordHint;
+
+  /// No description provided for @psCurrentPasswordRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your current password'**
+  String get psCurrentPasswordRequired;
+
+  /// No description provided for @psPasswordTooWeak.
+  ///
+  /// In en, this message translates to:
+  /// **'Your new password must be at least 8 characters and include an uppercase letter, a number, and a special character'**
+  String get psPasswordTooWeak;
+
+  /// No description provided for @psPasswordsDontMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'The new passwords don\'t match'**
+  String get psPasswordsDontMatch;
 }
 
 class _AppLocalizationsDelegate

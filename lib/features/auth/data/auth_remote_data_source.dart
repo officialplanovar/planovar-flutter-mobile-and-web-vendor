@@ -116,6 +116,20 @@ class AuthRemoteDataSource {
     _ensureOk(res);
   }
 
+  /// Change the signed-in user's password via Better Auth. Requires the current
+  /// password; revokes other sessions on success.
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    final res = await _dio.post('/api/auth/change-password', data: {
+      'currentPassword': currentPassword,
+      'newPassword': newPassword,
+      'revokeOtherSessions': true,
+    });
+    _ensureOk(res);
+  }
+
   Future<void> signOut() async {
     try {
       await _dio.post('/api/auth/sign-out');

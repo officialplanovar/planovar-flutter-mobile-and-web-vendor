@@ -67,7 +67,7 @@ Widget _buildGradientAppBar(
 Widget _gradientButton({
   required BuildContext context,
   required String label,
-  required VoidCallback onTap,
+  required VoidCallback? onTap,
   EdgeInsets? margin,
 }) {
   return Container(
@@ -1116,10 +1116,49 @@ class ChangePasswordScreen extends StatefulWidget {
 }
 
 class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
+  final _currentPwCtrl = TextEditingController();
   final _newPwCtrl = TextEditingController();
   final _confirmPwCtrl = TextEditingController();
+  bool _showCurrent = false;
   bool _showNew = false;
   bool _showConfirm = false;
+  bool _saving = false;
+
+  Future<void> _save() async {
+    final t = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    void err(String m) => messenger.showSnackBar(SnackBar(
+          content: Text(m, style: GoogleFonts.urbanist(fontSize: 14)),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: AppColors.error,
+        ));
+    if (_currentPwCtrl.text.isEmpty) return err(t.psCurrentPasswordRequired);
+    if (_newPwCtrl.text.length < 8 || _strengthLevel < 3) {
+      return err(t.psPasswordTooWeak);
+    }
+    if (_newPwCtrl.text != _confirmPwCtrl.text) {
+      return err(t.psPasswordsDontMatch);
+    }
+    setState(() => _saving = true);
+    try {
+      await AuthRepository().changePassword(
+        currentPassword: _currentPwCtrl.text,
+        newPassword: _newPwCtrl.text,
+      );
+      if (!mounted) return;
+      messenger.showSnackBar(SnackBar(
+        content: Text(t.psPasswordSaved, style: GoogleFonts.urbanist(fontSize: 14)),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.activeText,
+      ));
+      context.pop();
+    } catch (e) {
+      if (!mounted) return;
+      err(e.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
 
   bool get _hasUpper => _newPwCtrl.text.contains(RegExp(r'[A-Z]'));
   bool get _hasNumber => _newPwCtrl.text.contains(RegExp(r'[0-9]'));
@@ -1136,6 +1175,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   @override
   void dispose() {
+    _currentPwCtrl.dispose();
     _newPwCtrl.dispose();
     _confirmPwCtrl.dispose();
     super.dispose();
@@ -1177,6 +1217,28 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Spacer(),
+                  _fieldLabel(context, t.psCurrentPassword),
+                  TextField(
+                    controller: _currentPwCtrl,
+                    obscureText: !_showCurrent,
+                    style: GoogleFonts.urbanist(
+                        fontSize: 14, color: context.c.textPrimary),
+                    decoration: _filledDecoration(
+                      context,
+                      hint: t.psCurrentPasswordHint,
+                      suffix: GestureDetector(
+                        onTap: () => setState(() => _showCurrent = !_showCurrent),
+                        child: Icon(
+                          _showCurrent
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
+                          color: context.c.textHint,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   _fieldLabel(context, t.psNewPassword),
                   TextField(
                     controller: _newPwCtrl,
@@ -1250,19 +1312,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           ),
           _gradientButton(
             context: context,
-            label: t.psSavePassword,
+            label: _saving ? t.loading : t.psSavePassword,
             margin: EdgeInsets.fromLTRB(
                 24, 0, 24, bottomPad + 24),
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(t.psPasswordSaved,
-                      style: GoogleFonts.urbanist(fontSize: 14)),
-                  behavior: SnackBarBehavior.floating,
-                  backgroundColor: AppColors.activeText,
-                ),
-              );
-            },
+            onTap: _saving ? null : _save,
           ),
         ],
       ),
