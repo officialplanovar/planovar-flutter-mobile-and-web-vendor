@@ -4687,6 +4687,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The new passwords don\'t match'**
   String get psPasswordsDontMatch;
+
+  /// No description provided for @tfaChallengeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Two-Factor Authentication'**
+  String get tfaChallengeTitle;
+
+  /// No description provided for @tfaChallengeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 6-digit code from your authenticator app'**
+  String get tfaChallengeSubtitle;
+
+  /// No description provided for @tfaVerify.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get tfaVerify;
+
+  /// No description provided for @twofaDisable.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable Two-Factor'**
+  String get twofaDisable;
+
+  /// No description provided for @twofaConfirmPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm your password'**
+  String get twofaConfirmPasswordTitle;
+
+  /// No description provided for @twofaContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get twofaContinue;
+
+  /// No description provided for @twofaDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Two-factor authentication disabled'**
+  String get twofaDisabled;
+
+  /// No description provided for @twofaSecretCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Setup key copied'**
+  String get twofaSecretCopied;
+
+  /// No description provided for @twofaBackupCodesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup codes'**
+  String get twofaBackupCodesTitle;
+
+  /// No description provided for @twofaBackupCodesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Save these somewhere safe — each can be used once if you lose your authenticator.'**
+  String get twofaBackupCodesHint;
 }
 
 class _AppLocalizationsDelegate

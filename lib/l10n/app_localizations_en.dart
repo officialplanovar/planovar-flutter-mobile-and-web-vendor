@@ -2491,4 +2491,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get psPasswordsDontMatch => 'The new passwords don\'t match';
+
+  @override
+  String get tfaChallengeTitle => 'Two-Factor Authentication';
+
+  @override
+  String get tfaChallengeSubtitle =>
+      'Enter the 6-digit code from your authenticator app';
+
+  @override
+  String get tfaVerify => 'Verify';
+
+  @override
+  String get twofaDisable => 'Disable Two-Factor';
+
+  @override
+  String get twofaConfirmPasswordTitle => 'Confirm your password';
+
+  @override
+  String get twofaContinue => 'Continue';
+
+  @override
+  String get twofaDisabled => 'Two-factor authentication disabled';
+
+  @override
+  String get twofaSecretCopied => 'Setup key copied';
+
+  @override
+  String get twofaBackupCodesTitle => 'Backup codes';
+
+  @override
+  String get twofaBackupCodesHint =>
+      'Save these somewhere safe — each can be used once if you lose your authenticator.';
 }

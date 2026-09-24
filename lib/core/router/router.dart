@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/auth/ui/onboarding_screen.dart';
 import '../../features/auth/ui/login_screen.dart';
+import '../../features/auth/ui/two_factor_challenge_screen.dart';
 import '../../features/auth/ui/register_screen.dart';
 import '../../features/auth/ui/verify_email_screen.dart';
 import '../../features/auth/ui/reset_password_screen.dart';
@@ -52,6 +53,7 @@ final _authPaths = [
   AppRoutes.splash,
   AppRoutes.onboarding,
   AppRoutes.login,
+  AppRoutes.twoFactorChallenge,
   AppRoutes.register,
   AppRoutes.verifyEmail,
   AppRoutes.forgotPassword,
@@ -95,6 +97,10 @@ GoRouter createRouter() {
       GoRoute(
         path: AppRoutes.login,
         builder: (ctx, route) =>const LoginScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.twoFactorChallenge,
+        builder: (ctx, route) => const TwoFactorChallengeScreen(),
       ),
       GoRoute(
         path: AppRoutes.register,
@@ -398,7 +404,16 @@ GoRouter createRouter() {
       ),
       GoRoute(
         path: '/profile/2fa/setup',
-        builder: (_, __) => const TwoFASetupScreen(),
+        builder: (_, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          return TwoFASetupScreen(
+            totpUri: extra['totpURI'] as String? ?? '',
+            backupCodes: (extra['backupCodes'] as List?)
+                    ?.map((e) => e.toString())
+                    .toList() ??
+                const [],
+          );
+        },
       ),
       GoRoute(
         path: '/profile/2fa/confirm',

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../auth/data/auth_repository.dart';
 
 // ─── Gradient button helper ───────────────────────────────────────────────────
 
@@ -136,8 +139,90 @@ Widget _buildGradientAppBar(
 
 // ─── TwoFAIntroScreen ─────────────────────────────────────────────────────────
 
-class TwoFAIntroScreen extends StatelessWidget {
+class TwoFAIntroScreen extends StatefulWidget {
   const TwoFAIntroScreen({super.key});
+
+  @override
+  State<TwoFAIntroScreen> createState() => _TwoFAIntroScreenState();
+}
+
+class _TwoFAIntroScreenState extends State<TwoFAIntroScreen> {
+  bool _enabled = false;
+  bool _busy = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final e = await AuthRepository().isTwoFactorEnabled();
+      if (mounted) setState(() => _enabled = e);
+    } catch (_) {}
+  }
+
+  Future<String?> _promptPassword() async {
+    final ctrl = TextEditingController();
+    final t = AppLocalizations.of(context);
+    final pw = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(t.twofaConfirmPasswordTitle),
+        content: TextField(
+          controller: ctrl,
+          obscureText: true,
+          autofocus: true,
+          decoration: InputDecoration(hintText: t.psCurrentPasswordHint),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(t.cancel)),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, ctrl.text),
+            child: Text(t.twofaContinue),
+          ),
+        ],
+      ),
+    );
+    ctrl.dispose();
+    return pw;
+  }
+
+  Future<void> _onPrimary() async {
+    if (_busy) return;
+    final pw = await _promptPassword();
+    if (pw == null || pw.isEmpty || !mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final t = AppLocalizations.of(context);
+    setState(() => _busy = true);
+    try {
+      if (_enabled) {
+        await AuthRepository().disableTwoFactor(pw);
+        if (!mounted) return;
+        setState(() => _enabled = false);
+        messenger.showSnackBar(SnackBar(content: Text(t.twofaDisabled)));
+      } else {
+        final data = await AuthRepository().enableTwoFactor(pw);
+        if (!mounted) return;
+        final totpUri = data['totpURI'] as String? ?? '';
+        final codes = (data['backupCodes'] as List?)
+                ?.map((e) => e.toString())
+                .toList() ??
+            <String>[];
+        context.push('/profile/2fa/setup',
+            extra: {'totpURI': totpUri, 'backupCodes': codes});
+      }
+    } catch (e) {
+      if (!mounted) return;
+      messenger.showSnackBar(SnackBar(
+        content: Text(e.toString().replaceFirst('Exception: ', '')),
+        backgroundColor: AppColors.error,
+      ));
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -263,8 +348,12 @@ class TwoFAIntroScreen extends StatelessWidget {
                     bottom: bottomPadding + 24,
                   ),
                   child: _GradientButton(
-                    label: AppLocalizations.of(context).twofaGetStarted,
-                    onTap: () => context.push('/profile/2fa/setup'),
+                    label: _busy
+                        ? AppLocalizations.of(context).loading
+                        : (_enabled
+                            ? AppLocalizations.of(context).twofaDisable
+                            : AppLocalizations.of(context).twofaGetStarted),
+                    onTap: _onPrimary,
                   ),
                 ),
               ],
@@ -279,7 +368,21 @@ class TwoFAIntroScreen extends StatelessWidget {
 // ─── TwoFASetupScreen ─────────────────────────────────────────────────────────
 
 class TwoFASetupScreen extends StatelessWidget {
-  const TwoFASetupScreen({super.key});
+  final String totpUri;
+  final List<String> backupCodes;
+  const TwoFASetupScreen({
+    super.key,
+    required this.totpUri,
+    required this.backupCodes,
+  });
+
+  String get _manualSecret {
+    try {
+      return Uri.parse(totpUri).queryParameters['secret'] ?? '';
+    } catch (_) {
+      return '';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -313,18 +416,15 @@ class TwoFASetupScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 32),
-                // QR Code placeholder
+                // Real TOTP QR code (scan in an authenticator app).
                 Center(
                   child: Container(
-                    width: 180,
-                    height: 180,
-                    color: Colors.black,
-                    child: const Center(
-                      child: Icon(
-                        Icons.qr_code_2_rounded,
-                        size: 160,
-                        color: Colors.white,
-                      ),
+                    padding: const EdgeInsets.all(12),
+                    color: Colors.white,
+                    child: QrImageView(
+                      data: totpUri,
+                      version: QrVersions.auto,
+                      size: 180,
                     ),
                   ),
                 ),
@@ -352,8 +452,8 @@ class TwoFASetupScreen extends StatelessWidget {
                           color: context.c.surfaceElevated,
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Text(
-                          '48hd8b 94u83b c88b3 f9vb',
+                        child: SelectableText(
+                          _manualSecret,
                           style: GoogleFonts.urbanist(
                             fontSize: 13,
                             color: context.c.textPrimary,
@@ -362,21 +462,65 @@ class TwoFASetupScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: context.c.primaryLight,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.copy_rounded,
-                        color: AppColors.primary,
-                        size: 20,
+                    GestureDetector(
+                      onTap: () {
+                        Clipboard.setData(ClipboardData(text: _manualSecret));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(t.twofaSecretCopied)),
+                        );
+                      },
+                      child: Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: context.c.primaryLight,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.copy_rounded,
+                          color: AppColors.primary,
+                          size: 20,
+                        ),
                       ),
                     ),
                   ],
                 ),
+                if (backupCodes.isNotEmpty) ...[
+                  const SizedBox(height: 28),
+                  Text(
+                    t.twofaBackupCodesTitle,
+                    style: GoogleFonts.urbanist(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      color: context.c.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    t.twofaBackupCodesHint,
+                    style: GoogleFonts.urbanist(
+                      fontSize: 13,
+                      color: context.c.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: context.c.surfaceElevated,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: SelectableText(
+                      backupCodes.join('\n'),
+                      style: GoogleFonts.robotoMono(
+                        fontSize: 14,
+                        height: 1.6,
+                        color: context.c.textPrimary,
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -405,11 +549,38 @@ class _TwoFAConfirmScreenState extends State<TwoFAConfirmScreen> {
     _controller.addListener(() => setState(() {}));
   }
 
+  bool _verifying = false;
+
   @override
   void dispose() {
     _controller.dispose();
     _focusNode.dispose();
     super.dispose();
+  }
+
+  Future<void> _verify() async {
+    if (_verifying) return;
+    final t = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final code = _controller.text.trim();
+    if (code.length < 6) {
+      messenger.showSnackBar(SnackBar(content: Text(t.twofaEnterCode)));
+      return;
+    }
+    setState(() => _verifying = true);
+    try {
+      await AuthRepository().verifyTotp(code);
+      if (!mounted) return;
+      context.push('/profile/2fa/success');
+    } catch (e) {
+      if (!mounted) return;
+      messenger.showSnackBar(SnackBar(
+        content: Text(e.toString().replaceFirst('Exception: ', '')),
+        backgroundColor: AppColors.error,
+      ));
+    } finally {
+      if (mounted) setState(() => _verifying = false);
+    }
   }
 
   @override
@@ -509,8 +680,8 @@ class _TwoFAConfirmScreenState extends State<TwoFAConfirmScreen> {
 
                     const SizedBox(height: 40),
                     _GradientButton(
-                      label: t.twofaConfirm,
-                      onTap: () => context.push('/profile/2fa/success'),
+                      label: _verifying ? t.loading : t.twofaConfirm,
+                      onTap: _verify,
                     ),
                   ],
                 ),

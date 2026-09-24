@@ -185,6 +185,8 @@ class _LoginScreenState extends State<LoginScreen> {
               listener: (context, state) {
                 if (state is AuthAuthenticated) {
                   context.go(AppRoutes.home);
+                } else if (state is AuthTwoFactorRequired) {
+                  context.push(AppRoutes.twoFactorChallenge);
                 } else if (state is AuthError) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(state.message)),

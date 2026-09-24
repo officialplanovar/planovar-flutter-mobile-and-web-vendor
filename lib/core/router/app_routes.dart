@@ -5,6 +5,7 @@ abstract class AppRoutes {
   static const register = '/register';
   static const verifyEmail = '/verify-email';
   static const login = '/login';
+  static const twoFactorChallenge = '/two-factor-challenge';
   static const forgotPassword = '/forgot-password';
   static const resetPassword = '/reset-password';
 

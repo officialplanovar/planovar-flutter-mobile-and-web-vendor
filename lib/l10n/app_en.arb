@@ -1204,5 +1204,15 @@
   "psCurrentPasswordHint": "Enter your current password",
   "psCurrentPasswordRequired": "Please enter your current password",
   "psPasswordTooWeak": "Your new password must be at least 8 characters and include an uppercase letter, a number, and a special character",
-  "psPasswordsDontMatch": "The new passwords don't match"
+  "psPasswordsDontMatch": "The new passwords don't match",
+  "tfaChallengeTitle": "Two-Factor Authentication",
+  "tfaChallengeSubtitle": "Enter the 6-digit code from your authenticator app",
+  "tfaVerify": "Verify",
+  "twofaDisable": "Disable Two-Factor",
+  "twofaConfirmPasswordTitle": "Confirm your password",
+  "twofaContinue": "Continue",
+  "twofaDisabled": "Two-factor authentication disabled",
+  "twofaSecretCopied": "Setup key copied",
+  "twofaBackupCodesTitle": "Backup codes",
+  "twofaBackupCodesHint": "Save these somewhere safe — each can be used once if you lose your authenticator."
 }

@@ -2526,4 +2526,36 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get psPasswordsDontMatch =>
       'Les nouveaux mots de passe ne correspondent pas';
+
+  @override
+  String get tfaChallengeTitle => 'Authentification à deux facteurs';
+
+  @override
+  String get tfaChallengeSubtitle =>
+      'Saisissez le code à 6 chiffres de votre application d\'authentification';
+
+  @override
+  String get tfaVerify => 'Vérifier';
+
+  @override
+  String get twofaDisable => 'Désactiver la double authentification';
+
+  @override
+  String get twofaConfirmPasswordTitle => 'Confirmez votre mot de passe';
+
+  @override
+  String get twofaContinue => 'Continuer';
+
+  @override
+  String get twofaDisabled => 'Double authentification désactivée';
+
+  @override
+  String get twofaSecretCopied => 'Clé de configuration copiée';
+
+  @override
+  String get twofaBackupCodesTitle => 'Codes de secours';
+
+  @override
+  String get twofaBackupCodesHint =>
+      'Conservez-les en lieu sûr — chacun peut être utilisé une fois si vous perdez votre authentificateur.';
 }
