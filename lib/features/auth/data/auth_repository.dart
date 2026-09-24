@@ -27,6 +27,10 @@ class AuthRepository {
         newPassword: newPassword,
       );
 
+  Future<void> deleteAccount() => _remote.deleteAccount();
+
+  Future<void> deactivateAccount() => _remote.deactivateAccount();
+
   Future<UserModel> signUp({
     required String firstName,
     required String lastName,

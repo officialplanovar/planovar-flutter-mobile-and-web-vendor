@@ -18,6 +18,7 @@ import '../../../shared/widgets/plan_card.dart';
 import '../../auth/bloc/auth_bloc.dart';
 import '../../auth/bloc/auth_state.dart';
 import '../../auth/data/auth_repository.dart';
+import '../../../core/router/app_routes.dart';
 import '../../listings/data/listings_repository.dart';
 import '../../setup/ui/payment_checkout_screen.dart';
 import '../../subscription/data/subscription_repository.dart';
@@ -2036,6 +2037,40 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     super.dispose();
   }
 
+  Future<void> _performDeactivate() async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await AuthRepository().deactivateAccount();
+      if (!mounted) return;
+      context.go(AppRoutes.login);
+    } catch (e) {
+      if (!mounted) return;
+      messenger.showSnackBar(SnackBar(
+        content: Text(e.toString().replaceFirst('Exception: ', ''),
+            style: GoogleFonts.urbanist(fontSize: 14)),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.error,
+      ));
+    }
+  }
+
+  Future<void> _performDelete() async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await AuthRepository().deleteAccount();
+      if (!mounted) return;
+      _showDeleteSuccessSheet();
+    } catch (e) {
+      if (!mounted) return;
+      messenger.showSnackBar(SnackBar(
+        content: Text(e.toString().replaceFirst('Exception: ', ''),
+            style: GoogleFonts.urbanist(fontSize: 14)),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.error,
+      ));
+    }
+  }
+
   void _showReasonPicker() {
     final t = AppLocalizations.of(context);
     showModalBottomSheet(
@@ -2152,9 +2187,9 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
               children: [
                 Expanded(
                   child: GestureDetector(
-                    onTap: () {
+                    onTap: () async {
                       Navigator.pop(ctx);
-                      _showDeleteSuccessSheet();
+                      await _performDelete();
                     },
                     child: Container(
                       height: 44,
@@ -2421,15 +2456,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                   _gradientButton(
                     context: context,
                     label: t.psDeactivateAccount,
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(t.psAccountDeactivated,
-                              style: GoogleFonts.urbanist(fontSize: 14)),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                    },
+                    onTap: _performDeactivate,
                   ),
                   const SizedBox(height: 12),
                   Center(
