@@ -54,8 +54,6 @@ abstract class AppRoutes {
   static const createQuote = '/messages/create-quote';
   static String createQuotePath(String conversationId) => '/messages/create-quote?convId=$conversationId';
   static String createQuoteForBookingPath(String bookingId) => '/messages/create-quote?bookingId=$bookingId';
-  static const createInvoice = '/messages/create-invoice';
-  static String createInvoicePath(String conversationId) => '/messages/create-invoice?convId=$conversationId';
 
   // ─── Analytics ────────────────────────────────────────────────────────────────
   static const analytics = '/analytics';

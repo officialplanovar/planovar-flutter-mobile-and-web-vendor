@@ -1211,5 +1211,6 @@
   "twofaDisabled": "Double authentification désactivée",
   "twofaSecretCopied": "Clé de configuration copiée",
   "twofaBackupCodesTitle": "Codes de secours",
-  "twofaBackupCodesHint": "Conservez-les en lieu sûr — chacun peut être utilisé une fois si vous perdez votre authentificateur."
+  "twofaBackupCodesHint": "Conservez-les en lieu sûr — chacun peut être utilisé une fois si vous perdez votre authentificateur.",
+  "cqAfterEvent": "Après l'événement"
 }

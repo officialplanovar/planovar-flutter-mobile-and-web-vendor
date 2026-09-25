@@ -792,7 +792,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
           _buildMilestoneCard(
             milestoneNumber: 2,
             percent: 50,
-            dueLabel: '23rd May 2026',
+            dueLabel: AppLocalizations.of(context).cqAfterEvent,
           ),
         ];
       case '30/70':
@@ -805,7 +805,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
           _buildMilestoneCard(
             milestoneNumber: 2,
             percent: 70,
-            dueLabel: '23rd May 2026',
+            dueLabel: AppLocalizations.of(context).cqAfterEvent,
           ),
         ];
       case 'Custom':
@@ -820,7 +820,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
           _buildMilestoneCard(
             milestoneNumber: 2,
             percent: int.tryParse(_m2PercentCtrl.text) ?? 50,
-            dueLabel: '23rd May 2026',
+            dueLabel: AppLocalizations.of(context).cqAfterEvent,
             editable: true,
             percentCtrl: _m2PercentCtrl,
           ),

@@ -30,7 +30,6 @@ import '../../features/orders/ui/order_tracking_detail_screen.dart';
 import '../../features/messaging/ui/messages_screen.dart';
 import '../../features/messaging/ui/conversation_screen.dart';
 import '../../features/messaging/ui/create_quote_screen.dart';
-import '../../features/messaging/ui/create_invoice_screen.dart';
 import '../../features/profile/ui/profile_screen.dart';
 import '../../features/profile/ui/profile_sub_screens.dart';
 import '../../features/profile/ui/twofa_screens.dart';
@@ -216,14 +215,6 @@ GoRouter createRouter() {
         builder: (_, state) => CreateQuoteScreen(
           conversationId: state.uri.queryParameters['convId'] ?? '',
           bookingId: state.uri.queryParameters['bookingId'],
-        ),
-      ),
-
-      // ─── Create Invoice ────────────────────────────────────────────────────────
-      GoRoute(
-        path: AppRoutes.createInvoice,
-        builder: (_, state) => CreateInvoiceScreen(
-          conversationId: state.uri.queryParameters['convId'] ?? '',
         ),
       ),
 

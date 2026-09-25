@@ -1214,5 +1214,6 @@
   "twofaDisabled": "Two-factor authentication disabled",
   "twofaSecretCopied": "Setup key copied",
   "twofaBackupCodesTitle": "Backup codes",
-  "twofaBackupCodesHint": "Save these somewhere safe — each can be used once if you lose your authenticator."
+  "twofaBackupCodesHint": "Save these somewhere safe — each can be used once if you lose your authenticator.",
+  "cqAfterEvent": "After the event"
 }

@@ -2523,4 +2523,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get twofaBackupCodesHint =>
       'Save these somewhere safe — each can be used once if you lose your authenticator.';
+
+  @override
+  String get cqAfterEvent => 'After the event';
 }

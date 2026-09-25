@@ -4747,6 +4747,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save these somewhere safe — each can be used once if you lose your authenticator.'**
   String get twofaBackupCodesHint;
+
+  /// No description provided for @cqAfterEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'After the event'**
+  String get cqAfterEvent;
 }
 
 class _AppLocalizationsDelegate
