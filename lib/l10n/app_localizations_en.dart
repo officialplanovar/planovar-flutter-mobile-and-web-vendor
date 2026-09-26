@@ -492,7 +492,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Platform commission · Deducted before payout';
 
   @override
-  String get setupMinimumPayout => 'Minimum payout · ₦1,000';
+  String get setupMinimumPayout => 'Minimum payout · \$1,000';
 
   @override
   String get setupSecuredByPaystack => 'Secured by Paystack';
@@ -505,7 +505,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get setupProfileLive =>
-      'Your vendor profile is live on Planovar. Start adding your products and services to reach thousands of event planners in Lagos.';
+      'Your vendor profile is live on Planovar. Start adding your products and services to reach thousands of event planners around the world.';
 
   @override
   String get setupAddFirstListing => 'Add your first listing';
@@ -544,6 +544,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get payCompletedPayment => 'I\'ve completed payment';
+
+  @override
+  String get homeLocationNotSet => 'Location not set';
 
   @override
   String get homeTodaysSchedule => 'Today\'s Schedule';
@@ -1320,7 +1323,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String convDepositRefundedAmt(String amount) {
-    return 'Deposit refunded · ₦$amount';
+    return 'Deposit refunded · \$$amount';
   }
 
   @override
@@ -1328,7 +1331,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String convPaymentReceivedAmt(String amount) {
-    return 'Payment received · ₦$amount';
+    return 'Payment received · \$$amount';
   }
 
   @override

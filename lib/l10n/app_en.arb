@@ -184,11 +184,11 @@
   "setupPayoutSchedule": "Payout schedule",
   "setupPayoutRolling": "Rolling · 24–48hrs after completion",
   "setupPayoutCommission": "Platform commission · Deducted before payout",
-  "setupMinimumPayout": "Minimum payout · ₦1,000",
+  "setupMinimumPayout": "Minimum payout · $1,000",
   "setupSecuredByPaystack": "Secured by Paystack",
   "setupSavePayoutDetails": "Save Payout Details",
   "setupAllSet": "You're all set!",
-  "setupProfileLive": "Your vendor profile is live on Planovar. Start adding your products and services to reach thousands of event planners in Lagos.",
+  "setupProfileLive": "Your vendor profile is live on Planovar. Start adding your products and services to reach thousands of event planners around the world.",
   "setupAddFirstListing": "Add your first listing",
   "setupAddFirstListingSub": "Products, services or rentals",
   "setupUpgradePlan": "Upgrade your plan",
@@ -201,6 +201,7 @@
   "payOpenPaymentPage": "Open payment page",
   "payReopenPaymentPage": "Reopen payment page",
   "payCompletedPayment": "I've completed payment",
+  "homeLocationNotSet": "Location not set",
   "homeTodaysSchedule": "Today's Schedule",
   "homeQuickAction": "Quick Action",
   "viewAll": "View all",
@@ -623,7 +624,7 @@
   "convConfirmed": "Confirmed",
   "convDeclined": "Declined",
   "convQuoteExpired": "Quote expired",
-  "convDepositRefundedAmt": "Deposit refunded · ₦{amount}",
+  "convDepositRefundedAmt": "Deposit refunded · ${amount}",
   "@convDepositRefundedAmt": {
     "placeholders": {
       "amount": {
@@ -632,7 +633,7 @@
     }
   },
   "convDepositRefunded": "Deposit refunded",
-  "convPaymentReceivedAmt": "Payment received · ₦{amount}",
+  "convPaymentReceivedAmt": "Payment received · ${amount}",
   "@convPaymentReceivedAmt": {
     "placeholders": {
       "amount": {

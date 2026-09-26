@@ -58,7 +58,7 @@ class SetupCubit extends Cubit<SetupState> {
   String? description;
   List<String> tags = const [];
   String? logoUrl;
-  String country = 'Nigeria';
+  String country = '';
   String? city;
   String? planId;
   String billingCycle = 'MONTHLY';
@@ -118,7 +118,10 @@ class SetupCubit extends Cubit<SetupState> {
         vendorType: vendorType,
         description: description,
         logoUrl: logoUrl,
-        location: {'country': country, if (city != null) 'city': city},
+        location: {
+          if (country.isNotEmpty) 'country': country,
+          if (city != null) 'city': city,
+        },
         tags: tags,
       );
 

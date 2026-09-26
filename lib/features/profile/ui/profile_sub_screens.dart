@@ -20,6 +20,7 @@ import '../../listings/data/listings_repository.dart';
 import '../../setup/ui/payment_checkout_screen.dart';
 import '../../subscription/data/subscription_repository.dart';
 import '../../vendor/data/vendor_repository.dart';
+import '../../../shared/data/dial_codes.dart';
 
 // ─── Shared helpers ──────────────────────────────────────────────────────────
 
@@ -186,7 +187,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   // Personal
   final _emailCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
-  String _countryCode = '+234';
+  String _countryCode = '';
   int _dobDay = 30;
   String _dobMonth = 'March';
   int _dobYear = 1999;
@@ -204,7 +205,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (auth is AuthAuthenticated) {
       _emailCtrl.text = auth.user.email;
       if ((auth.user.phone ?? '').isNotEmpty) {
-        _phoneCtrl.text = auth.user.phone!.replaceFirst('+234', '');
+        _setPhoneFromStored(auth.user.phone!);
       }
       _prefillDob(auth.user.dateOfBirth);
     }
@@ -214,7 +215,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       setState(() {
         if (user.email.isNotEmpty) _emailCtrl.text = user.email;
         if ((user.phone ?? '').isNotEmpty) {
-          _phoneCtrl.text = user.phone!.replaceFirst('+234', '');
+          _setPhoneFromStored(user.phone!);
         }
       });
       _prefillDob(user.dateOfBirth);
@@ -327,6 +328,46 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   /// Personal details (phone + date of birth) live on the account/user record.
+  /// Given a stored E.164 number, pick the matching dial code (longest match
+  /// wins so e.g. +234 beats +2) and leave the local part in the field.
+  void _setPhoneFromStored(String stored) {
+    final phone = stored.trim();
+    DialCode? best;
+    for (final d in kDialCodes) {
+      if (phone.startsWith(d.code) &&
+          (best == null || d.code.length > best.code.length)) {
+        best = d;
+      }
+    }
+    _countryCode = best?.code ?? '';
+    _phoneCtrl.text =
+        best != null ? phone.substring(best.code.length) : phone;
+  }
+
+  void _showCountryCodeSheet() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => ListView(
+        shrinkWrap: true,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        children: kDialCodes.map((d) {
+          return ListTile(
+            leading: Text(d.flag, style: const TextStyle(fontSize: 24)),
+            title: Text('${d.label} (${d.code})',
+                style: GoogleFonts.urbanist(fontWeight: FontWeight.w500)),
+            onTap: () {
+              setState(() => _countryCode = d.code);
+              Navigator.pop(context);
+            },
+          );
+        }).toList(),
+      ),
+    );
+  }
+
   /// Email is account-managed by Better Auth, so it's display-only here.
   Future<void> _savePersonal() async {
     final t = AppLocalizations.of(context);
@@ -337,7 +378,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         '${_dobDay.toString().padLeft(2, '0')}';
     try {
       await AuthRepository().updateMe({
-        if (phone.isNotEmpty) 'phone': '$_countryCode$phone',
+        if (phone.isNotEmpty && _countryCode.isNotEmpty)
+          'phone': '$_countryCode$phone',
         'dateOfBirth': dob,
       });
       if (!mounted) return;
@@ -403,11 +445,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           Row(
             children: [
               GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _countryCode = _countryCode == '+234' ? '+1' : '+234';
-                  });
-                },
+                onTap: _showCountryCodeSheet,
                 child: Container(
                   width: 72,
                   height: 52,
@@ -418,7 +456,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ),
                   child: Center(
                     child: Text(
-                      '$_countryCode ▾',
+                      _countryCode.isEmpty ? '🌐 ▾' : '$_countryCode ▾',
                       style: GoogleFonts.urbanist(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,

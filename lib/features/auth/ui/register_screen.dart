@@ -34,8 +34,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   DateTime? _dob;
   bool _obscurePassword = true;
   bool _agreed = false;
-  String _dialCode = '+234';
-  String _flag = '🇳🇬';
+  String _dialCode = '';
+  String _flag = '';
 
   void _showDialCodeSheet() {
     showModalBottomSheet(
@@ -344,10 +344,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         child: Row(
                           children: [
-                            Text(_flag, style: const TextStyle(fontSize: 18)),
-                            const SizedBox(width: 6),
+                            if (_flag.isNotEmpty) ...[
+                              Text(_flag, style: const TextStyle(fontSize: 18)),
+                              const SizedBox(width: 6),
+                            ],
                             Text(
-                              _dialCode,
+                              _dialCode.isEmpty ? '🌐' : _dialCode,
                               style: GoogleFonts.urbanist(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w500,
@@ -491,8 +493,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   businessName: _businessNameCtrl.text.trim(),
                                   email: _emailCtrl.text.trim(),
                                   password: _passwordCtrl.text,
-                                  phone:
-                                      phone.isEmpty ? null : '$_dialCode$phone',
+                                  phone: (phone.isEmpty || _dialCode.isEmpty)
+                                      ? null
+                                      : '$_dialCode$phone',
                                 ),
                               );
                         }

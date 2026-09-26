@@ -1,15 +1,19 @@
 import 'package:intl/intl.dart';
 
 class Formatters {
-  static final _currencyFormat = NumberFormat('#,###', 'en_NG');
+  static final _currencyFormat = NumberFormat.currency(
+    locale: 'en_US',
+    symbol: '\$',
+    decimalDigits: 2,
+  );
   static final _dateFormat = DateFormat('d MMM, yyyy');
   static final _shortDateFormat = DateFormat('MMM d');
   static final _timeFormat = DateFormat('h:mm a');
   static final _monthYearFormat = DateFormat('MMM yyyy');
 
-  /// Formats a number as Nigerian naira: ₦1,234,000
+  /// Formats a number as US dollars: $1,234,000.00
   static String formatCurrency(num amount) {
-    return '₦${_currencyFormat.format(amount.toInt())}';
+    return _currencyFormat.format(amount);
   }
 
   /// Alias for [formatCurrency]

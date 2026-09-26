@@ -169,7 +169,9 @@ class _GradientHeader extends StatelessWidget {
         .where((e) => e != null && '$e'.trim().isNotEmpty)
         .map((e) => '$e'.trim())
         .toList();
-    final locationLabel = locParts.isEmpty ? 'Nigeria' : locParts.join(', ');
+    final locationLabel = locParts.isEmpty
+        ? AppLocalizations.of(context).homeLocationNotSet
+        : locParts.join(', ');
 
     return Container(
       decoration: const BoxDecoration(

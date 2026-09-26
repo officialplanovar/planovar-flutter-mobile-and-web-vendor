@@ -71,6 +71,6 @@ class AppConstants {
   static const String keyThemeMode = 'vendor_theme_mode';
 
   // Currency
-  static const String currencyCode = 'NGN';
-  static const String currencySymbol = '₦';
+  static const String currencyCode = 'USD';
+  static const String currencySymbol = '\$';
 }

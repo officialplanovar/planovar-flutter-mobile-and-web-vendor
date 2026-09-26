@@ -985,7 +985,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  '₦',
+                  '\$',
                   style: GoogleFonts.urbanist(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
@@ -1313,7 +1313,7 @@ class _NairaPrefix extends StatelessWidget {
           ),
           const SizedBox(width: 4),
           Text(
-            '₦',
+            '\$',
             style: GoogleFonts.urbanist(
               fontSize: 15,
               fontWeight: FontWeight.w600,

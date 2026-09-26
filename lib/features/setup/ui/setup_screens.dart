@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:country_picker/country_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -684,19 +685,6 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
 
 // ─── Step 3: Location ─────────────────────────────────────────────────────────
 
-const _nigerianCities = [
-  'Lagos',
-  'Abuja',
-  'Port Harcourt',
-  'Ibadan',
-  'Kano',
-  'Enugu',
-  'Warri',
-  'Benin City',
-  'Owerri',
-  'Calabar',
-];
-
 class SetupLocationScreen extends StatefulWidget {
   const SetupLocationScreen({super.key});
 
@@ -705,10 +693,16 @@ class SetupLocationScreen extends StatefulWidget {
 }
 
 class _SetupLocationScreenState extends State<SetupLocationScreen> {
-  String _country = 'Nigeria';
-  String? _city;
+  String? _country;
+  final _cityCtrl = TextEditingController();
   String _vendorType = 'both';
   bool _locating = false;
+
+  @override
+  void dispose() {
+    _cityCtrl.dispose();
+    super.dispose();
+  }
 
   void _toast(String message) {
     if (!mounted) return;
@@ -763,7 +757,7 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
       if (!mounted) return;
       setState(() {
         if (country != null && country.isNotEmpty) _country = country;
-        if (city != null && city.isNotEmpty) _city = city;
+        if (city != null && city.isNotEmpty) _cityCtrl.text = city;
       });
       if (city == null || city.isEmpty) {
         if (mounted) _toast(AppLocalizations.of(context).setupCouldNotDetermineCity);
@@ -775,95 +769,21 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
     }
   }
 
-  void _showCountryDialog() {
-    showDialog(
+  void _showCountryPicker() {
+    showCountryPicker(
       context: context,
-      builder: (ctx) => AlertDialog(
+      showPhoneCode: false,
+      onSelect: (country) {
+        setState(() => _country = country.name);
+      },
+      countryListTheme: CountryListThemeData(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         backgroundColor: context.c.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          AppLocalizations.of(context).selectCountry,
-          style: GoogleFonts.urbanist(
-              fontSize: 17, fontWeight: FontWeight.w700,
-              color: context.c.textPrimary),
-        ),
-        content: ListTile(
-          title: Text('Nigeria',
-              style: GoogleFonts.urbanist(
-                  fontSize: 15, color: context.c.textPrimary)),
-          leading: const Text('🇳🇬', style: TextStyle(fontSize: 20)),
-          trailing: const Icon(Icons.check_rounded,
-              color: AppColors.primary, size: 20),
-          onTap: () {
-            setState(() => _country = 'Nigeria');
-            Navigator.pop(ctx);
-          },
-        ),
-      ),
-    );
-  }
-
-  void _showCitySheet() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: context.c.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: 12),
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-                color: context.c.border,
-                borderRadius: BorderRadius.circular(4)),
-          ),
-          Padding(
-            padding: pagePadding(context, base: 24).add(const EdgeInsets.only(top: 20, bottom: 8)),
-            child: Text(
-              AppLocalizations.of(context).selectCity,
-              style: GoogleFonts.urbanist(
-                  fontSize: 17, fontWeight: FontWeight.w700,
-                  color: context.c.textPrimary),
-            ),
-          ),
-          Flexible(
-            child: ListView.separated(
-              shrinkWrap: true,
-              itemCount: _nigerianCities.length,
-              separatorBuilder: (_, __) =>
-                  Divider(height: 1, color: context.c.divider),
-              itemBuilder: (ctx2, i) {
-                final city = _nigerianCities[i];
-                final isSelected = _city == city;
-                return ListTile(
-                  title: Text(city,
-                      style: GoogleFonts.urbanist(
-                        fontSize: 15,
-                        fontWeight: isSelected
-                            ? FontWeight.w600
-                            : FontWeight.normal,
-                        color: isSelected
-                            ? AppColors.primary
-                            : context.c.textPrimary,
-                      )),
-                  trailing: isSelected
-                      ? const Icon(Icons.check_rounded,
-                          color: AppColors.primary)
-                      : null,
-                  onTap: () {
-                    setState(() => _city = city);
-                    Navigator.pop(ctx);
-                  },
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 16),
-        ],
+        textStyle: GoogleFonts.urbanist(
+            fontSize: 15, color: context.c.textPrimary),
+        searchTextStyle: GoogleFonts.urbanist(
+            fontSize: 15, color: context.c.textPrimary),
+        bottomSheetHeight: MediaQuery.of(context).size.height * 0.7,
       ),
     );
   }
@@ -966,14 +886,15 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
 
                     _buildDropdownField(
                       label: t.country,
-                      displayValue: _country,
-                      onTap: _showCountryDialog,
+                      displayValue: _country ?? t.selectCountry,
+                      onTap: _showCountryPicker,
                     ),
                     const SizedBox(height: 16),
-                    _buildDropdownField(
+                    AppInput(
                       label: t.city,
-                      displayValue: _city ?? t.selectYourCity,
-                      onTap: _showCitySheet,
+                      hint: t.selectYourCity,
+                      controller: _cityCtrl,
+                      textInputAction: TextInputAction.done,
                     ),
 
                     const SizedBox(height: 20),
@@ -1061,9 +982,10 @@ class _SetupLocationScreenState extends State<SetupLocationScreen> {
               child: AppButton.primary(
                 t.proceed,
                 onTap: () {
+                  final city = _cityCtrl.text.trim();
                   context.read<SetupCubit>().setLocation(
-                        country: _country,
-                        city: _city,
+                        country: _country ?? '',
+                        city: city.isEmpty ? null : city,
                         vendorType: _vendorType,
                       );
                   context.push(AppRoutes.setupPlan);

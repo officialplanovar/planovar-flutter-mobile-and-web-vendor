@@ -181,11 +181,11 @@
   "setupPayoutSchedule": "Calendrier des versements",
   "setupPayoutRolling": "En continu · 24–48 h après réalisation",
   "setupPayoutCommission": "Commission de la plateforme · Déduite avant le versement",
-  "setupMinimumPayout": "Versement minimum · ₦1 000",
+  "setupMinimumPayout": "Versement minimum · $1 000",
   "setupSecuredByPaystack": "Sécurisé par Paystack",
   "setupSavePayoutDetails": "Enregistrer les détails de versement",
   "setupAllSet": "Tout est prêt !",
-  "setupProfileLive": "Votre profil prestataire est en ligne sur Planovar. Commencez à ajouter vos produits et services pour atteindre des milliers d'organisateurs d'événements à Lagos.",
+  "setupProfileLive": "Votre profil prestataire est en ligne sur Planovar. Commencez à ajouter vos produits et services pour atteindre des milliers d'organisateurs d'événements dans le monde entier.",
   "setupAddFirstListing": "Ajoutez votre première annonce",
   "setupAddFirstListingSub": "Produits, services ou locations",
   "setupUpgradePlan": "Améliorez votre forfait",
@@ -198,6 +198,7 @@
   "payOpenPaymentPage": "Ouvrir la page de paiement",
   "payReopenPaymentPage": "Rouvrir la page de paiement",
   "payCompletedPayment": "J'ai finalisé le paiement",
+  "homeLocationNotSet": "Emplacement non défini",
   "homeTodaysSchedule": "Programme du jour",
   "homeQuickAction": "Action rapide",
   "viewAll": "Voir tout",
@@ -620,7 +621,7 @@
   "convConfirmed": "Confirmé",
   "convDeclined": "Refusé",
   "convQuoteExpired": "Devis expiré",
-  "convDepositRefundedAmt": "Caution remboursée · ₦{amount}",
+  "convDepositRefundedAmt": "Caution remboursée · ${amount}",
   "@convDepositRefundedAmt": {
     "placeholders": {
       "amount": {
@@ -629,7 +630,7 @@
     }
   },
   "convDepositRefunded": "Caution remboursée",
-  "convPaymentReceivedAmt": "Paiement reçu · ₦{amount}",
+  "convPaymentReceivedAmt": "Paiement reçu · ${amount}",
   "@convPaymentReceivedAmt": {
     "placeholders": {
       "amount": {

@@ -503,7 +503,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Commission de la plateforme · Déduite avant le versement';
 
   @override
-  String get setupMinimumPayout => 'Versement minimum · ₦1 000';
+  String get setupMinimumPayout => 'Versement minimum · \$1 000';
 
   @override
   String get setupSecuredByPaystack => 'Sécurisé par Paystack';
@@ -516,7 +516,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get setupProfileLive =>
-      'Votre profil prestataire est en ligne sur Planovar. Commencez à ajouter vos produits et services pour atteindre des milliers d\'organisateurs d\'événements à Lagos.';
+      'Votre profil prestataire est en ligne sur Planovar. Commencez à ajouter vos produits et services pour atteindre des milliers d\'organisateurs d\'événements dans le monde entier.';
 
   @override
   String get setupAddFirstListing => 'Ajoutez votre première annonce';
@@ -555,6 +555,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get payCompletedPayment => 'J\'ai finalisé le paiement';
+
+  @override
+  String get homeLocationNotSet => 'Emplacement non défini';
 
   @override
   String get homeTodaysSchedule => 'Programme du jour';
@@ -1338,7 +1341,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String convDepositRefundedAmt(String amount) {
-    return 'Caution remboursée · ₦$amount';
+    return 'Caution remboursée · \$$amount';
   }
 
   @override
@@ -1346,7 +1349,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String convPaymentReceivedAmt(String amount) {
-    return 'Paiement reçu · ₦$amount';
+    return 'Paiement reçu · \$$amount';
   }
 
   @override

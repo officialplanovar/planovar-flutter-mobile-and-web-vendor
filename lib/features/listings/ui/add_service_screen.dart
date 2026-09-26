@@ -569,7 +569,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  '₦',
+                  '\$',
                   style: GoogleFonts.urbanist(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,

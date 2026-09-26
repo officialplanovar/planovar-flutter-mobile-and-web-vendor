@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
+import 'app_localizations_es.dart';
 import 'app_localizations_fr.dart';
 
 // ignore_for_file: type=lint
@@ -95,6 +96,7 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
+    Locale('es'),
     Locale('fr'),
   ];
 
@@ -1019,7 +1021,7 @@ abstract class AppLocalizations {
   /// No description provided for @setupMinimumPayout.
   ///
   /// In en, this message translates to:
-  /// **'Minimum payout · ₦1,000'**
+  /// **'Minimum payout · \$1,000'**
   String get setupMinimumPayout;
 
   /// No description provided for @setupSecuredByPaystack.
@@ -1043,7 +1045,7 @@ abstract class AppLocalizations {
   /// No description provided for @setupProfileLive.
   ///
   /// In en, this message translates to:
-  /// **'Your vendor profile is live on Planovar. Start adding your products and services to reach thousands of event planners in Lagos.'**
+  /// **'Your vendor profile is live on Planovar. Start adding your products and services to reach thousands of event planners around the world.'**
   String get setupProfileLive;
 
   /// No description provided for @setupAddFirstListing.
@@ -1117,6 +1119,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'I\'ve completed payment'**
   String get payCompletedPayment;
+
+  /// No description provided for @homeLocationNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Location not set'**
+  String get homeLocationNotSet;
 
   /// No description provided for @homeTodaysSchedule.
   ///
@@ -2519,7 +2527,7 @@ abstract class AppLocalizations {
   /// No description provided for @convDepositRefundedAmt.
   ///
   /// In en, this message translates to:
-  /// **'Deposit refunded · ₦{amount}'**
+  /// **'Deposit refunded · \${amount}'**
   String convDepositRefundedAmt(String amount);
 
   /// No description provided for @convDepositRefunded.
@@ -2531,7 +2539,7 @@ abstract class AppLocalizations {
   /// No description provided for @convPaymentReceivedAmt.
   ///
   /// In en, this message translates to:
-  /// **'Payment received · ₦{amount}'**
+  /// **'Payment received · \${amount}'**
   String convPaymentReceivedAmt(String amount);
 
   /// No description provided for @convPaymentReceived.
@@ -4772,7 +4780,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en', 'fr'].contains(locale.languageCode);
+      <String>['en', 'es', 'fr'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -4783,6 +4791,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'en':
       return AppLocalizationsEn();
+    case 'es':
+      return AppLocalizationsEs();
     case 'fr':
       return AppLocalizationsFr();
   }
