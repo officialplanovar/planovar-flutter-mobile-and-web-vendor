@@ -55,14 +55,22 @@ class VendorRepository {
     return VendorModel.fromJson(Map<String, dynamic>.from(res.data as Map));
   }
 
-  /// Submits KYC documents (NIN always; CAC required for licensed businesses).
+  /// Submits KYC/KYB documents: a government ID for every vendor, plus a
+  /// business registration document for registered (LICENSED) businesses.
   Future<Map<String, dynamic>> submitKyc({
-    required String ninDocumentUrl,
-    String? cacDocumentUrl,
+    required String idDocumentUrl,
+    required String idType,
+    required String idCountry,
+    String? businessRegDocumentUrl,
+    String? businessRegCountry,
   }) async {
     final res = await _api.dio.post('/vendors/me/kyc', data: {
-      'ninDocumentUrl': ninDocumentUrl,
-      if (cacDocumentUrl != null) 'cacDocumentUrl': cacDocumentUrl,
+      'idDocumentUrl': idDocumentUrl,
+      'idType': idType,
+      'idCountry': idCountry,
+      if (businessRegDocumentUrl != null)
+        'businessRegDocumentUrl': businessRegDocumentUrl,
+      if (businessRegCountry != null) 'businessRegCountry': businessRegCountry,
     });
     _ensureOk(res);
     return Map<String, dynamic>.from(res.data as Map);

@@ -1140,6 +1140,7 @@ class _SetupKycScreenState extends State<SetupKycScreen> {
   bool _uploadingNin = false;
   String? _cacUrl, _cacName;
   bool _uploadingCac = false;
+  String _idType = 'national_id'; // passport | national_id | drivers_license
 
   void _toast(String message) {
     if (!mounted) return;
@@ -1325,6 +1326,30 @@ class _SetupKycScreenState extends State<SetupKycScreen> {
                           subtitle: t.setupVerifyIdentitySubtitle,
                         ),
                         const SizedBox(height: 28),
+                        Text(
+                          t.setupIdTypeLabel,
+                          style: GoogleFonts.urbanist(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: context.c.textSecondary),
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          children: [
+                            ('passport', t.idTypePassport),
+                            ('national_id', t.idTypeNationalId),
+                            ('drivers_license', t.idTypeDriversLicense),
+                          ]
+                              .map((e) => ChoiceChip(
+                                    label: Text(e.$2),
+                                    selected: _idType == e.$1,
+                                    onSelected: (_) =>
+                                        setState(() => _idType = e.$1),
+                                  ))
+                              .toList(),
+                        ),
+                        const SizedBox(height: 16),
                         _uploadBox(
                           label: t.setupUploadNin,
                           url: _ninUrl,
@@ -1353,8 +1378,9 @@ class _SetupKycScreenState extends State<SetupKycScreen> {
                             ? null
                             : () {
                                 final cubit = context.read<SetupCubit>();
+                                cubit.setIdType(_idType);
                                 // Keep the proof captured on the profile step if
-                                // no CAC was uploaded here.
+                                // no business-registration doc was uploaded here.
                                 cubit.setKyc(
                                   ninUrl: _ninUrl,
                                   cacUrl: _cacUrl ?? cubit.cacUrl,

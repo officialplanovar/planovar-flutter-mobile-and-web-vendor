@@ -895,7 +895,7 @@ abstract class AppLocalizations {
   /// No description provided for @setupVerifyIdentitySubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Upload your NIN, and CAC if you run a licensed business. Stored securely.'**
+  /// **'Upload a government photo ID, and your business registration if you run a registered business. Stored securely.'**
   String get setupVerifyIdentitySubtitle;
 
   /// No description provided for @setupUploaded.
@@ -907,14 +907,38 @@ abstract class AppLocalizations {
   /// No description provided for @setupUploadNin.
   ///
   /// In en, this message translates to:
-  /// **'Upload your NIN slip'**
+  /// **'Upload your government ID'**
   String get setupUploadNin;
 
   /// No description provided for @setupUploadCac.
   ///
   /// In en, this message translates to:
-  /// **'Upload your CAC document'**
+  /// **'Upload your business registration'**
   String get setupUploadCac;
+
+  /// No description provided for @setupIdTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'ID type'**
+  String get setupIdTypeLabel;
+
+  /// No description provided for @idTypePassport.
+  ///
+  /// In en, this message translates to:
+  /// **'Passport'**
+  String get idTypePassport;
+
+  /// No description provided for @idTypeNationalId.
+  ///
+  /// In en, this message translates to:
+  /// **'National ID'**
+  String get idTypeNationalId;
+
+  /// No description provided for @idTypeDriversLicense.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver\'s licence'**
+  String get idTypeDriversLicense;
 
   /// No description provided for @setupPaymentNotCompleted.
   ///

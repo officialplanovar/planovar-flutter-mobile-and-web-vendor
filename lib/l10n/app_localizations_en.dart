@@ -426,16 +426,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get setupVerifyIdentitySubtitle =>
-      'Upload your NIN, and CAC if you run a licensed business. Stored securely.';
+      'Upload a government photo ID, and your business registration if you run a registered business. Stored securely.';
 
   @override
   String get setupUploaded => 'Uploaded';
 
   @override
-  String get setupUploadNin => 'Upload your NIN slip';
+  String get setupUploadNin => 'Upload your government ID';
 
   @override
-  String get setupUploadCac => 'Upload your CAC document';
+  String get setupUploadCac => 'Upload your business registration';
+
+  @override
+  String get setupIdTypeLabel => 'ID type';
+
+  @override
+  String get idTypePassport => 'Passport';
+
+  @override
+  String get idTypeNationalId => 'National ID';
+
+  @override
+  String get idTypeDriversLicense => 'Driver\'s licence';
 
   @override
   String get setupPaymentNotCompleted =>

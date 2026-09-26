@@ -437,16 +437,28 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get setupVerifyIdentitySubtitle =>
-      'Téléchargez votre NIN, et votre CAC si vous dirigez une entreprise agréée. Stocké en toute sécurité.';
+      'Téléchargez une pièce d\'identité officielle avec photo, et votre enregistrement d\'entreprise si vous gérez une entreprise enregistrée. Stocké en toute sécurité.';
 
   @override
   String get setupUploaded => 'Téléchargé';
 
   @override
-  String get setupUploadNin => 'Téléchargez votre attestation NIN';
+  String get setupUploadNin => 'Téléchargez votre pièce d\'identité';
 
   @override
-  String get setupUploadCac => 'Téléchargez votre document CAC';
+  String get setupUploadCac => 'Téléchargez votre enregistrement d\'entreprise';
+
+  @override
+  String get setupIdTypeLabel => 'Type de pièce d\'identité';
+
+  @override
+  String get idTypePassport => 'Passeport';
+
+  @override
+  String get idTypeNationalId => 'Carte nationale d\'identité';
+
+  @override
+  String get idTypeDriversLicense => 'Permis de conduire';
 
   @override
   String get setupPaymentNotCompleted =>

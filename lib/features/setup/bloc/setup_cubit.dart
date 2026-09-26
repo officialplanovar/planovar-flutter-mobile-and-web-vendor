@@ -62,10 +62,13 @@ class SetupCubit extends Cubit<SetupState> {
   String? city;
   String? planId;
   String billingCycle = 'MONTHLY';
-  String? ninUrl;
-  String? cacUrl;
+  String? ninUrl; // government-ID document URL
+  String? cacUrl; // business-registration document URL
+  String idType = 'national_id'; // passport | national_id | drivers_license
 
   void setBusinessName(String name) => businessName = name.trim();
+
+  void setIdType(String value) => idType = value;
 
   void setBusinessType(String uiValue) =>
       businessType = uiValue == 'licensed' ? 'LICENSED' : 'FREELANCER';
@@ -79,8 +82,8 @@ class SetupCubit extends Cubit<SetupState> {
     this.description = description;
     this.tags = tags.toList();
     this.logoUrl = logoUrl;
-    // "Proof of ownership" is the business-registration doc (CAC). It flows to
-    // the KYC submission alongside the NIN collected on the dedicated KYC step.
+    // "Proof of ownership" is the business-registration document. It flows to
+    // the KYC submission alongside the government ID from the dedicated KYC step.
     if (proofUrl != null && proofUrl.isNotEmpty) cacUrl = proofUrl;
   }
 
@@ -147,7 +150,13 @@ class SetupCubit extends Cubit<SetupState> {
       }
 
       if (ninUrl != null && ninUrl!.isNotEmpty) {
-        await _vendors.submitKyc(ninDocumentUrl: ninUrl!, cacDocumentUrl: cacUrl);
+        await _vendors.submitKyc(
+          idDocumentUrl: ninUrl!,
+          idType: idType,
+          idCountry: country,
+          businessRegDocumentUrl: cacUrl,
+          businessRegCountry: cacUrl != null ? country : null,
+        );
       }
 
       emit(state.copyWith(
