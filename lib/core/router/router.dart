@@ -39,7 +39,6 @@ import '../../features/profile/ui/language_screen.dart';
 import '../../features/profile/ui/support_screen.dart';
 import '../../features/profile/ui/terms_screen.dart';
 import '../../features/analytics/ui/analytics_screen.dart';
-import '../../features/payouts/ui/payouts_screen.dart';
 import '../../features/notifications/ui/notifications_screen.dart';
 import '../responsive/responsive.dart';
 import '../theme/app_colors.dart';
@@ -62,7 +61,6 @@ final _authPaths = [
   AppRoutes.setupLocation,
   AppRoutes.setupPlan,
   AppRoutes.setupKyc,
-  AppRoutes.setupPayout,
   AppRoutes.setupSuccess,
 ];
 
@@ -146,10 +144,6 @@ GoRouter createRouter() {
       GoRoute(
         path: AppRoutes.setupKyc,
         builder: (ctx, route) =>const SetupKycScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.setupPayout,
-        builder: (ctx, route) =>const SetupPayoutScreen(),
       ),
       GoRoute(
         path: AppRoutes.setupSuccess,
@@ -304,12 +298,6 @@ GoRouter createRouter() {
         builder: (ctx, route) =>const AnalyticsScreen(),
       ),
 
-      // ─── Payouts ──────────────────────────────────────────────────────────
-      GoRoute(
-        path: AppRoutes.payouts,
-        builder: (ctx, route) =>const PayoutsScreen(),
-      ),
-
       // ─── Notifications ────────────────────────────────────────────────────
       GoRoute(
         path: AppRoutes.notifications,
@@ -324,10 +312,6 @@ GoRouter createRouter() {
       GoRoute(
         path: AppRoutes.subscriptionPlan,
         builder: (ctx, route) => const SubscriptionPlanScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.bankDetails,
-        builder: (ctx, route) => const BankDetailsScreen(),
       ),
       GoRoute(
         path: AppRoutes.themeSettings,

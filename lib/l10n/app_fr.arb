@@ -701,7 +701,8 @@
     }
   },
   "cqLineItems": "Articles",
-  "cqSetPaymentTerms": "Définissez vos conditions de paiement",
+  "cqSetPaymentTerms": "Conditions de paiement (facultatif)",
+  "cqPaymentTermsHint": "ex. 50 % d'acompte, solde à la livraison — payé directement",
   "cqNoteToClient": "Note au client",
   "cqNoteHint": "Brève description du produit",
   "cqSending": "Envoi…",
@@ -1025,7 +1026,7 @@
   "supportCallHours": "Disponible du lun. au ven., 9h - 17h",
   "supportFaqQ1": "Comment créer une annonce ?",
   "supportFaqQ2": "Comment gérer les réservations ?",
-  "supportFaqQ3": "Comment fonctionne le paiement en séquestre ?",
+  "supportFaqQ3": "Comment les clients paient-ils mes services ?",
   "supportFaqQ4": "Comment retirer mes revenus ?",
   "supportFaqQ5": "Quels frais Planovar facture-t-il ?",
   "supportFaqQ6": "Comment vérifier mon compte ?",

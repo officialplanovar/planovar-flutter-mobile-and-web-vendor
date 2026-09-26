@@ -62,7 +62,9 @@ class _LineItem {
 class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
   ConversationModel? _conv;
   late final List<_LineItem> _items;
-  String _paymentTerm = 'Pay at once';
+
+  /// Optional free-text payment terms the vendor writes (paid off-platform).
+  final TextEditingController _paymentTermsController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
   String _validFor = '7 Days';
   bool _sending = false;
@@ -70,19 +72,6 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
   int get _validDays {
     final match = RegExp(r'\d+').firstMatch(_validFor);
     return match != null ? int.parse(match.group(0)!) : 7;
-  }
-
-  /// Localized display label for an internal payment-term key.
-  String _paymentTermLabel(String term) {
-    final t = AppLocalizations.of(context);
-    switch (term) {
-      case 'Pay at once':
-        return t.cqTermPayAtOnce;
-      case 'Custom':
-        return t.cqTermCustom;
-      default:
-        return term; // '50/50', '30/70' — locale-independent
-    }
   }
 
   /// Localized display label for an internal validity-window key.
@@ -104,42 +93,10 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
     }
   }
 
-  /// The payment terms selection → milestone inputs for the API. "Pay at once"
-  /// sends no terms (backend uses a single 100% milestone).
-  List<QuotePaymentTermInput> _buildPaymentTerms() {
-    switch (_paymentTerm) {
-      case '50/50':
-        return const [
-          QuotePaymentTermInput(
-              label: 'On Confirmation', percentage: 50, dueLabel: 'Due on confirmation'),
-          QuotePaymentTermInput(
-              label: 'After Event', percentage: 50, dueLabel: 'After the event'),
-        ];
-      case '30/70':
-        return const [
-          QuotePaymentTermInput(
-              label: 'On Confirmation', percentage: 30, dueLabel: 'Due on confirmation'),
-          QuotePaymentTermInput(
-              label: 'After Event', percentage: 70, dueLabel: 'After the event'),
-        ];
-      case 'Custom':
-        return [
-          QuotePaymentTermInput(
-              label: 'Milestone 1',
-              percentage: double.tryParse(_m1PercentCtrl.text) ?? 50,
-              dueLabel: 'Due on confirmation'),
-          QuotePaymentTermInput(
-              label: 'Milestone 2',
-              percentage: double.tryParse(_m2PercentCtrl.text) ?? 50,
-              dueLabel: 'After the event'),
-        ];
-      default:
-        return const [];
-    }
-  }
-
   Future<void> _submit() async {
     final t = AppLocalizations.of(context);
+    final paymentTermsText = _paymentTermsController.text.trim();
+    final paymentTerms = paymentTermsText.isEmpty ? null : paymentTermsText;
     final lineItems = _items
         .map((i) => QuoteLineItemInput(
               label: i.desc.text.trim(),
@@ -164,7 +121,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
         await QuotesRepository().reviseQuote(
           quoteId: widget.reviseQuoteId!,
           lineItems: lineItems,
-          paymentTerms: _buildPaymentTerms(),
+          paymentTerms: paymentTerms,
           validUntil: DateTime.now().add(Duration(days: _validDays)),
           notes: note.isEmpty ? null : note,
         );
@@ -193,7 +150,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
           listingId: widget.listingId!,
           eventId: widget.eventId,
           lineItems: lineItems,
-          paymentTerms: _buildPaymentTerms(),
+          paymentTerms: paymentTerms,
           validForDays: _validDays,
           notes: note.isEmpty ? null : note,
         );
@@ -230,7 +187,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
         lineItems: lineItems,
         validUntil: DateTime.now().add(Duration(days: _validDays)),
         notes: [
-          if (_paymentTerm != 'Pay at once') 'Payment terms: $_paymentTerm',
+          if (paymentTermsText.isNotEmpty) 'Payment terms: $paymentTermsText',
           if (note.isNotEmpty) note,
         ].join('\n'),
       );
@@ -248,12 +205,6 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
       if (mounted) setState(() => _sending = false);
     }
   }
-
-  // For "Custom" milestone percentage controllers
-  final TextEditingController _m1PercentCtrl =
-      TextEditingController(text: '50');
-  final TextEditingController _m2PercentCtrl =
-      TextEditingController(text: '50');
 
   @override
   void initState() {
@@ -283,26 +234,8 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
     if (q != null) {
       _noteController.text = q.notes ?? '';
       _validFor = _closestValidFor(q.validUntil.difference(DateTime.now()).inDays);
-      final terms = q.paymentTerms;
-      if (terms.length == 2) {
-        final p1 = terms[0].percentage.round();
-        final p2 = terms[1].percentage.round();
-        if (p1 == 50 && p2 == 50) {
-          _paymentTerm = '50/50';
-        } else if (p1 == 30 && p2 == 70) {
-          _paymentTerm = '30/70';
-        } else {
-          _paymentTerm = 'Custom';
-          _m1PercentCtrl.text = '$p1';
-          _m2PercentCtrl.text = '$p2';
-        }
-      } else {
-        _paymentTerm = 'Pay at once';
-      }
+      _paymentTermsController.text = q.paymentTerms ?? '';
     }
-
-    _m1PercentCtrl.addListener(() => setState(() {}));
-    _m2PercentCtrl.addListener(() => setState(() {}));
   }
 
   String _closestValidFor(int days) {
@@ -326,8 +259,7 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
       item.dispose();
     }
     _noteController.dispose();
-    _m1PercentCtrl.dispose();
-    _m2PercentCtrl.dispose();
+    _paymentTermsController.dispose();
     super.dispose();
   }
 
@@ -596,245 +528,40 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
     );
   }
 
-  Widget _buildPaymentTermSelector() {
-    final terms = ['Pay at once', '50/50', '30/70', 'Custom'];
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: terms.map((term) {
-          final isActive = _paymentTerm == term;
-          return GestureDetector(
-            onTap: () => setState(() => _paymentTerm = term),
-            child: Container(
-              margin: const EdgeInsets.only(right: 8),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: isActive ? AppColors.primary : context.c.border,
-                  width: 1.5,
-                ),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Text(
-                _paymentTermLabel(term),
-                style: GoogleFonts.urbanist(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color:
-                      isActive ? AppColors.primary : context.c.textSecondary,
-                ),
-              ),
-            ),
-          );
-        }).toList(),
+  Widget _buildPaymentTermsField() {
+    final t = AppLocalizations.of(context);
+    return TextField(
+      controller: _paymentTermsController,
+      maxLines: 3,
+      keyboardType: TextInputType.multiline,
+      style: GoogleFonts.urbanist(
+        fontSize: 15,
+        color: context.c.textPrimary,
+      ),
+      decoration: InputDecoration(
+        hintText: t.cqPaymentTermsHint,
+        hintStyle: GoogleFonts.urbanist(
+          fontSize: 15,
+          color: context.c.textHint,
+        ),
+        filled: true,
+        fillColor: context.c.surfaceElevated,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+        ),
       ),
     );
-  }
-
-  Widget _buildMilestoneCard({
-    required int milestoneNumber,
-    required int percent,
-    required String dueLabel,
-    bool editable = false,
-    TextEditingController? percentCtrl,
-  }) {
-    final amount = (_subtotal * percent / 100).round();
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: context.c.surface,
-        border: Border.all(color: context.c.border),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppLocalizations.of(context).cqMilestone(milestoneNumber),
-            style: GoogleFonts.urbanist(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: context.c.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              if (editable && percentCtrl != null) ...[
-                SizedBox(
-                  width: 60,
-                  child: TextField(
-                    controller: percentCtrl,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.urbanist(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: context.c.textPrimary,
-                    ),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: context.c.surfaceElevated,
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide.none,
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(
-                            color: AppColors.primary, width: 1.5),
-                      ),
-                    ),
-                  ),
-                ),
-              ] else ...[
-                Container(
-                  width: 60,
-                  height: 36,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: context.c.surfaceElevated,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    '$percent',
-                    style: GoogleFonts.urbanist(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: context.c.textPrimary,
-                    ),
-                  ),
-                ),
-              ],
-              const SizedBox(width: 6),
-              Text(
-                '%',
-                style: GoogleFonts.urbanist(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
-                ),
-              ),
-              const Spacer(),
-              Text(
-                Formatters.formatCurrency(
-                  editable && percentCtrl != null
-                      ? (_subtotal *
-                              (int.tryParse(percentCtrl.text) ?? 0) /
-                              100)
-                          .round()
-                      : amount,
-                ),
-                style: GoogleFonts.urbanist(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              const Icon(Icons.calendar_today_outlined,
-                  color: AppColors.primary, size: 16),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  dueLabel,
-                  style: GoogleFonts.urbanist(
-                    fontSize: 12,
-                    color: context.c.textSecondary,
-                  ),
-                ),
-              ),
-              Text(
-                Formatters.formatCurrency(
-                  editable && percentCtrl != null
-                      ? (_subtotal *
-                              (int.tryParse(percentCtrl.text) ?? 0) /
-                              100)
-                          .round()
-                      : amount,
-                ),
-                style: GoogleFonts.urbanist(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: context.c.textPrimary,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  List<Widget> _buildMilestoneCards() {
-    switch (_paymentTerm) {
-      case '50/50':
-        return [
-          _buildMilestoneCard(
-            milestoneNumber: 1,
-            percent: 50,
-            dueLabel: AppLocalizations.of(context).cqDueOnConfirmation,
-          ),
-          _buildMilestoneCard(
-            milestoneNumber: 2,
-            percent: 50,
-            dueLabel: AppLocalizations.of(context).cqAfterEvent,
-          ),
-        ];
-      case '30/70':
-        return [
-          _buildMilestoneCard(
-            milestoneNumber: 1,
-            percent: 30,
-            dueLabel: AppLocalizations.of(context).cqDueOnConfirmation,
-          ),
-          _buildMilestoneCard(
-            milestoneNumber: 2,
-            percent: 70,
-            dueLabel: AppLocalizations.of(context).cqAfterEvent,
-          ),
-        ];
-      case 'Custom':
-        return [
-          _buildMilestoneCard(
-            milestoneNumber: 1,
-            percent: int.tryParse(_m1PercentCtrl.text) ?? 50,
-            dueLabel: AppLocalizations.of(context).cqDueOnConfirmation,
-            editable: true,
-            percentCtrl: _m1PercentCtrl,
-          ),
-          _buildMilestoneCard(
-            milestoneNumber: 2,
-            percent: int.tryParse(_m2PercentCtrl.text) ?? 50,
-            dueLabel: AppLocalizations.of(context).cqAfterEvent,
-            editable: true,
-            percentCtrl: _m2PercentCtrl,
-          ),
-        ];
-      // 'Pay at once'
-      default:
-        return [
-          _buildMilestoneCard(
-            milestoneNumber: 1,
-            percent: 100,
-            dueLabel: AppLocalizations.of(context).cqDueOnConfirmation,
-          ),
-        ];
-    }
   }
 
   @override
@@ -859,12 +586,10 @@ class _CreateQuoteScreenState extends State<CreateQuoteScreen> {
             _buildSubtotalRow(),
             const SizedBox(height: 28),
 
-            // Payment Terms
+            // Payment Terms (optional free text — paid directly, off-platform)
             _buildSectionTitle(t.cqSetPaymentTerms),
             const SizedBox(height: 12),
-            _buildPaymentTermSelector(),
-            const SizedBox(height: 16),
-            ..._buildMilestoneCards(),
+            _buildPaymentTermsField(),
             const SizedBox(height: 28),
 
             // Note to client

@@ -704,7 +704,8 @@
     }
   },
   "cqLineItems": "Line Items",
-  "cqSetPaymentTerms": "Set your Payment Terms",
+  "cqSetPaymentTerms": "Payment Terms (optional)",
+  "cqPaymentTermsHint": "e.g. 50% deposit, balance on delivery — paid directly",
   "cqNoteToClient": "Note to client",
   "cqNoteHint": "Short description of the product",
   "cqSending": "Sending…",
@@ -1028,7 +1029,7 @@
   "supportCallHours": "Available Mon - Fri, 9am - 5pm",
   "supportFaqQ1": "How do I create a listing?",
   "supportFaqQ2": "How do I manage bookings?",
-  "supportFaqQ3": "How does escrow payment work?",
+  "supportFaqQ3": "How do clients pay for my services?",
   "supportFaqQ4": "How do I withdraw my earnings?",
   "supportFaqQ5": "What fees does Planovar charge?",
   "supportFaqQ6": "How do I verify my account?",

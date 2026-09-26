@@ -257,11 +257,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onTap: () => context.push(AppRoutes.reviews),
               ),
               _MenuItem(
-                asset: 'assets/icons/hugeicons_bank.svg',
-                label: t.profileLinkedBanks,
-                onTap: () => context.push(AppRoutes.bankDetails),
-              ),
-              _MenuItem(
                 asset: 'assets/icons/gallery.svg',
                 label: t.profileGallery,
                 onTap: () => context.push(AppRoutes.gallery),

@@ -23,7 +23,6 @@ class OrderDetailScreen extends StatefulWidget {
 
 class _OrderDetailScreenState extends State<OrderDetailScreen> {
   int _selectedTab = 0;
-  bool _paymentConfirmed = false;
   bool _serviceDelivered = false;
   bool _acting = false;
 
@@ -53,93 +52,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   }
 
   // ─── Dialogs ────────────────────────────────────────────────────────────────
-
-  void _showConfirmPaymentDialog() {
-    showDialog<void>(
-      context: context,
-      barrierDismissible: true,
-      builder: (ctx) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Align(
-                alignment: Alignment.topRight,
-                child: GestureDetector(
-                  onTap: () => Navigator.of(ctx).pop(),
-                  child: Icon(
-                    Icons.close,
-                    color: context.c.textSecondary,
-                    size: 22,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                '⚠️',
-                style: TextStyle(fontSize: 48),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Confirm Payment',
-                style: GoogleFonts.urbanist(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: context.c.textPrimary,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Text(
-                  'Are you sure you have received the payment to your bank account?',
-                  style: GoogleFonts.urbanist(
-                    fontSize: 14,
-                    color: context.c.textSecondary,
-                    height: 1.5,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: _GradientButton(
-                      label: 'Yes, Confirm',
-                      gradient: const LinearGradient(
-                        colors: [AppColors.primary, AppColors.primaryDark],
-                      ),
-                      onTap: () {
-                        setState(() => _paymentConfirmed = true);
-                        Navigator.of(ctx).pop();
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _GradientButton(
-                      label: 'Not Yet',
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFE53935), Color(0xFFC62828)],
-                      ),
-                      onTap: () => Navigator.of(ctx).pop(),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
   void _showServiceDeliveredDialog() {
     showDialog<void>(
@@ -635,36 +547,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               ],
             ),
           ),
-
-          // Payment Received banner
-          if (order.paymentConfirmedAt != null) ...[
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFFE8F5E9),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.check_circle_outline,
-                    color: Colors.green,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Payment Received',
-                    style: GoogleFonts.urbanist(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.green,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
         ],
       ),
     );
@@ -711,23 +593,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             isLast: false,
           ),
 
-          // Step 2: Payment confirmed
+          // Step 2: Event day
           _buildTimelineStep(
             stepNumber: 2,
-            label: 'Payment confirmed',
-            date: order.paymentConfirmedAt ?? order.invoiceAcceptedAt,
-            isCompleted:
-                order.paymentConfirmedAt != null || _paymentConfirmed,
-            chipLabel: (order.paymentConfirmedAt != null || _paymentConfirmed)
-                ? 'Completed'
-                : 'Pending',
-            actionWidget: _buildStep2Action(order),
-            isLast: false,
-          ),
-
-          // Step 3: Event day
-          _buildTimelineStep(
-            stepNumber: 3,
             label: 'Event day',
             date: order.eventDate,
             isCompleted:
@@ -740,9 +608,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             isLast: false,
           ),
 
-          // Step 4: Review
+          // Step 3: Review
           _buildTimelineStep(
-            stepNumber: 4,
+            stepNumber: 3,
             label: 'Review',
             date: order.reviewedAt,
             isCompleted: order.reviewedAt != null,
@@ -755,25 +623,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     );
   }
 
-  Widget _buildStep2Action(OrderModel order) {
-    if (order.paymentConfirmedAt != null || _paymentConfirmed) {
-      return _greenBanner('Payment received');
-    } else if (order.invoiceAcceptedAt != null) {
-      return _GradientButton(
-        label: 'Confirm Payment',
-        gradient: const LinearGradient(
-          colors: [AppColors.primary, AppColors.primaryDark],
-        ),
-        onTap: _showConfirmPaymentDialog,
-      );
-    }
-    return const SizedBox.shrink();
-  }
-
   Widget _buildStep3Action(OrderModel order) {
     if (order.serviceDeliveredAt != null || _serviceDelivered) {
       return _greenBanner('Service Delivered');
-    } else if (_paymentConfirmed || order.paymentConfirmedAt != null) {
+    } else if (order.invoiceAcceptedAt != null) {
       return _GradientButton(
         label: 'Service Delivered',
         gradient: const LinearGradient(

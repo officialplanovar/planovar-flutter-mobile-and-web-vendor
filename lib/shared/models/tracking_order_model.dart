@@ -21,7 +21,6 @@ class TrackingOrderModel extends Equatable {
 
   // ── Pricing ──────────────────────────────────────────────────────────────────
   final double amount;
-  final double platformFee;
   final double deliveryCost;
 
   // ── Delivery ─────────────────────────────────────────────────────────────────
@@ -34,7 +33,6 @@ class TrackingOrderModel extends Equatable {
   // ── Rental-only ──────────────────────────────────────────────────────────────
   final DateTime? pickupTime;
   final DateTime? returnByTime;
-  final double depositAmount;
   final double perDayRate;
   final int rentalDays;
 
@@ -55,7 +53,6 @@ class TrackingOrderModel extends Equatable {
   final DateTime? deliveredAt;
 
   // ── Rental timeline timestamps ────────────────────────────────────────────────
-  final DateTime? paymentConfirmedAt;
   final DateTime? pickupConfirmedAt;
   final DateTime? returnConfirmedAt;
 
@@ -73,7 +70,6 @@ class TrackingOrderModel extends Equatable {
     required this.orderDate,
     required this.status,
     required this.amount,
-    this.platformFee = 0,
     this.deliveryCost = 0,
     this.hasDelivery = false,
     this.deliveryAddress,
@@ -82,7 +78,6 @@ class TrackingOrderModel extends Equatable {
     this.driverPhone,
     this.pickupTime,
     this.returnByTime,
-    this.depositAmount = 0,
     this.perDayRate = 0,
     this.rentalDays = 0,
     required this.orderPlacedAt,
@@ -90,7 +85,6 @@ class TrackingOrderModel extends Equatable {
     this.inProductionAt,
     this.outForDeliveryAt,
     this.deliveredAt,
-    this.paymentConfirmedAt,
     this.pickupConfirmedAt,
     this.returnConfirmedAt,
     this.reviewedAt,
@@ -99,7 +93,7 @@ class TrackingOrderModel extends Equatable {
   // ── Computed helpers ──────────────────────────────────────────────────────────
 
   double get subtotal => amount + deliveryCost;
-  double get total => subtotal + platformFee;
+  double get total => subtotal;
 
   /// Label shown on the list card chip
   String get statusLabel {
@@ -146,7 +140,6 @@ class TrackingOrderModel extends Equatable {
     DateTime? orderDate,
     String? status,
     double? amount,
-    double? platformFee,
     double? deliveryCost,
     bool? hasDelivery,
     String? deliveryAddress,
@@ -155,7 +148,6 @@ class TrackingOrderModel extends Equatable {
     String? driverPhone,
     DateTime? pickupTime,
     DateTime? returnByTime,
-    double? depositAmount,
     double? perDayRate,
     int? rentalDays,
     DateTime? orderPlacedAt,
@@ -163,7 +155,6 @@ class TrackingOrderModel extends Equatable {
     DateTime? inProductionAt,
     DateTime? outForDeliveryAt,
     DateTime? deliveredAt,
-    DateTime? paymentConfirmedAt,
     DateTime? pickupConfirmedAt,
     DateTime? returnConfirmedAt,
     DateTime? reviewedAt,
@@ -179,7 +170,6 @@ class TrackingOrderModel extends Equatable {
       orderDate: orderDate ?? this.orderDate,
       status: status ?? this.status,
       amount: amount ?? this.amount,
-      platformFee: platformFee ?? this.platformFee,
       deliveryCost: deliveryCost ?? this.deliveryCost,
       hasDelivery: hasDelivery ?? this.hasDelivery,
       deliveryAddress: deliveryAddress ?? this.deliveryAddress,
@@ -188,7 +178,6 @@ class TrackingOrderModel extends Equatable {
       driverPhone: driverPhone ?? this.driverPhone,
       pickupTime: pickupTime ?? this.pickupTime,
       returnByTime: returnByTime ?? this.returnByTime,
-      depositAmount: depositAmount ?? this.depositAmount,
       perDayRate: perDayRate ?? this.perDayRate,
       rentalDays: rentalDays ?? this.rentalDays,
       orderPlacedAt: orderPlacedAt ?? this.orderPlacedAt,
@@ -196,7 +185,6 @@ class TrackingOrderModel extends Equatable {
       inProductionAt: inProductionAt ?? this.inProductionAt,
       outForDeliveryAt: outForDeliveryAt ?? this.outForDeliveryAt,
       deliveredAt: deliveredAt ?? this.deliveredAt,
-      paymentConfirmedAt: paymentConfirmedAt ?? this.paymentConfirmedAt,
       pickupConfirmedAt: pickupConfirmedAt ?? this.pickupConfirmedAt,
       returnConfirmedAt: returnConfirmedAt ?? this.returnConfirmedAt,
       reviewedAt: reviewedAt ?? this.reviewedAt,
@@ -213,7 +201,6 @@ class TrackingOrderModel extends Equatable {
         inProductionAt,
         outForDeliveryAt,
         deliveredAt,
-        paymentConfirmedAt,
         pickupConfirmedAt,
         returnConfirmedAt,
         reviewedAt,

@@ -15,7 +15,6 @@ abstract class AppRoutes {
   static const setupLocation = '/setup/location';
   static const setupPlan = '/setup/plan';
   static const setupKyc = '/setup/kyc';
-  static const setupPayout = '/setup/payout'; // legacy, unused under subscription-only
   static const setupSuccess = '/setup/success';
 
   // ─── Main App (Shell routes) ──────────────────────────────────────────────────
@@ -58,9 +57,6 @@ abstract class AppRoutes {
   // ─── Analytics ────────────────────────────────────────────────────────────────
   static const analytics = '/analytics';
 
-  // ─── Payouts ─────────────────────────────────────────────────────────────────
-  static const payouts = '/payouts';
-
   // ─── Notifications ────────────────────────────────────────────────────────────
   static const notifications = '/notifications';
 
@@ -73,7 +69,6 @@ abstract class AppRoutes {
   static const faq = '/profile/faq';
   static const deleteAccount = '/profile/delete-account';
   static const subscriptionPlan = '/profile/plan';
-  static const bankDetails = '/profile/bank-details';
   static const reviews = '/profile/reviews';
   static const gallery = '/profile/gallery';
   static const language = '/profile/language';

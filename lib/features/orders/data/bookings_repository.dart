@@ -157,7 +157,6 @@ class BookingsRepository {
       hasDelivery: delivery == 'DELIVERY',
       deliveryAddress:
           loc is Map ? loc['address'] as String? : null,
-      depositAmount: _num(b['depositAmount']),
       pickupTime: _date(b['pickupAt']),
       returnByTime: _date(b['returnAt']),
       orderPlacedAt: created,

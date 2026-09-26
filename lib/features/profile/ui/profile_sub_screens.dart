@@ -4,13 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../core/services/bank_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../core/theme/theme_cubit.dart';
-import '../../../shared/models/bank_models.dart';
 import '../../../shared/models/subscription_plan_model.dart';
-import '../../../shared/widgets/add_bank_account_sheet.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/network_image_widget.dart';
 import '../../../core/services/upload_service.dart';
@@ -1886,160 +1883,6 @@ class _NotificationSettingsScreenState
           ),
         const SizedBox(height: 8),
       ],
-    );
-  }
-}
-
-// ─── 6. BankDetailsScreen ─────────────────────────────────────────────────────
-
-class BankDetailsScreen extends StatefulWidget {
-  const BankDetailsScreen({super.key});
-
-  @override
-  State<BankDetailsScreen> createState() => _BankDetailsScreenState();
-}
-
-class _BankDetailsScreenState extends State<BankDetailsScreen> {
-  final _service = BankService();
-  BankAccount? _account;
-  bool _loading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  Future<void> _load() async {
-    try {
-      final a = await _service.getMine();
-      if (mounted) setState(() { _account = a; _loading = false; });
-    } catch (_) {
-      if (mounted) setState(() => _loading = false);
-    }
-  }
-
-  void _addOrChange() {
-    showAddBankAccountSheet(
-      context,
-      onSaved: (a) {
-        if (mounted) setState(() => _account = a);
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context);
-    final bottomPad = MediaQuery.of(context).padding.bottom;
-    final a = _account;
-    return Scaffold(
-      backgroundColor: context.c.background,
-      body: Column(
-        children: [
-          _buildGradientAppBar(
-            context,
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(t.psLinkedBankAccount,
-                    style: GoogleFonts.urbanist(
-                        fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white)),
-                Text(t.psWhereClientsPay,
-                    style: GoogleFonts.urbanist(fontSize: 12, color: Colors.white70)),
-              ],
-            ),
-          ),
-          Expanded(
-            child: _loading
-                ? const Center(child: CircularProgressIndicator())
-                : ListView(
-                    padding: EdgeInsets.fromLTRB(20, 20, 20, bottomPad + 20),
-                    children: [
-                      if (a == null) _emptyState(context) else _accountCard(context, a),
-                      const SizedBox(height: 20),
-                      AppButton.primary(
-                        a == null ? t.psAddBankAccount : t.psChangeBankAccount,
-                        onTap: _addOrChange,
-                      ),
-                    ],
-                  ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _emptyState(BuildContext context) {
-    final t = AppLocalizations.of(context);
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: context.c.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: context.c.border),
-      ),
-      child: Column(
-        children: [
-          Icon(Icons.account_balance_rounded, size: 40, color: context.c.textHint),
-          const SizedBox(height: 10),
-          Text(t.psNoBankYet,
-              style: GoogleFonts.urbanist(
-                  fontSize: 15, fontWeight: FontWeight.w700, color: context.c.textPrimary)),
-          const SizedBox(height: 4),
-          Text(t.psNoBankBody,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.urbanist(fontSize: 13, color: context.c.textSecondary)),
-        ],
-      ),
-    );
-  }
-
-  Widget _accountCard(BuildContext context, BankAccount a) {
-    final t = AppLocalizations.of(context);
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: context.c.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: context.c.border),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 46,
-            height: 46,
-            decoration: BoxDecoration(
-                color: context.c.primaryLight, borderRadius: BorderRadius.circular(12)),
-            child: const Icon(Icons.account_balance_rounded, color: AppColors.primary),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(a.bankName ?? t.psBankFallback,
-                    style: GoogleFonts.urbanist(
-                        fontSize: 15, fontWeight: FontWeight.w800, color: context.c.textPrimary)),
-                const SizedBox(height: 2),
-                Text('${a.maskedNumber}  ·  ${a.accountName ?? ''}',
-                    style: GoogleFonts.urbanist(fontSize: 13, color: context.c.textSecondary)),
-                const SizedBox(height: 6),
-                Row(mainAxisSize: MainAxisSize.min, children: [
-                  Icon(a.active ? Icons.check_circle_rounded : Icons.schedule_rounded,
-                      size: 13, color: a.active ? const Color(0xFF047857) : context.c.textHint),
-                  const SizedBox(width: 4),
-                  Text(a.active ? t.psReadyToReceive : t.psSettingUp,
-                      style: GoogleFonts.urbanist(
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.w600,
-                          color: a.active ? const Color(0xFF047857) : context.c.textHint)),
-                ]),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

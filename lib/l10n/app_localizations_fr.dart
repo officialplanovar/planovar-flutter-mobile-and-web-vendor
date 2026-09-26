@@ -1491,7 +1491,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get cqLineItems => 'Articles';
 
   @override
-  String get cqSetPaymentTerms => 'Définissez vos conditions de paiement';
+  String get cqSetPaymentTerms => 'Conditions de paiement (facultatif)';
+
+  @override
+  String get cqPaymentTermsHint =>
+      'ex. 50 % d\'acompte, solde à la livraison — payé directement';
 
   @override
   String get cqNoteToClient => 'Note au client';
@@ -2161,7 +2165,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get supportFaqQ2 => 'Comment gérer les réservations ?';
 
   @override
-  String get supportFaqQ3 => 'Comment fonctionne le paiement en séquestre ?';
+  String get supportFaqQ3 => 'Comment les clients paient-ils mes services ?';
 
   @override
   String get supportFaqQ4 => 'Comment retirer mes revenus ?';

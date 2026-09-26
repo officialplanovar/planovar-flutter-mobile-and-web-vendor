@@ -2,7 +2,7 @@ name: planovar_vendor
 description: "Planovar Vendor — the vendor-side app for the Planovar event marketplace."
 publish_to: 'none'
 
-version: 1.0.0+2
+version: 1.0.0+3
 
 environment:
   sdk: ^3.11.5

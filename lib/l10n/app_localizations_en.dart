@@ -1471,7 +1471,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cqLineItems => 'Line Items';
 
   @override
-  String get cqSetPaymentTerms => 'Set your Payment Terms';
+  String get cqSetPaymentTerms => 'Payment Terms (optional)';
+
+  @override
+  String get cqPaymentTermsHint =>
+      'e.g. 50% deposit, balance on delivery — paid directly';
 
   @override
   String get cqNoteToClient => 'Note to client';
@@ -2130,7 +2134,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get supportFaqQ2 => 'How do I manage bookings?';
 
   @override
-  String get supportFaqQ3 => 'How does escrow payment work?';
+  String get supportFaqQ3 => 'How do clients pay for my services?';
 
   @override
   String get supportFaqQ4 => 'How do I withdraw my earnings?';

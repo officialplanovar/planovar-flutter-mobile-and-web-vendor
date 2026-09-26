@@ -8,11 +8,8 @@ import '../../../shared/widgets/app_icon.dart';
 import '../../../core/services/chat_socket.dart';
 import '../../../core/services/messaging_service.dart';
 import '../../calls/call_screen.dart';
-import '../../../core/services/bank_service.dart';
 import '../../orders/data/bookings_repository.dart';
 import '../../listings/data/listings_repository.dart';
-import '../../../shared/models/bank_models.dart';
-import '../../../shared/widgets/add_bank_account_sheet.dart';
 import 'create_quote_screen.dart';
 import '../data/quotes_repository.dart';
 import '../../../core/utils/formatters.dart';
@@ -48,8 +45,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
   final _scrollController = ScrollController();
   final _textController = TextEditingController();
   bool _hasDraft = false;
-  BankAccount? _bankAccount;
-  bool _bankLoaded = false;
 
   @override
   void initState() {
@@ -57,7 +52,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
     final auth = context.read<AuthBloc>().state;
     if (auth is AuthAuthenticated) _currentUserId = auth.user.id;
     _resolveMyId();
-    _loadBank();
     _load();
     _connectSocket();
     _textController.addListener(() {
@@ -207,9 +201,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
             ),
           ),
 
-          // ── Bank-setup warning (a quote was accepted, no account yet) ────
-          if (_needsBankAccount) _buildBankBanner(),
-
           // ── Contextual vendor action (quote / fulfilment) ────────────────
           if (conv.type != 'group') _buildBottomAction(conv),
 
@@ -321,58 +312,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
       }
     }
     return null;
-  }
-
-  Future<void> _loadBank() async {
-    try {
-      final a = await BankService().getMine();
-      if (mounted) setState(() { _bankAccount = a; _bankLoaded = true; });
-    } catch (_) {
-      if (mounted) setState(() => _bankLoaded = true);
-    }
-  }
-
-  bool get _needsBankAccount =>
-      _bankLoaded &&
-      _bankAccount == null &&
-      _messages.any(
-          (m) => m.typeLower == 'invoice' || m.typeLower == 'quote_accepted');
-
-  Widget _buildBankBanner() {
-    final t = AppLocalizations.of(context);
-    return Container(
-      color: const Color(0xFFFEF3C7),
-      padding: const EdgeInsets.fromLTRB(16, 10, 12, 10),
-      child: Row(
-        children: [
-          const Icon(Icons.account_balance_rounded, size: 20, color: Color(0xFFB45309)),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              t.convBankBanner,
-              style: GoogleFonts.urbanist(
-                  fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF92400E)),
-            ),
-          ),
-          const SizedBox(width: 8),
-          TextButton(
-            onPressed: () => showAddBankAccountSheet(
-              context,
-              onSaved: (a) {
-                if (mounted) setState(() => _bankAccount = a);
-              },
-            ),
-            style: TextButton.styleFrom(
-              backgroundColor: const Color(0xFFB45309),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-            child: Text(t.convAdd, style: GoogleFonts.urbanist(fontWeight: FontWeight.w700)),
-          ),
-        ],
-      ),
-    );
   }
 
   /// A booking that's confirmed but not yet delivered (fulfilment pending).

@@ -2795,8 +2795,14 @@ abstract class AppLocalizations {
   /// No description provided for @cqSetPaymentTerms.
   ///
   /// In en, this message translates to:
-  /// **'Set your Payment Terms'**
+  /// **'Payment Terms (optional)'**
   String get cqSetPaymentTerms;
+
+  /// No description provided for @cqPaymentTermsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 50% deposit, balance on delivery — paid directly'**
+  String get cqPaymentTermsHint;
 
   /// No description provided for @cqNoteToClient.
   ///
@@ -4025,7 +4031,7 @@ abstract class AppLocalizations {
   /// No description provided for @supportFaqQ3.
   ///
   /// In en, this message translates to:
-  /// **'How does escrow payment work?'**
+  /// **'How do clients pay for my services?'**
   String get supportFaqQ3;
 
   /// No description provided for @supportFaqQ4.

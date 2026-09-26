@@ -7,17 +7,6 @@ class QuoteLineItemInput {
   const QuoteLineItemInput({required this.label, required this.amount});
 }
 
-class QuotePaymentTermInput {
-  final String label;
-  final double percentage;
-  final String? dueLabel;
-  const QuotePaymentTermInput({
-    required this.label,
-    required this.percentage,
-    this.dueLabel,
-  });
-}
-
 class QuotesRepository {
   final ApiClient _api;
   QuotesRepository({ApiClient? api}) : _api = api ?? ApiClient();
@@ -29,7 +18,7 @@ class QuotesRepository {
     required String listingId,
     String? eventId,
     required List<QuoteLineItemInput> lineItems,
-    List<QuotePaymentTermInput> paymentTerms = const [],
+    String? paymentTerms,
     int validForDays = 7,
     String? description,
     String? notes,
@@ -41,15 +30,8 @@ class QuotesRepository {
       'lineItems': [
         for (final li in lineItems) {'label': li.label, 'amount': li.amount},
       ],
-      if (paymentTerms.isNotEmpty)
-        'paymentTerms': [
-          for (final t in paymentTerms)
-            {
-              'label': t.label,
-              'percentage': t.percentage,
-              if (t.dueLabel != null) 'dueLabel': t.dueLabel,
-            },
-        ],
+      if (paymentTerms != null && paymentTerms.isNotEmpty)
+        'paymentTerms': paymentTerms,
       'validForDays': validForDays,
       if (description != null && description.isNotEmpty)
         'description': description,
@@ -68,7 +50,7 @@ class QuotesRepository {
   Future<void> reviseQuote({
     required String quoteId,
     required List<QuoteLineItemInput> lineItems,
-    List<QuotePaymentTermInput> paymentTerms = const [],
+    String? paymentTerms,
     DateTime? validUntil,
     String? description,
     String? notes,
@@ -77,15 +59,8 @@ class QuotesRepository {
       'lineItems': [
         for (final li in lineItems) {'label': li.label, 'amount': li.amount},
       ],
-      if (paymentTerms.isNotEmpty)
-        'paymentTerms': [
-          for (final t in paymentTerms)
-            {
-              'label': t.label,
-              'percentage': t.percentage,
-              if (t.dueLabel != null) 'dueLabel': t.dueLabel,
-            },
-        ],
+      if (paymentTerms != null && paymentTerms.isNotEmpty)
+        'paymentTerms': paymentTerms,
       if (validUntil != null) 'validUntil': validUntil.toUtc().toIso8601String(),
       if (description != null && description.isNotEmpty)
         'description': description,
@@ -109,7 +84,6 @@ class QuotesRepository {
       'bookingId': bookingId,
       'totalAmount': total,
       'validUntil': validUntil.toUtc().toIso8601String(),
-      'paymentStructure': 'FULL_UPFRONT',
       if (notes != null && notes.isNotEmpty) 'notes': notes,
       if (description != null && description.isNotEmpty)
         'description': description,

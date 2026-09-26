@@ -70,13 +70,7 @@ class AppConstants {
   static const String keyIsLoggedIn = 'vendor_isLoggedIn';
   static const String keyThemeMode = 'vendor_theme_mode';
 
-  // Platform fee percentage
-  static const double platformFeeRate = 0.05; // 5%
-
   // Currency
   static const String currencyCode = 'NGN';
   static const String currencySymbol = '₦';
-
-  // Escrow hold period (days)
-  static const int escrowHoldDays = 3;
 }

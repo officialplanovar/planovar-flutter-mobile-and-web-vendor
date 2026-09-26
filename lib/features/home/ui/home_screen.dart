@@ -727,13 +727,6 @@ class _QuickActions extends StatelessWidget {
         iconColor: AppColors.primary,
         onTap: () => context.push(AppRoutes.subscriptionPlan),
       ),
-      _QuickAction(
-        icon: Icons.account_balance_wallet_outlined,
-        label: t.homePayouts,
-        bgColor: const Color(0xFFE6F9F0),
-        iconColor: const Color(0xFF27AE60),
-        onTap: () => context.push(AppRoutes.payouts),
-      ),
     ];
 
     return GridView.count(

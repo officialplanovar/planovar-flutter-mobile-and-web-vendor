@@ -14,7 +14,6 @@ class BookingModel extends Equatable {
   final String status;
   final double totalAmount;
   final DateTime createdAt;
-  final String? escrowType;
 
   const BookingModel({
     required this.id,
@@ -29,7 +28,6 @@ class BookingModel extends Equatable {
     required this.status,
     required this.totalAmount,
     required this.createdAt,
-    this.escrowType,
   });
 
   factory BookingModel.fromJson(Map<String, dynamic> json) {
@@ -46,7 +44,6 @@ class BookingModel extends Equatable {
       status: json['status'] as String? ?? 'PENDING',
       totalAmount: (json['totalAmount'] as num).toDouble(),
       createdAt: DateTime.parse(json['createdAt'] as String),
-      escrowType: json['escrowType'] as String?,
     );
   }
 
@@ -63,7 +60,6 @@ class BookingModel extends Equatable {
         'status': status,
         'totalAmount': totalAmount,
         'createdAt': createdAt.toIso8601String(),
-        'escrowType': escrowType,
       };
 
   BookingModel copyWith({
@@ -79,7 +75,6 @@ class BookingModel extends Equatable {
     String? status,
     double? totalAmount,
     DateTime? createdAt,
-    String? escrowType,
   }) {
     return BookingModel(
       id: id ?? this.id,
@@ -94,7 +89,6 @@ class BookingModel extends Equatable {
       status: status ?? this.status,
       totalAmount: totalAmount ?? this.totalAmount,
       createdAt: createdAt ?? this.createdAt,
-      escrowType: escrowType ?? this.escrowType,
     );
   }
 

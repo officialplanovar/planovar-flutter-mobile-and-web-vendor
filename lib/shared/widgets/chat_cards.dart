@@ -164,6 +164,11 @@ class QuoteCard extends StatelessWidget {
           Text(_money(quote.amount),
               style: GoogleFonts.urbanist(fontSize: 17, fontWeight: FontWeight.w800, color: amber)),
         ]),
+        if (quote.paymentTerms != null && quote.paymentTerms!.trim().isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Text(quote.paymentTerms!.trim(),
+              style: GoogleFonts.urbanist(fontSize: 12.5, color: context.c.textSecondary)),
+        ],
         if (canRevise) ...[
           const SizedBox(height: 10),
           SizedBox(
@@ -214,25 +219,10 @@ class InvoiceCard extends StatelessWidget {
           Text(_money(invoice.total),
               style: GoogleFonts.urbanist(fontSize: 17, fontWeight: FontWeight.w800, color: green)),
         ]),
-        if (invoice.milestones.isNotEmpty) ...[
-          const SizedBox(height: 10),
-          ...invoice.milestones.map((m) => Padding(
-                padding: const EdgeInsets.only(top: 6),
-                child: Row(children: [
-                  Icon(m.isPaid ? Icons.check_circle_rounded : Icons.schedule_rounded,
-                      size: 15, color: m.isPaid ? green : context.c.textHint),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text('${m.label}${m.dueLabel != null ? ' · ${m.dueLabel}' : ''}',
-                        style: GoogleFonts.urbanist(fontSize: 12, color: context.c.textSecondary)),
-                  ),
-                  Text(_money(m.amount),
-                      style: GoogleFonts.urbanist(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w700,
-                          color: m.isPaid ? green : context.c.textPrimary)),
-                ]),
-              )),
+        if (invoice.paymentTerms != null && invoice.paymentTerms!.trim().isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Text(invoice.paymentTerms!.trim(),
+              style: GoogleFonts.urbanist(fontSize: 12.5, color: context.c.textSecondary)),
         ],
       ]),
     );
