@@ -17,6 +17,7 @@ class VendorRepository {
     Map<String, dynamic>? location,
     int? serviceRadiusKm,
     List<String>? tags,
+    List<String>? eventTypes,
   }) async {
     final res = await _api.dio.post('/vendors/onboard', data: {
       'businessName': businessName,
@@ -28,6 +29,7 @@ class VendorRepository {
       if (location != null) 'location': location,
       if (serviceRadiusKm != null) 'serviceRadiusKm': serviceRadiusKm,
       if (tags != null) 'tags': tags,
+      if (eventTypes != null) 'eventTypes': eventTypes,
     });
     _ensureOk(res);
     return VendorModel.fromJson(Map<String, dynamic>.from(res.data as Map));

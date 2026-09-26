@@ -57,6 +57,7 @@ class SetupCubit extends Cubit<SetupState> {
   String vendorType = 'BOTH';
   String? description;
   List<String> tags = const [];
+  List<String> eventTypes = const []; // WEDDING | FUNERAL | BIRTHDAY | CORPORATE | SOCIAL_PARTY
   String? logoUrl;
   String country = '';
   String? city;
@@ -76,11 +77,13 @@ class SetupCubit extends Cubit<SetupState> {
   void setProfile({
     String? description,
     required Set<String> tags,
+    Set<String>? eventTypes,
     String? logoUrl,
     String? proofUrl,
   }) {
     this.description = description;
     this.tags = tags.toList();
+    if (eventTypes != null) this.eventTypes = eventTypes.toList();
     this.logoUrl = logoUrl;
     // "Proof of ownership" is the business-registration document. It flows to
     // the KYC submission alongside the government ID from the dedicated KYC step.
@@ -126,6 +129,7 @@ class SetupCubit extends Cubit<SetupState> {
           if (city != null) 'city': city,
         },
         tags: tags,
+        eventTypes: eventTypes,
       );
 
       String? checkoutUrl;

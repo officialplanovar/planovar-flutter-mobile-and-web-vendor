@@ -21,6 +21,34 @@ import '../../subscription/data/subscription_repository.dart';
 import '../bloc/setup_cubit.dart';
 import 'payment_checkout_screen.dart';
 
+/// Event types a vendor can declare it serves. Value sent is the API ENUM; the
+/// UI shows the localized label. Empty selection = serves all event types.
+const _kEventTypeValues = <String>[
+  'WEDDING',
+  'FUNERAL',
+  'BIRTHDAY',
+  'CORPORATE',
+  'SOCIAL_PARTY',
+];
+
+String _eventTypeLabel(BuildContext context, String value) {
+  final t = AppLocalizations.of(context);
+  switch (value) {
+    case 'WEDDING':
+      return t.eventTypeWedding;
+    case 'FUNERAL':
+      return t.eventTypeFuneral;
+    case 'BIRTHDAY':
+      return t.eventTypeBirthday;
+    case 'CORPORATE':
+      return t.eventTypeCorporate;
+    case 'SOCIAL_PARTY':
+      return t.eventTypeSocialParty;
+    default:
+      return value;
+  }
+}
+
 // ─── Shared Setup Widgets ────────────────────────────────────────────────────
 
 class _SetupProgressBar extends StatelessWidget {
@@ -248,6 +276,7 @@ class SetupProfileScreen extends StatefulWidget {
 class _SetupProfileScreenState extends State<SetupProfileScreen> {
   final _descCtrl = TextEditingController();
   final Set<String> _selectedTags = {};
+  final Set<String> _selectedEventTypes = {};
   final _uploads = UploadService();
   final _picker = ImagePicker();
 
@@ -656,6 +685,55 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                       }).toList(),
                     ),
                     const SizedBox(height: 24),
+                    Text(
+                      t.eventTypesServedLabel,
+                      style: GoogleFonts.urbanist(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: context.c.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _kEventTypeValues.map((value) {
+                        final isSelected = _selectedEventTypes.contains(value);
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              if (isSelected) {
+                                _selectedEventTypes.remove(value);
+                              } else {
+                                _selectedEventTypes.add(value);
+                              }
+                            });
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 180),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : context.c.surfaceElevated,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              _eventTypeLabel(context, value),
+                              style: GoogleFonts.urbanist(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: isSelected
+                                    ? Colors.white
+                                    : context.c.textSecondary,
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 24),
                   ],
                 ),
               ),
@@ -669,6 +747,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                   context.read<SetupCubit>().setProfile(
                         description: desc.isEmpty ? null : desc,
                         tags: _selectedTags,
+                        eventTypes: _selectedEventTypes,
                         logoUrl: _logoUrl,
                         proofUrl: _proofUrl,
                       );

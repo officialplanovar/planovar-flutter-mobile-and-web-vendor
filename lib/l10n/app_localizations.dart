@@ -3220,6 +3220,42 @@ abstract class AppLocalizations {
   /// **'Category Tags'**
   String get psCategoryTags;
 
+  /// No description provided for @eventTypesServedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Event types you serve'**
+  String get eventTypesServedLabel;
+
+  /// No description provided for @eventTypeWedding.
+  ///
+  /// In en, this message translates to:
+  /// **'Wedding'**
+  String get eventTypeWedding;
+
+  /// No description provided for @eventTypeFuneral.
+  ///
+  /// In en, this message translates to:
+  /// **'Funeral'**
+  String get eventTypeFuneral;
+
+  /// No description provided for @eventTypeBirthday.
+  ///
+  /// In en, this message translates to:
+  /// **'Birthday'**
+  String get eventTypeBirthday;
+
+  /// No description provided for @eventTypeCorporate.
+  ///
+  /// In en, this message translates to:
+  /// **'Corporate'**
+  String get eventTypeCorporate;
+
+  /// No description provided for @eventTypeSocialParty.
+  ///
+  /// In en, this message translates to:
+  /// **'Social party'**
+  String get eventTypeSocialParty;
+
   /// No description provided for @psEditProfile.
   ///
   /// In en, this message translates to:

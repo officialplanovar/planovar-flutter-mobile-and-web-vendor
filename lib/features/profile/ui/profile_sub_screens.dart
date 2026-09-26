@@ -167,6 +167,34 @@ String _monthLabel(BuildContext context, String english) {
   }
 }
 
+/// Event types a vendor can declare it serves. The stored/sent value is the API
+/// ENUM; the UI shows the localized label. Empty selection = serves all types.
+const _kEventTypeValues = <String>[
+  'WEDDING',
+  'FUNERAL',
+  'BIRTHDAY',
+  'CORPORATE',
+  'SOCIAL_PARTY',
+];
+
+String _eventTypeLabel(BuildContext context, String value) {
+  final t = AppLocalizations.of(context);
+  switch (value) {
+    case 'WEDDING':
+      return t.eventTypeWedding;
+    case 'FUNERAL':
+      return t.eventTypeFuneral;
+    case 'BIRTHDAY':
+      return t.eventTypeBirthday;
+    case 'CORPORATE':
+      return t.eventTypeCorporate;
+    case 'SOCIAL_PARTY':
+      return t.eventTypeSocialParty;
+    default:
+      return value;
+  }
+}
+
 // ─── 1. EditProfileScreen ─────────────────────────────────────────────────────
 
 class EditProfileScreen extends StatefulWidget {
@@ -197,6 +225,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   String _businessType = 'Licensed Business';
   final _descCtrl = TextEditingController();
   List<String> _selectedTags = [];
+  List<String> _selectedEventTypes = [];
 
   @override
   void initState() {
@@ -227,6 +256,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _businessNameCtrl.text = v.businessName;
         _descCtrl.text = v.description ?? '';
         _selectedTags = List<String>.from(v.tags);
+        _selectedEventTypes = List<String>.from(v.eventTypes);
         _logoUrl = v.logoUrl;
         _coverUrl = v.coverUrl;
       });
@@ -802,6 +832,55 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               );
             }).toList(),
           ),
+          const SizedBox(height: 16),
+          _fieldLabel(context, t.eventTypesServedLabel),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _kEventTypeValues.map((value) {
+              final selected = _selectedEventTypes.contains(value);
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    if (selected) {
+                      _selectedEventTypes.remove(value);
+                    } else {
+                      _selectedEventTypes.add(value);
+                    }
+                  });
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: selected ? AppColors.primary : context.c.surface,
+                    border: Border.all(
+                      color: selected ? AppColors.primary : context.c.border,
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        selected ? Icons.check : Icons.add,
+                        size: 14,
+                        color: selected ? Colors.white : context.c.textPrimary,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        _eventTypeLabel(context, value),
+                        style: GoogleFonts.urbanist(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: selected ? Colors.white : context.c.textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
           const SizedBox(height: 32),
           _gradientButton(
             context: context,
@@ -812,6 +891,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 if (name.length >= 2) 'businessName': name,
                 'description': _descCtrl.text.trim(),
                 'tags': _selectedTags,
+                'eventTypes': _selectedEventTypes,
                 if (_logoUrl != null) 'logoUrl': _logoUrl,
                 if (_coverUrl != null) 'coverUrl': _coverUrl,
               });

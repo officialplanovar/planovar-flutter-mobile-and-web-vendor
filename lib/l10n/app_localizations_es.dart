@@ -1708,6 +1708,24 @@ class AppLocalizationsEs extends AppLocalizations {
   String get psCategoryTags => 'Etiquetas de categoría';
 
   @override
+  String get eventTypesServedLabel => 'Tipos de eventos que ofreces';
+
+  @override
+  String get eventTypeWedding => 'Boda';
+
+  @override
+  String get eventTypeFuneral => 'Funeral';
+
+  @override
+  String get eventTypeBirthday => 'Cumpleaños';
+
+  @override
+  String get eventTypeCorporate => 'Corporativo';
+
+  @override
+  String get eventTypeSocialParty => 'Fiesta social';
+
+  @override
   String get psEditProfile => 'Edita tu perfil';
 
   @override

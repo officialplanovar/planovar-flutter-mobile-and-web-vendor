@@ -10,6 +10,9 @@ class VendorModel extends Equatable {
   final String? phone;
   final String? email;
   final List<String> tags;
+  /// Event types the vendor serves (enum values: WEDDING, FUNERAL, BIRTHDAY,
+  /// CORPORATE, SOCIAL_PARTY, OTHER). Empty = serves all event types.
+  final List<String> eventTypes;
   final List<String> portfolioUrls;
   final double ratingAvg;
   final int reviewCount;
@@ -28,6 +31,7 @@ class VendorModel extends Equatable {
     this.phone,
     this.email,
     this.tags = const [],
+    this.eventTypes = const [],
     this.portfolioUrls = const [],
     required this.ratingAvg,
     required this.reviewCount,
@@ -47,6 +51,7 @@ class VendorModel extends Equatable {
       phone: json['phone'] as String?,
       email: json['email'] as String?,
       tags: List<String>.from(json['tags'] as List? ?? []),
+      eventTypes: List<String>.from(json['eventTypes'] as List? ?? []),
       portfolioUrls: List<String>.from(json['portfolioUrls'] as List? ?? []),
       // Prisma Decimal serializes as a String over JSON (e.g. "0") — tolerate both.
       ratingAvg: _toDouble(json['ratingAvg']),
@@ -80,6 +85,7 @@ class VendorModel extends Equatable {
         'phone': phone,
         'email': email,
         'tags': tags,
+        'eventTypes': eventTypes,
         'portfolioUrls': portfolioUrls,
         'ratingAvg': ratingAvg,
         'reviewCount': reviewCount,
@@ -98,6 +104,7 @@ class VendorModel extends Equatable {
     String? phone,
     String? email,
     List<String>? tags,
+    List<String>? eventTypes,
     List<String>? portfolioUrls,
     double? ratingAvg,
     int? reviewCount,
@@ -115,6 +122,7 @@ class VendorModel extends Equatable {
       phone: phone ?? this.phone,
       email: email ?? this.email,
       tags: tags ?? this.tags,
+      eventTypes: eventTypes ?? this.eventTypes,
       portfolioUrls: portfolioUrls ?? this.portfolioUrls,
       ratingAvg: ratingAvg ?? this.ratingAvg,
       reviewCount: reviewCount ?? this.reviewCount,
