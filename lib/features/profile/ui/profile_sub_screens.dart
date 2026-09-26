@@ -1391,7 +1391,22 @@ class ThemeSettingsScreen extends StatefulWidget {
 }
 
 class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
-  String _selectedTheme = 'light';
+  late String _selectedTheme;
+
+  @override
+  void initState() {
+    super.initState();
+    // Seed the selector from the theme that's actually active, so it reflects
+    // the current choice instead of always showing "Light".
+    switch (context.read<ThemeCubit>().state) {
+      case ThemeMode.dark:
+        _selectedTheme = 'dark';
+      case ThemeMode.system:
+        _selectedTheme = 'system';
+      case ThemeMode.light:
+        _selectedTheme = 'light';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

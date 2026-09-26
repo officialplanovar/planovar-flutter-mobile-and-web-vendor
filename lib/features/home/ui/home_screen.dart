@@ -220,7 +220,7 @@ class _GradientHeader extends StatelessWidget {
                   backgroundColor: Colors.white24,
                   child: ClipOval(
                     child: AppNetworkImage(
-                      url: user?.image,
+                      url: vendor.logoUrl ?? user?.image,
                       width: 56,
                       height: 56,
                       fit: BoxFit.cover,
